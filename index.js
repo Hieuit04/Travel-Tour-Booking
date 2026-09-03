@@ -5,18 +5,13 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 require('dotenv').config()
+const Tour = require('./models/tour.model');
 const app = express();
 const port = 3000;
 
 mongoose.connect(process.env.DATABASE);
 
-const schema = new mongoose.Schema({
-  name: String,
-  vehicle: String
-});
-const Tour = mongoose.model('Tour', schema,'tours');
-
-// Cấu himhf thư mục mặc định chứa giao diện 
+// Cấu hình thư mục mặc định chứa giao diện 
 app.set('views', path.join(__dirname, 'views'));
 // Cấu hình sử dụng Pug làm engine để render giao diện
 app.set('view engine', 'pug');
