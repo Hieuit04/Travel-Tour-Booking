@@ -7,6 +7,9 @@ const path = require('path');
 app.set('views', path.join(__dirname, 'views'));
 // Cấu hình sử dụng Pug làm engine để render giao diện
 app.set('view engine', 'pug');
+// Cấu hình thư mục chứa các file tĩnh 
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.get('/', (req, res) => {
   res.render('client/pages/home.pug', {
