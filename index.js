@@ -3,14 +3,14 @@ dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const express = require('express');
 const path = require('path');
-const mongoose = require('mongoose');
-require('dotenv').config()
+require('dotenv').config();
+const connectDB = require('./configs/database.config');
 const clientRouter = require('./routes/client/index.route');
 
 const app = express();
 const port = 3000;
 
-mongoose.connect(process.env.DATABASE);
+connectDB(); // Kết nối đến cơ sở dữ liệu MongoDB
 
 // Cấu hình thư mục mặc định chứa giao diện 
 app.set('views', path.join(__dirname, 'views'));
