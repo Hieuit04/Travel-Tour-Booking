@@ -872,6 +872,20 @@ button {
   /* min-width: 0;   */
 }
 
+.section-3 .swiperSection3 {
+  height: auto;
+  padding-bottom: 28px;
+}
+
+.section-3 .swiperSection3 .swiper-wrapper {
+  height: auto;
+}
+
+.section-3 .swiperSection3 .swiper-pagination {
+  
+  margin-top: 20px;
+}
+
 .section-3 .inner-item img {
   width: 100%;
   aspect-ratio: 382/269;
@@ -2713,7 +2727,7 @@ button {
   position: static;
 }
 .swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal, .swiper-pagination-custom, .swiper-pagination-fraction{
-  bottom: var(--swiper-pagination-bottom, -20px);
+  bottom: var(--swiper-pagination-bottom, -20px) ;
 }
 .swiper-pagination-bullet-active {
     background: var(--swiper-pagination-color, var(--color-main));
