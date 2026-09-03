@@ -1,7 +1,20 @@
+const dns = require('node:dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 const express = require('express');
+const path = require('path');
+const mongoose = require('mongoose');
+require('dotenv').config()
 const app = express();
 const port = 3000;
-const path = require('path');
+
+mongoose.connect(process.env.DATABASE);
+
+const schema = new mongoose.Schema({
+  name: String,
+  vehicle: String
+});
+const Tour = mongoose.model('Tour', schema,'tours');
 
 // Cấu himhf thư mục mặc định chứa giao diện 
 app.set('views', path.join(__dirname, 'views'));
@@ -17,9 +30,12 @@ app.get('/', (req, res) => {
   });
 });
 
-app.get('/tour', (req, res) => {
-  res.render('client/pages/tour.pug', {
+app.get('/tour', async (req, res) => {
+  const tourList = await Tour.find({});
+  console.log(tourList);
+  res.render('client/pages/tour', {
     pageTitle: 'Danh sách tour',
+    tourList: tourList
   });
 });
 
