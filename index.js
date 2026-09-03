@@ -5,8 +5,8 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 require('dotenv').config()
-const tourController = require('./controllers/client/tour.controller');
-const homeController = require('./controllers/client/home.controller');
+const clientRouter = require('./routes/client/index.route');
+
 const app = express();
 const port = 3000;
 
@@ -20,9 +20,7 @@ app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.get('/', homeController.home);
-
-app.get('/tour', tourController.list);
+app.use('/', clientRouter)
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
