@@ -1,8 +1,6 @@
 extends ../layouts/default.pug
 include ../mixins/checkbox.pug
 
-block title
-  title Quản lý người dùng
 
 block main
   h1.box-title Quản lý người dùng
@@ -61,7 +59,7 @@ block main
             +checkbox-30("", "")
           td Lê Văn A
           td
-            img(src="assets/images/demo-tour-1.png" class="inner-avatar")
+            img(src="/admin/assets/images/demo-tour-1.png" class="inner-avatar")
           td levana@gmail.com
           td 0123456789
           td Số 123, đường ABC,...
