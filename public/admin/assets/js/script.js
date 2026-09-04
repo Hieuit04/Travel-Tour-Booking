@@ -19,9 +19,21 @@ initTinyMCE()
 // Sider
 const sider = document.querySelector('.sider')
 if (sider) {
+  // Đóng mở
   const buttonMenu = document.querySelector('.header .inner-button-menu')
   buttonMenu.addEventListener('click', () => {
     sider.classList.toggle('show')
+  })
+  // Active menu
+  const listTagA = sider.querySelectorAll('a')
+  const pathname = window.location.pathname;
+  const pathNameSplit = pathname.split('/')
+  listTagA.forEach((tagA) => {
+    const href = tagA.getAttribute('href');
+    const hrefSplit= href.split('/')
+    if (hrefSplit[2]===pathNameSplit[2]) {
+      tagA.classList.add('active')
+    }
   })
 }
 // End Sider
@@ -571,4 +583,6 @@ if (changePasswordForm) {
 }
 
 // End validate profile change password form
+
+
        

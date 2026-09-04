@@ -20,5 +20,12 @@ router.use('/contact', contactRouters);
 router.use('/setting', settingRouters);
 router.use('/profile', profileRouters);
 
+
+router.use((req, res) => {
+  res.render('admin/pages/error-404', {
+    pageTitle: 'Trang không tồn tại',
+  });
+});
+
 module.exports = router;
 

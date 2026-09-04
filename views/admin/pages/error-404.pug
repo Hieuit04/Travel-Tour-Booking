@@ -1,12 +1,9 @@
 extends ../layouts/default.pug
 
-block title
-  title 404 Not Found
-
 block main
   //- Section 10
   .section-10
-    img.inner-image(src="assets/images/404.svg")
+    img.inner-image(src="/admin/assets/images/404.svg")
     .inner-text Trang này không tồn tại...
-    a.inner-link(href="#") Trở về trang tổng quan
+    a.inner-link(href=`/${pathAdmin}/dashboard`) Trở về trang tổng quan
   //- End Section 10
