@@ -3,10 +3,12 @@ const router = express.Router();
 const accountRouters = require('./account.route');
 const dashboardRouters = require('./dashboard.route');
 const categoryRouters = require('./category.route');
+const tourRouters = require('./tour.route');
 
 router.use('/account', accountRouters);
 router.use('/dashboard', dashboardRouters);
 router.use('/category', categoryRouters);
+router.use('/tour', tourRouters);
 
 module.exports = router;
 
