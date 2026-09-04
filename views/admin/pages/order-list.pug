@@ -1,8 +1,6 @@
 extends ../layouts/default.pug
 include ../mixins/checkbox.pug
 
-block title
-  title Quản lý đơn hàng
 
 block main
   h1.box-title Quản lý đơn hàng
@@ -67,7 +65,7 @@ block main
           td
             .tour-list
               .inner-item
-                img(src="assets/images/demo-tour-1.png")
+                img(src="/admin/assets/images/demo-tour-1.png")
                 .inner-content
                   .inner-title Tour Hạ Long
                   .inner-desc
@@ -75,7 +73,7 @@ block main
                     div Trẻ em: 2 x 1.300.000đ
                     div Em bé: 2 x 1.000.000đ
               .inner-item
-                img(src="assets/images/demo-tour-1.png")
+                img(src="/admin/assets/images/demo-tour-1.png")
                 .inner-content
                   .inner-title Tour Hạ Long
                   .inner-desc
@@ -96,7 +94,7 @@ block main
           td 16:20 - 01/01/2024
           td
             .inner-action
-              a(href="#") <i class="fa-regular fa-pen-to-square"></i>
+              a(href=`/${pathAdmin}/order/edit`) <i class="fa-regular fa-pen-to-square"></i>
               a(href="#" class="inner-remove") <i class="fa-regular fa-trash-can"></i>
   //- End Section 6
 

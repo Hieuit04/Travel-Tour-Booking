@@ -1,8 +1,5 @@
 extends ../layouts/default.pug
 
-block title
-  title Đơn hàng: OD000001
-
 block main
   h1.box-title Đơn hàng: OD000001
 
@@ -43,7 +40,7 @@ block main
         label(for="") Danh sách tour
         .tour-list.inner-large
           .inner-item
-            img(src="assets/images/demo-tour-1.png")
+            img(src="/admin/assets/images/demo-tour-1.png")
             .inner-content
               .inner-title Tour Hạ Long
               .inner-desc
@@ -53,7 +50,7 @@ block main
                 div Ngày khởi hành: 20/10/2024
                 div Khởi hành tại: Hà Nội
           .inner-item
-            img(src="assets/images/demo-tour-1.png")
+            img(src="/admin/assets/images/demo-tour-1.png")
             .inner-content
               .inner-title Tour Hạ Long
               .inner-desc
@@ -72,5 +69,5 @@ block main
       .inner-group.inner-two-col.text-center
         button.btn-create(type="submit") Cập nhật
     .inner-link
-      a(href="#") Quay lại danh sách
+      a(href=`/${pathAdmin}/order/list`) Quay lại danh sách
   //- End Section 8
