@@ -5,6 +5,7 @@ const express = require('express');
 const path = require('path');
 require('dotenv').config();
 const connectDB = require('./configs/database.config');
+const adminRouter = require('./routes/admin/index.route');
 const clientRouter = require('./routes/client/index.route');
 
 const app = express();
@@ -19,7 +20,7 @@ app.set('view engine', 'pug');
 // Cấu hình thư mục chứa các file tĩnh 
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+app.use('/admin', adminRouter);
 app.use('/', clientRouter)
 
 app.listen(port, () => {

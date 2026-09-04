@@ -1,9 +1,6 @@
 extends ../layouts/account.pug
 include ../mixins/checkbox.pug
 
-block title
-  title Đăng nhập
-
 block main
   .form-account
     h1.inner-title Đăng nhập
@@ -32,8 +29,8 @@ block main
         .inner-check
           +checkbox-30("rememberPassword", "rememberPassword")
           label(for="rememberPassword") Nhớ mật khẩu
-        a(href="#") Quên mật khẩu?
+        a(href="/admin/account/forgot-password") Quên mật khẩu?
       button.inner-button(type="submit") Đăng nhập
     .inner-more
       span Bạn chưa có tài khoản?
-      a(href="#") Tạo tài khoản
+      a(href="/admin/account/register") Tạo tài khoản
