@@ -1400,6 +1400,7 @@ button {
   position: fixed;
   right: 20px;
   bottom: 40px;
+  z-index: 999;
 }
 
 .box-contact a {
