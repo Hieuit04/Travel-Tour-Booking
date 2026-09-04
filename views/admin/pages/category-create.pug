@@ -1,0 +1,39 @@
+extends ../layouts/default.pug
+
+block title
+  title Tạo danh mục
+
+block main
+  h1.box-title Tạo danh mục
+
+  //- Section 8
+  .section-8
+    form(id="category-create-form")
+      .inner-group
+        label(for="categoryName") Tên danh mục
+        input(type="text" name="categoryName" id="categoryName")
+      .inner-group
+        label(for="parent") Danh mục cha
+        select(name="parent" id="parent")
+          option(value="") -- Chọn danh mục --
+          option(value="danh-muc-1") Danh mục 1
+          option(value="danh-muc-2") Danh mục 2
+      .inner-group
+        label(for="position") Vị trí
+        input(type="number" name="position" id="position")
+      .inner-group
+        label(for="status") Trạng thái
+        select(name="status" id="status")
+          option(value="active") Hoạt động
+          option(value="inactive") Tạm dừng
+      .inner-group.inner-two-col
+        label(for="avatar") Ảnh đại diện
+        input(type="file" name="avatar" id="avatar" accept="image/*"  filepondImage).inner-upload-image
+      .inner-group.inner-two-col
+        label(for="description") Mô tả
+        textarea(name="description" id="description" textarea-mce)
+      .inner-group.inner-two-col.text-center 
+        button.btn-create(type="submit") Tạo mới
+    .inner-link
+      a(href="#") Quay lại danh sách
+  //- End Section 8

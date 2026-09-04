@@ -1,0 +1,78 @@
+extends ../layouts/default.pug
+include ../mixins/checkbox.pug
+
+block title
+  title Thùng rác tour
+
+block main
+  h1.box-title Thùng rác tour
+
+  //- Section 5
+  .section-5
+    form.inner-status
+      .inner-item
+        select
+          option(value="") -- Hành động --
+          option(value="") Khôi phục
+          option(value="") Xóa vĩnh viễn
+      .inner-item
+        button Áp dụng
+    form.inner-search
+      button <i class="fa-solid fa-magnifying-glass"></i>
+      input(type="text" placeholder="Tìm kiếm")
+  //- End Section 5
+
+  //- Section 6
+  .section-6
+    table
+      thead
+        tr
+          th
+            +checkbox-30("", "")
+          th Tên tour
+          th Ảnh đại diện
+          th Giá
+          th Còn lại
+          th Vị trí
+          th Trạng thái
+          th Tạo bởi
+          th Xóa bởi
+          th Hành động
+      tbody
+        tr
+          td
+            +checkbox-30("", "")
+          td Tour Hạ Long
+          td
+            img(src="assets/images/demo-tour-1.png" class="inner-avatar")
+          td
+            div NL: 1.900.000đ
+            div TE: 1.600.000đ
+            div EB: 1.000.000đ
+          td
+            div NL: 1
+            div TE: 1
+            div EB: 1
+          td 1
+          td
+            .tag.tag-green Hoạt động
+          td
+            div Lê Văn A
+            .inner-time 16:30 - 20/10/2024
+          td
+            div Lê Văn B
+            .inner-time 16:30 - 20/10/2024
+          td
+            .inner-action
+              a(href="#" title="Khôi phục") <i class="fa-solid fa-rotate-left"></i>
+              a(href="#" class="inner-remove" title="Xóa vĩnh viễn") <i class="fa-regular fa-trash-can"></i>
+  //- End Section 6
+
+  //- Section 7
+  .section-7
+    .inner-text Hiển thị 1 - 9 của 78
+    select
+      option(value="") Trang 1
+      option(value="") Trang 2
+      option(value="") Trang 3
+  //- End Section 7

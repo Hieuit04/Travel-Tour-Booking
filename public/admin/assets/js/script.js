@@ -1,0 +1,574 @@
+// Init Tiny MCE 
+const initTinyMCE = (selector) => {
+  if (typeof tinymce === 'undefined') return;
+  const targetSelector = selector || '[textarea-mce]';
+  if (document.querySelector(targetSelector)) {
+    tinymce.init({
+      selector: selector || '[textarea-mce]',
+      plugins: ['charmap', 'codesample', 'emoticons', 'image', 'insertdatetime', 'link', 'media', 'fullscreen', 'preview', 'quickbars', 'searchreplace', 'wordcount', 'anchor', 'link', 'lists', 'advlist', 'table'],
+      toolbar: 'undo redo | styles | table| bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent | link image | searchreplace | fullscreen preview  ',
+      quickbars_selection_toolbar: 'bold italic underline | blocks | bullist numlist | blockquote quicklink',
+    })
+  }
+}
+initTinyMCE()
+
+// End Init Tiny MCE 
+
+
+// Sider
+const sider = document.querySelector('.sider')
+if (sider) {
+  const buttonMenu = document.querySelector('.header .inner-button-menu')
+  buttonMenu.addEventListener('click', () => {
+    sider.classList.toggle('show')
+  })
+}
+// End Sider
+
+// Schedule Section8
+const scheduleSection8 = document.querySelector('.section-8 .inner-schedule')
+if (scheduleSection8) {
+  const buttonCreate = scheduleSection8.querySelector('.inner-schedule-create');
+  const boxList = scheduleSection8.querySelector('.inner-schedule-list');
+  buttonCreate.addEventListener('click', () => {
+    const firstItem = boxList.querySelector('.inner-schedule-item');
+    const cloneItem = firstItem.cloneNode(true);
+    cloneItem.querySelector('input').value = '';
+    // Xử lý lỗi tinyMCE sau khi clone
+    /** @type {HTMLElement} */
+    const boxBody = cloneItem.querySelector('.inner-schedule-body');
+    const id = `mce_${Date.now()}`;
+    boxBody.innerHTML = `<textarea textarea-mce id="${id}"></textarea>`
+    boxList.appendChild(cloneItem);
+    initTinyMCE(`#${id}`) // Khởi tạo lại với ID mới 
+  })
+  boxList.addEventListener('click', (event) => {
+    //Đóng mở item 
+    if (event.target.closest('.inner-more')) {
+      const item = event.target.closest('.inner-schedule-item');
+      if (item.classList.contains('hidden')) {
+        item.classList.remove('hidden');
+        item.querySelector('.inner-more i').setAttribute("class", "fa-solid fa-angle-up");
+      } else {
+        item.classList.add('hidden');
+        item.querySelector('.inner-more i').setAttribute("class", "fa-solid fa-angle-down");
+      }
+    }
+    //End đóng mở item
+
+    // Xoá item
+    if (event.target.closest('.inner-remove')) {
+      const item = event.target.closest('.inner-schedule-item');
+      const totalItem = boxList.querySelectorAll('.inner-schedule-item').length;
+      if (totalItem > 1) {
+        item.remove();
+      }
+    }
+    // End xoá item
+  })
+  // Sort Item Section 8
+  new Sortable(boxList, {
+    handle: '.inner-move', // handle's class
+    animation: 150,
+    onStart: function (event) {
+      const textarea = event.item.querySelector('[textarea-mce]');
+      const id = textarea.id;
+      if (textarea && id && tinymce.get(id)) {
+        tinymce.get(id).remove();
+      }
+    },
+    onEnd: function (event) {
+      const textarea = event.item.querySelector('[textarea-mce]');
+      const id = textarea.id;
+      if (textarea && id && tinymce.get(id)) {
+        initTinyMCE(id); // Khởi tạo lại với ID
+      }
+    }
+  });
+  // End Sort Item Section 8
+}
+// End Schedule Section8
+
+// File Pond 
+const listFilepondImage = document.querySelectorAll('[filepondImage]');
+let filePond = {};
+if (listFilepondImage.length > 0) {
+  FilePond.registerPlugin(FilePondPluginImagePreview);
+  // FilePond.registerPlugin(FilePondPluginImageCrop);`
+  FilePond.registerPlugin(FilePondPluginFileValidateType);
+
+  listFilepondImage.forEach((filepondImage) => {
+    filePond[filepondImage.name] = FilePond.create(filepondImage, {
+      labelIdle: '+',
+      // allowImageCrop: true,
+      // imageCropAspectRatio: '1:1',
+    });
+  })
+}
+// End File Pond
+
+// Revenue chart 
+const revenueChart = document.querySelector('#revenue-chart');
+if (revenueChart) {
+  new Chart(revenueChart, {
+    type: 'line',
+    data: {
+      labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
+      datasets: [
+        {
+          label: 'Tháng này',
+          data: [20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000, 65000, 70000, 75000, 80000, 85000, 90000, 489000, 95000, 100000, 105000, 110000, 115000, 120000, 125000, 130000, 135000, 140000, 145000, 150000, 0, 0, 0],
+          borderColor: '#007bff',
+          borderWidth: 1.5,
+        },
+        {
+          label: 'Tháng trước',
+          data: [10000, 35000, 80000, 95000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 80000, 85000, 85000, 85000, 85000, 85000, 85000, 85000, 85000, 120000, 85000, 85000, 85000, 140000, 145000, 140000, 140000, 140000, 140000],
+          borderColor: '#ff002b',
+          borderWidth: 1.5,
+        }
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Ngày',
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Doanh thu',
+          }
+        }
+      }
+    },
+  });
+}
+// End Revenue chart
+
+// Validate category create form
+const categoryCreateForm = document.querySelector('.section-8 #category-create-form');
+if (categoryCreateForm) {
+  const validator = new JustValidate('#category-create-form');
+  validator
+    .addField('#categoryName', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập tên danh mục!',
+      },
+    ])
+    
+    .onSuccess((event) => {
+      const categoryName = event.target.categoryName.value;
+      const parent = event.target.parent.value;
+      const position = event.target.position.value;
+      const status = event.target.status.value;
+      const avatar = filePond.avatar.getFile().file;
+      const description = tinymce.get('description').getContent();
+      console.log(categoryName, parent, position, status,avatar, description);
+    });
+}
+// End validate category create form
+
+// Validate tour create form
+const tourCreateForm = document.querySelector('.section-8 #tour-create-form');
+if (tourCreateForm) {
+  const validator = new JustValidate('#tour-create-form');
+  validator
+    .addField('#tourName', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập tên tour!',
+      },
+    ])
+    
+    .onSuccess((event) => {
+      const tourName = event.target.tourName.value;
+      const category = event.target.category.value;
+      const position = event.target.position.value;
+      const status = event.target.status.value;
+      const avatar = filePond.avatar.getFile()?.file || null;      
+      const priceAdult = event.target.priceAdult.value;      
+      const priceChildren = event.target.priceChildren.value; 
+      const priceBaby = event.target.priceBaby.value;      
+      const newPriceAdult = event.target.newPriceAdult.value;      
+      const newPriceChildren = event.target.newPriceChildren.value;      
+      const newPriceBaby = event.target.newPriceBaby.value;      
+      const stockAdult = event.target.stockAdult.value;      
+      const stockChildren = event.target.stockChildren.value;      
+      const stockBaby = event.target.stockBaby.value;      
+      const loaction = [];
+      const time = event.target.time.value;
+      const vihicle = event.target.vehicle.value;
+      const departureDate = event.target.departureDate.value;
+      const information = tinymce.get('information').getContent();
+      const schedule= [];
+      // location
+      const listLocationChecked = document.querySelectorAll('input[name="locations"]:checked');
+      listLocationChecked.forEach((location) => {
+        loaction.push(location.value);
+      });
+      // end location
+      // schedule
+      const listSchedule = document.querySelectorAll('.section-8 .inner-schedule-list .inner-schedule-item');
+      listSchedule.forEach((item) => { 
+        const inputTitle = item.querySelector('.inner-schedule-head input');
+        const title = inputTitle ? inputTitle.value : '';
+        const textarea = item.querySelector('[textarea-mce]');
+        const id = textarea ? textarea.id : '';
+        const content = id && tinymce.get(id) ? tinymce.get(id).getContent() : '';
+        schedule.push({
+          title: title,
+          content: content,
+        });
+      })
+      // schedule
+      
+
+      console.log(tourName);
+      console.log(category);
+      console.log(position);
+      console.log(status);
+      console.log(avatar);
+      console.log(priceAdult);
+      console.log(priceChildren);
+      console.log(priceBaby);
+      console.log(newPriceAdult);
+      console.log(newPriceChildren);
+      console.log(newPriceBaby);
+      console.log(stockAdult);
+      console.log(stockChildren);
+      console.log(stockBaby);
+      console.log(loaction);
+      console.log(time);
+      console.log(vihicle);
+      console.log(departureDate);
+      console.log(information);
+      console.log(schedule);
+    });
+}
+// End validate tour create form
+
+
+// Validate tour create form
+const orderEditForm = document.querySelector('.section-8 #order-edit-form');
+if (orderEditForm) {
+  const validator = new JustValidate('#order-edit-form');
+  validator
+    .addField('#customerName', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập tên khách hàng!',
+      },
+    ])
+    .addField('#phone', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập số điện thoại!',
+      },
+      {
+        rule: 'customRegexp',
+        value: /^(0|\+?84)[35789]\d{8}$/,
+        errorMessage: 'Số điện thoại chưa đúng định dạng Việt Nam!',
+      },
+    ])
+    
+    .onSuccess((event) => {
+      const customerName = event.target.customerName.value;
+      const phone = event.target.phone.value;
+      const notes = event.target.notes.value;
+      const paymentMethod = event.target.paymentMethod.value;
+      const paymentStatus = event.target.paymentStatus.value;      
+      const orderDate = event.target.orderDate.value; 
+      const status = event.target.status.value;      
+      console.log(customerName);
+      console.log(phone);
+      console.log(notes);
+      console.log(paymentMethod);
+      console.log(paymentStatus);
+      console.log(orderDate);
+      console.log(status);
+    });
+}
+// End validate tour create form
+
+
+// Validate setting website info form
+const settingWebsiteInfoForm = document.querySelector('.section-8 #setting-website-info-form');
+if (settingWebsiteInfoForm) {
+  const validator = new JustValidate('#setting-website-info-form');
+  validator
+    .addField('#nameWebsite', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập tên website!',
+      },
+    ])
+    .addField('#phone', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập số điện thoại!',
+      },
+      {
+        rule: 'customRegexp',
+        value: /^(0|\+?84)[35789]\d{8}$/,
+        errorMessage: 'Số điện thoại chưa đúng định dạng Việt Nam!',
+      },
+    ])
+    .addField('#email', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập email!',
+      },
+      {
+        rule: 'email',
+        errorMessage: 'Email chưa đúng định dạng!',
+      }
+    ])
+    .onSuccess((event) => {
+      const nameWebsite = event.target.nameWebsite.value;
+      const phone = event.target.phone.value;
+      const email = event.target.email.value;
+      const address = event.target.address.value;
+      const logo = filePond.logo.getFile()?.file || null;
+      const favicon = filePond.favicon.getFile()?.file || null;
+      console.log(nameWebsite);
+      console.log(phone);
+      console.log(email);
+      console.log(address);
+      console.log(logo);
+      console.log(favicon);
+    });
+}
+// End validate setting website info form
+
+
+// Validate setting account admin create form
+const settingAccountAdminCreateForm = document.querySelector('.section-8 #setting-account-admin-create-form');
+if (settingAccountAdminCreateForm) {
+  const validator = new JustValidate('#setting-account-admin-create-form');
+  validator
+    .addField('#name', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập tên!',
+      },
+    ])
+    .addField('#phone', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập số điện thoại!',
+      },
+      {
+        rule: 'customRegexp',
+        value: /^(0|\+?84)[35789]\d{8}$/,
+        errorMessage: 'Số điện thoại chưa đúng định dạng Việt Nam!',
+      },
+    ])
+    .addField('#email', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập email!',
+      },
+      {
+        rule: 'email',
+        errorMessage: 'Email chưa đúng định dạng!',
+      }
+    ])
+    .addField('#password', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập mật khẩu!',
+      },
+      {
+        rule: 'strongPassword',
+        errorMessage: (value) => {
+          let html = ``;
+          if (value.length < 8) {
+            html += `<div>Mật khẩu tối thiểu 8 ký tự!</div>`
+          }
+          if (!/[0-9]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ số!</div>`
+          }
+          if (!/[a-z]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết thường!</div>`
+          }
+          if (!/[A-Z]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết hoa!</div>`
+          }
+          if (!/[^A-Za-z0-9]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ký tự đặc biệt!</div>`
+          }
+          return html
+        }
+      }
+    ])
+    .onSuccess((event) => {
+      const name = event.target.name.value;
+      const email = event.target.email.value;
+      const phone = event.target.phone.value;
+      const role = event.target.role.value;
+      const position = event.target.position.value;
+      const status = event.target.status.value;
+      const password = event.target.password.value;
+      const avatar = filePond.avatar.getFile()?.file || null;
+      console.log(name);
+      console.log(email);
+      console.log(phone);
+      console.log(role);
+      console.log(position);
+      console.log(status);
+      console.log(password);
+      console.log(avatar);
+    });
+}
+// End validate setting account admin create form
+
+
+
+// Validate setting role create form
+const roleCreateForm = document.querySelector('.section-8 #setting-role-create-form');
+if (roleCreateForm) {
+  const validator = new JustValidate('#setting-role-create-form');
+  validator
+    .addField('#nameRole', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập tên nhóm quyền!',
+      },
+    ])
+    
+    .onSuccess((event) => {
+      const categoryName = event.target.nameRole.value;
+      const description = event.target.description.value;
+      const rolePermissions = [];
+      const listRolePermissionsChecked = document.querySelectorAll('input[name="rolePermissions"]:checked');
+      listRolePermissionsChecked.forEach((permission) => {
+        rolePermissions.push(permission.value);
+      });
+      console.log(categoryName);
+      console.log(description);
+      console.log(rolePermissions);
+    });
+}
+// End validate setting role create form
+
+// Validate profile edit form
+const profileEditForm = document.querySelector('.section-8 #profile-edit-form');
+if (profileEditForm) {
+  const validator = new JustValidate('#profile-edit-form');
+  validator
+    .addField('#name', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập họ tên!',
+      },
+    ])
+    .addField('#email', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập email!',
+      },
+      {
+        rule: 'email',
+        errorMessage: 'Email không hợp lệ!',
+      }
+    ])
+    .addField('#phone', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập số điện thoại!',
+      },
+      {
+        rule: 'customRegexp',
+        value: /^(0|\+?84)[35789]\d{8}$/,
+        errorMessage: 'Số điện thoại chưa đúng định dạng Việt Nam!',
+      },
+    ])
+    .onSuccess((event) => {
+      const name = event.target.name.value;
+      const email = event.target.email.value;
+      const phone = event.target.phone.value;
+      const position = event.target.position.value;
+      const role = event.target.role.value;
+      const avatar = filePond.avatar.getFile()?.file || null;
+      console.log(name);
+      console.log(email);
+      console.log(phone);
+      console.log(position);
+      console.log(role);
+      console.log(avatar);
+    });
+}
+// End validate profile edit form
+
+
+
+// Validate profile change password form
+const changePasswordForm = document.querySelector('#profile-change-password-form');
+if (changePasswordForm) {
+  const validator = new JustValidate('#profile-change-password-form');
+  validator
+    .addField('#password', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập mật khẩu!',
+      },
+      {
+        rule: 'strongPassword',
+        errorMessage: (value) => {
+          let html = ``;
+          if (value.length < 8) {
+            html += `<div>Mật khẩu tối thiểu 8 ký tự!</div>`
+          }
+          if (!/[0-9]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ số!</div>`
+          }
+          if (!/[a-z]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết thường!</div>`
+          }
+          if (!/[A-Z]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết hoa!</div>`
+          }
+          if (!/[^A-Za-z0-9]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ký tự đặc biệt!</div>`
+          }
+          return html
+        }
+      }
+    ])
+    .addField('#confirmPassword', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập mật khẩu!',
+      },
+      {
+        validator: (value, fields) => {
+          if (fields['#password'] && fields['#password'].elem) {
+            const passwordValue = fields['#password'].elem.value;
+            return value === passwordValue;
+          }
+          return true;
+        },
+        errorMessage: 'Mật khẩu xác nhận không trùng khớp!',
+      }
+    ])
+    .onSuccess((event) => {
+      console.log(event.target.password.value);
+      console.log(event.target.confirmPassword.value);
+    });
+}
+
+// End validate profile change password form
+       

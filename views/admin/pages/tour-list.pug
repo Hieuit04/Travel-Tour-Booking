@@ -1,0 +1,118 @@
+extends ../layouts/default.pug
+include ../mixins/checkbox.pug
+
+block title
+  title Quản lý tour
+
+block main
+  h1.box-title Quản lý tour
+
+  //- Section 4
+  .section-4
+    .inner-wrap
+      .inner-item
+        <i class="fa-solid fa-filter"></i> Bộ lọc
+      .inner-item
+        select
+          option(value="") Trạng thái
+          option(value="") Hoạt động
+          option(value="") Tạm dừng
+      .inner-item
+        select
+          option(value="") Người tạo
+          option(value="") Lê Văn A
+          option(value="") Lê Văn B
+      .inner-item
+        input(type="date")
+        span -
+        input(type="date")
+      .inner-item
+        select
+          option(value="") Danh mục
+          option(value="") Danh mục 1
+          option(value="") Danh mục 2
+      .inner-item
+        select
+          option(value="") Mức giá
+          option(value="") Dưới 1tr
+          option(value="") Từ 1tr đến 3tr
+          option(value="") Từ 3tr đến 5tr
+          option(value="") Từ 5tr đến 7tr
+          option(value="") Từ 7tr đến 10tr
+          option(value="") Trên 10tr
+      .inner-item.inner-reset
+        <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
+  //- End Section 4
+
+  //- Section 5
+  .section-5
+    form.inner-status
+      .inner-item
+        select
+          option(value="") -- Hành động --
+          option(value="") Hoạt động
+          option(value="") Tạm dừng
+          option(value="") Xóa
+      .inner-item
+        button Áp dụng
+    form.inner-search
+      button <i class="fa-solid fa-magnifying-glass"></i>
+      input(type="text" placeholder="Tìm kiếm")
+    a.inner-create(href="#") + Tạo mới
+    a.inner-trash(href="#") Thùng rác
+  //- End Section 5
+
+  //- Section 6
+  .section-6
+    table
+      thead
+        tr
+          th
+            +checkbox-30("", "")
+          th Tên tour
+          th Ảnh đại diện
+          th Giá
+          th Còn lại
+          th Vị trí
+          th Trạng thái
+          th Tạo bởi
+          th Cập nhật bởi
+          th Hành động
+      tbody
+        tr
+          td
+            +checkbox-30("", "")
+          td Tour Hạ Long
+          td
+            img(src="assets/images/demo-tour-1.png" class="inner-avatar")
+          td
+            div NL: 1.900.000đ
+            div TE: 1.600.000đ
+            div EB: 1.000.000đ
+          td
+            div NL: 1
+            div TE: 1
+            div EB: 1
+          td 1
+          td
+            .tag.tag-green Hoạt động
+          td
+            div Lê Văn A
+            .inner-time 16:30 - 20/10/2024
+          td
+            div Lê Văn B
+            .inner-time 16:30 - 20/10/2024
+          td
+            .inner-action
+              a(href="#") <i class="fa-regular fa-pen-to-square"></i>
+              a(href="#" class="inner-remove") <i class="fa-regular fa-trash-can"></i>
+  //- End Section 6
+
+  //- Section 7
+  .section-7
+    .inner-text Hiển thị 1 - 9 của 78
+    select
+      option(value="") Trang 1
+      option(value="") Trang 2
+      option(value="") Trang 3
+  //- End Section 7

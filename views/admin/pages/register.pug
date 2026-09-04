@@ -1,0 +1,45 @@
+extends ../layouts/account.pug
+include ../mixins/checkbox.pug
+
+block title
+  title Đăng ký
+
+block main
+  .form-account
+    h1.inner-title Đăng ký
+    p.inner-desc Tạo một tài khoản để tiếp tục
+    form.inner-form(id="register-form")
+      .inner-group 
+        label.inner-label(for="fullName") Họ tên *
+        input(
+          type="text" 
+          id="fullName" 
+          name="fullName" 
+          placeholder="Ví dụ: Lê Văn A" 
+          class="inner-control"
+        )
+      .inner-group 
+        label.inner-label(for="email") Email *
+        input(
+          type="email" 
+          id="email" 
+          name="email" 
+          placeholder="Ví dụ: levana@gmail.com" 
+          class="inner-control"
+        )
+      .inner-group 
+        label.inner-label(for="password") Mật khẩu *
+        input(
+          type="password" 
+          id="password" 
+          name="password" 
+          class="inner-control"
+        )
+      .inner-meta
+        .inner-check
+          +checkbox-30("agree", "agree")
+          label(for="agree") Tôi chấp nhận các điều khoản và điều kiện
+      button.inner-button Đăng ký
+    .inner-more
+      span Bạn đã có tài khoản? 
+      a(href="#") Đăng nhập
