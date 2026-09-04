@@ -1,0 +1,12 @@
+module.exports.edit = (req, res) => {
+  res.render('admin/pages/profile-edit', {
+    pageTitle: 'Chỉnh sửa thông tin cá nhân',
+  });
+};
+
+module.exports.changePassword = (req, res) => {
+  res.render('admin/pages/profile-change-password', {
+    pageTitle: 'Đổi mật khẩu',
+  });
+};
+

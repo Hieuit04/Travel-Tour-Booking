@@ -8,6 +8,7 @@ const orderRouters = require('./order.route');
 const userRouters = require('./user.route');
 const contactRouters = require('./contact.route');
 const settingRouters = require('./setting.route');
+const profileRouters = require('./profile.route');
 
 router.use('/account', accountRouters);
 router.use('/dashboard', dashboardRouters);
@@ -17,6 +18,7 @@ router.use('/order', orderRouters);
 router.use('/user', userRouters);
 router.use('/contact', contactRouters);
 router.use('/setting', settingRouters);
+router.use('/profile', profileRouters);
 
 module.exports = router;
 
