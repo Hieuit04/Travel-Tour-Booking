@@ -1,8 +1,5 @@
 extends ../layouts/default.pug
 
-block title
-  title Thông tin website
-
 block main
   h1.box-title Thông tin website
 
@@ -30,5 +27,5 @@ block main
       .inner-group.inner-two-col.text-center
         button.btn-create(type="submit") Cập nhật
     .inner-link
-      a(href="#") Quay lại danh sách
+      a(href=`/${pathAdmin}/setting/list`) Quay lại danh sách
   //- End Section 8

@@ -1,9 +1,6 @@
 extends ../layouts/default.pug
 include ../mixins/checkbox.pug
 
-block title
-  title Tạo nhóm quyền
-
 block main
   h1.box-title Tạo nhóm quyền
 
@@ -37,5 +34,5 @@ block main
       .inner-group.inner-two-col.text-center
         button.btn-create(type="submit") Tạo mới
     .inner-link
-      a(href="#") Quay lại danh sách
+      a(href=`/${pathAdmin}/setting/role/list`) Quay lại danh sách
   //- End Section 8

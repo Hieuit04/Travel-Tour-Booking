@@ -1,8 +1,5 @@
 extends ../layouts/default.pug
 
-block title
-  title Tạo tài khoản quản trị
-
 block main
   h1.box-title Tạo tài khoản quản trị
 
@@ -40,5 +37,5 @@ block main
       .inner-group.inner-two-col.text-center
         button.btn-create(type="submit") Tạo mới
     .inner-link
-      a(href="#") Quay lại danh sách
+      a(href=`/${pathAdmin}/setting/account-admin/list`) Quay lại danh sách
   //- End Section 8
