@@ -1,3 +1,4 @@
+
 // Validate login form
 const loginForm = document.querySelector('.form-account #login-form');
 if (loginForm) {
