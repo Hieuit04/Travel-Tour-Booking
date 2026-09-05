@@ -113,16 +113,20 @@ if (registerForm) {
       fetch(`/admin/account/register`, {
         method: "POST",
         headers: {
-          "Content-Type":"application/json"  
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(dataFinal),
       })
         .then(res => res.json())
         .then(data => {
           if (data.code === 'error') {
-            alert(data.message);
-          } else {
-            alert(data.message);
+            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
+            // drawNotyf("error", data.message); // In ra thông báo lỗi khi bị load lại trang
+          }
+          if (data.code === 'success') {
+            console.log(data)
+            //notyf.success(data.message); // In ra thông báo thành công khi ko bị load lại trang
+            drawNotyf(data.code, data.message);// In ra thông báo thành công khi bị load lại trang
             window.location.href = "/admin/account/register-success";
           }
         })

@@ -32,7 +32,7 @@ module.exports.registerPost = async (req, res) => {
   const newRecord = new AccountAdmin(req.body);
   await newRecord.save();
   res.json({
-    code: "sucess",
+    code: "success",
     message: "Đăng ký thành công",
   })
 }
