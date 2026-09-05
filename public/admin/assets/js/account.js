@@ -101,15 +101,32 @@ if (registerForm) {
       },
     ])
     .onSuccess((event) => {
+
       const fullName = event.target.fullName.value
       const email = event.target.email.value
       const password = event.target.password.value
-      const agree = event.target.agree.checked
-      console.log(fullName);
-      console.log(email);
-      console.log(password);
-      console.log(agree);
-    });
+      const dataFinal = {
+        fullName: fullName,
+        email: email,
+        passWord: password,
+      }
+      fetch(`/admin/account/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type":"application/json"  
+        },
+        body: JSON.stringify(dataFinal),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            alert(data.message);
+          } else {
+            alert(data.message);
+            window.location.href = "/admin/account/register-success";
+          }
+        })
+    })
 }
 
 // End validate register form

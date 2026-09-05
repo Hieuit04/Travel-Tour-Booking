@@ -21,7 +21,9 @@ app.set('view engine', 'pug');
 // Cấu hình thư mục chứa các file tĩnh 
 app.use(express.static(path.join(__dirname, 'public')));
 // Thêm biến dùng trong pug
-app.locals.pathAdmin = pathAdmin;
+app.locals.pathAdmin = pathAdmin; 
+// Cho phép data gửi lên dưới dạng JSON, chuyển dữ liệu từ JSON sang JS
+app.use(express.json())
 
 app.use(`/${pathAdmin}`, adminRouter);
 app.use('/', clientRouter)
