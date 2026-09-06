@@ -11,7 +11,9 @@ router.get('/register', accountController.register);
 
 router.post('/register',  accountValidate.registerPost, accountController.registerPost);
 
-router.get('/register-success' ,accountController.registerSuccess);
+router.get('/register-success', accountController.registerSuccess);
+
+router.get('/logout' ,accountController.logout);
 
 router.get('/forgot-password', accountController.forgotPassword);
 

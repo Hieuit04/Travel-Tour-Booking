@@ -22,6 +22,8 @@ app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')));
 // Thêm biến dùng trong pug
 app.locals.pathAdmin = pathAdmin; 
+// Thêm biết toàn cục dùng bên back end 
+global.pathAdmin = pathAdmin;
 // Cho phép data gửi lên dưới dạng JSON, chuyển dữ liệu từ JSON sang JS
 app.use(express.json())
 

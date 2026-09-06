@@ -94,6 +94,11 @@ module.exports.registerPost = async (req, res) => {
   })
 }
 
+module.exports.logout = (req, res) => {
+  res.clearCookie("token");
+  res.redirect(`/${pathAdmin}/account/login`);
+}
+
 
 module.exports.forgotPassword = (req, res) => {
   res.render('admin/pages/forgot-password', {
