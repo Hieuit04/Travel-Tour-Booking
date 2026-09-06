@@ -19,17 +19,34 @@ if (loginForm) {
         rule: 'required',
         errorMessage: 'Vui lòng nhập mật khẩu',
       },
-      {
-        rule: 'customRegexp',
-        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-        errorMessage: 'Mật khẩu tối thiểu 8 ký tự, gồm ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (@$!%*?&)',
-      },
-
     ])
     .onSuccess((event) => {
-      console.log(event.target.email.value);
-      console.log(event.target.password.value);
-      console.log(event.target.rememberPassword.checked);
+      const email = event.target.email.value
+      const password = event.target.password.value
+      const dataFinal = {
+        email: email,
+        passWord: password,
+      }
+      fetch(`/admin/account/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataFinal),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
+            // drawNotyf("error", data.message); // In ra thông báo lỗi khi bị load lại trang
+          }
+          if (data.code === 'success') {
+            console.log(data)
+            //notyf.success(data.message); // In ra thông báo thành công khi ko bị load lại trang
+            drawNotyf(data.code, data.message);// In ra thông báo thành công khi bị load lại trang
+            window.location.href = `/${pathAdmin}/dashboard`;
+          }
+        })
     });
 }
 
@@ -128,7 +145,7 @@ if (registerForm) {
             console.log(data)
             //notyf.success(data.message); // In ra thông báo thành công khi ko bị load lại trang
             drawNotyf(data.code, data.message);// In ra thông báo thành công khi bị load lại trang
-            window.location.href = "/admin/account/register-success";
+            window.location.href = `/${pathAdmin}/account/register-success`;
           }
         })
     })

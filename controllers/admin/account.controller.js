@@ -8,6 +8,41 @@ module.exports.login = (req, res) => {
   });
 }
 
+module.exports.loginPost = async (req, res) => {
+  const { email, passWord } = req.body;
+  const existAccount = await AccountAdmin.findOne({ email: email });
+  if (!existAccount) {
+    return res.json({
+      code: "error",
+      message: "Email không tồn tại",
+    });
+    return;
+  }
+
+  const isMatchPassword = await bcrypt.compare(passWord, existAccount.passWord);
+  if (!isMatchPassword) {
+    return res.json({
+      code: "error",
+      message: "Mật khẩu không chính xác",
+    });
+    return;
+  }
+
+  if (existAccount.status !== "active") {
+    return res.json({
+      code: "error",
+      message: "Tài khoản chưa được kích hoạt",
+    });
+    return;
+  }
+  
+  res.json({
+    code: "success",
+    message: "Đăng nhập thành công",
+  });
+}
+
+
 module.exports.register = (req, res) => {
   res.render('admin/pages/register', {
     pageTitle: 'Đăng ký',

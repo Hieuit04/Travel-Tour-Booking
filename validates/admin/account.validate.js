@@ -1,5 +1,33 @@
 const Joi = require('joi');
 
+module.exports.loginPost = (req, res, next) => {
+  const schema = Joi.object({
+    email: Joi.string()
+      .required()
+      .email()
+      .messages({
+        "string.empty": "Vui lòng điền email!",
+        "string.email": "Email không hợp lệ!",
+      }),
+    passWord: Joi.string()
+      .required()
+      .messages({
+        "string.empty": "Vui lòng điền mật khẩu!",
+      }),
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    res.json({
+      code: "error",
+      message: error.details[0].message
+    })
+    return;
+  }
+  next();
+} 
+
+
 module.exports.registerPost = (req, res, next) => {
   const schema = Joi.object({
     fullName: Joi.string()
