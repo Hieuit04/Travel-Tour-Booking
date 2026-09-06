@@ -23,9 +23,11 @@ if (loginForm) {
     .onSuccess((event) => {
       const email = event.target.email.value
       const password = event.target.password.value
+      const rememberPassword = event.target.rememberPassword.checked;
       const dataFinal = {
         email: email,
         passWord: password,
+        rememberPassword: rememberPassword,
       }
       fetch(`/admin/account/login`, {
         method: "POST",

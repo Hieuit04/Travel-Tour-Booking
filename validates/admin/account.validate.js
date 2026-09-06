@@ -14,6 +14,7 @@ module.exports.loginPost = (req, res, next) => {
       .messages({
         "string.empty": "Vui lòng điền mật khẩu!",
       }),
+    rememberPassword: Joi.boolean()
   });
 
   const { error } = schema.validate(req.body);
