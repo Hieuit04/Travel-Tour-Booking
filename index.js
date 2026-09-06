@@ -3,6 +3,7 @@ dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const express = require('express');
 const path = require('path');
+var cookieParser = require('cookie-parser')
 require('dotenv').config();
 const connectDB = require('./configs/database.config');
 const adminRouter = require('./routes/admin/index.route');
@@ -26,6 +27,9 @@ app.locals.pathAdmin = pathAdmin;
 global.pathAdmin = pathAdmin;
 // Cho phép data gửi lên dưới dạng JSON, chuyển dữ liệu từ JSON sang JS
 app.use(express.json())
+
+// Thêm cookie-parser vào middleware để lấy đc token trong cookie
+app.use(cookieParser())
 
 app.use(`/${pathAdmin}`, adminRouter);
 app.use('/', clientRouter)
