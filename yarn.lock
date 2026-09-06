@@ -756,6 +756,11 @@ negotiator@^1.0.0:
   dependencies:
     content-type "^2.1.0"
 
+nodemailer@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-10.0.0.tgz#b1622f98bc87646ea8b847e6c1101cd2179c8cdd"
+  integrity sha512-wdv+hXBg0iIPIOf108FaZyTxqjQpCvQeAJt9pHHTooPy/y3vQtI9eiImM9AIVKR3e/0FeMA1oueNfBjFJcaK+Q==
+
 nodemon@^3.1.14:
   version "3.1.14"
   resolved "https://registry.yarnpkg.com/nodemon/-/nodemon-3.1.14.tgz#8487ca379c515301d221ec007f27f24ecafa2b51"
