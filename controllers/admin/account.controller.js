@@ -211,14 +211,52 @@ module.exports.forgotPasswordPost = async (req, res) => {
   // ngpv caht kwve kdbd
   console.log(email);
   res.json({
-    code: "error",
+    code: "success",
     message: "Đã gửi mã OTP đến email của bạn", // Gửi mã OTP đến email của người dùng
   });
 }
 
 module.exports.otpPassword = (req, res) => {
+  const { email } = req.query;
   res.render('admin/pages/otp-password', {
     pageTitle: 'Nhập mã OTP',
+    email: email,
+  });
+}
+
+module.exports.otpPasswordPost = async (req, res) => {
+  const { email, otp } = req.body;
+  // Kiểm tra email và OTP có tồn tại trong forgot-password không
+  const existRecord = await ForgotPassword.findOne({ email: email, otp: otp });
+  if (!existRecord) {
+    return res.json({
+      code: "error",
+      message: "Mã OTP không hợp lệ hoặc đã hết hạn!",
+    });
+    return;
+  }
+  const existAccount = await AccountAdmin.findOne({ email: email });
+  const token = jwt.sign(
+    {
+      id: existAccount.id,
+      email: existAccount.email
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1d"
+    }
+  );
+
+  res.cookie("token", token, {
+    maxAge: (24 * 60 * 60 * 1000), // 7 ngày nếu remember true 1 ngày nếu false
+    httpOnly: true, // Chỉ gửi cookie qua HTTP
+    secure: true, // Chỉ sử dụng khi HTTPS
+    sameSite: 'strict' // Chỉ gửi cookie cho trang web gốc
+  })
+
+  res.json({
+    code: "success",
+    message: "Xác thực thành công!",
   });
 }
 
