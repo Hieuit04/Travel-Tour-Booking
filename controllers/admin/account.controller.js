@@ -225,44 +225,86 @@ module.exports.otpPassword = (req, res) => {
 }
 
 module.exports.otpPasswordPost = async (req, res) => {
-  const { email, otp } = req.body;
-  // Kiểm tra email và OTP có tồn tại trong forgot-password không
-  const existRecord = await ForgotPassword.findOne({ email: email, otp: otp });
-  if (!existRecord) {
-    return res.json({
-      code: "error",
-      message: "Mã OTP không hợp lệ hoặc đã hết hạn!",
-    });
-    return;
-  }
-  const existAccount = await AccountAdmin.findOne({ email: email });
-  const token = jwt.sign(
-    {
-      id: existAccount.id,
-      email: existAccount.email
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "1d"
+  try {
+    const { email, otp } = req.body;
+    // Kiểm tra email và OTP có tồn tại trong forgot-password không
+    const existRecord = await ForgotPassword.findOne({ email: email, otp: otp });
+    if (!existRecord) {
+      return res.json({
+        code: "error",
+        message: "Mã OTP không hợp lệ hoặc đã hết hạn!",
+      });
+      return;
     }
-  );
+    const existAccount = await AccountAdmin.findOne({ email: email });
+    const token = jwt.sign(
+      {
+        id: existAccount.id,
+        email: existAccount.email
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d"
+      }
+    );
 
-  res.cookie("token", token, {
-    maxAge: (24 * 60 * 60 * 1000), // 7 ngày nếu remember true 1 ngày nếu false
-    httpOnly: true, // Chỉ gửi cookie qua HTTP
-    secure: true, // Chỉ sử dụng khi HTTPS
-    sameSite: 'strict' // Chỉ gửi cookie cho trang web gốc
-  })
+    res.cookie("token", token, {
+      maxAge: (24 * 60 * 60 * 1000), // 7 ngày nếu remember true 1 ngày nếu false
+      httpOnly: true, // Chỉ gửi cookie qua HTTP
+      secure: true, // Chỉ sử dụng khi HTTPS
+      sameSite: 'strict' // Chỉ gửi cookie cho trang web gốc
+    })
 
-  res.json({
-    code: "success",
-    message: "Xác thực thành công!",
-  });
+    res.json({
+      code: "success",
+      message: "Xác thực thành công!",
+    });
+  } catch {
+    console.error("Lỗi xác thực OTP:", error);
+    return res.status(500).json({
+      code: "error",
+      message: "Đã xảy ra lỗi máy chủ, vui lòng thử lại sau!",
+    });
+  }
 }
 
 module.exports.resetPassword = (req, res) => {
   res.render('admin/pages/reset-password', {
     pageTitle: 'Đổi mật khẩu',
   });
+}
+
+module.exports.resetPasswordPost = async (req, res) => {
+  try {
+    const { passWord } = req.body;
+    const token = req.cookies.token;
+    console.log(token);
+    console.log(passWord);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { id, email } = decoded;
+    const existAccount = await AccountAdmin.findOne({ _id: id, email: email, status: "active" });
+    if (!existAccount) {
+      res.clearCookie("token");
+      res.json({
+        code: "error",
+        message: "Không tìm thấy tài khoản!",
+      });
+      return;
+    }
+    const salt = await bcrypt.genSalt(10); // Tạo chuỗi ngẫu nhiên 10 ký tự 
+    const hashPassWord = await bcrypt.hash(passWord, salt); // Hash mật khẩu
+    existAccount.passWord = hashPassWord;
+    await existAccount.save();
+    res.json({
+      code: "success",
+      message: "Đổi mật khẩu thành công!",
+    });
+  }  catch {
+    console.error("Lỗi xác thực OTP:", error);
+    return res.status(500).json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ hoặc đã hết hạn!",
+    });
+  }
 }
 

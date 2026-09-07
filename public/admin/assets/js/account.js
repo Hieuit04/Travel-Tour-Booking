@@ -292,8 +292,29 @@ if (resetPasswordForm) {
       }
     ])
     .onSuccess((event) => {
-      console.log(event.target.password.value);
-      console.log(event.target.confirmPassword.value);
+      const passWord = event.target.password.value;
+      const finalData = {
+        passWord: passWord,
+      }
+      fetch(`/admin/account/reset-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(finalData),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
+          }
+          if (data.code === 'success') {
+            console.log(data)
+            //notyf.success(data.message); // In ra thông báo thành công khi ko bị load lại trang
+            drawNotyf(data.code, data.message);// In ra thông báo thành công khi bị load lại trang
+            window.location.href = `/${pathAdmin}/dashboard`;
+          }
+        })
     });
 }
 
