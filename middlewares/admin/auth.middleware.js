@@ -21,7 +21,8 @@ module.exports.verifyToken = async (req, res, next) => {
       res.redirect(`/${pathAdmin}/account/login`);
       return;
     }
-
+    console.log(existAccount)
+    res.locals.account = existAccount;
     next();
   } catch (error) {
     console.log(error);
