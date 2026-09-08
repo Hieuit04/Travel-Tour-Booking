@@ -30,17 +30,16 @@ module.exports.createPost = async (req, res) => {
         req.body.position = 1;
       }
     }
+    req.body.avatar = req.file ? req.file.path : "";
     req.body.createdBy = res.locals.account.id;
-    console.log(req.body)
     const newRecord = new Category(req.body);
     await newRecord.save();
-    console.log(req.body)
     res.json({
       code: "success",
       message: "Danh mục đã được tạo thành công",
-    }) 
-  } catch(error) {
-    res, json({
+    })
+  } catch (error) {
+    res.json({
       code: "error",
       message: "Dữ liệu không hợp lệ!"
     })

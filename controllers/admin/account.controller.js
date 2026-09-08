@@ -80,7 +80,6 @@ module.exports.registerSuccess = (req, res) => {
 
 module.exports.registerPost = async (req, res) => {
   req.body.status = 'initial';
-  console.log(req.body);
   const existAccount = await AccountAdmin.findOne({ email: req.body.email });
   if (existAccount) {
     return res.json({
@@ -278,8 +277,6 @@ module.exports.resetPasswordPost = async (req, res) => {
   try {
     const { passWord } = req.body;
     const token = req.cookies.token;
-    console.log(token);
-    console.log(passWord);
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { id, email } = decoded;
     const existAccount = await AccountAdmin.findOne({ _id: id, email: email, status: "active" });

@@ -186,7 +186,9 @@ if (categoryCreateForm) {
       const parent = event.target.parent.value;
       const position = event.target.position.value;
       const status = event.target.status.value;
-      const avatar = filePond.avatar.getFile()?.file||null;
+      const avatar = filePond.avatar?.getFile()?.file
+        || document.querySelector('#avatar')?.files[0]
+        || null;
       const description = tinymce.get('description').getContent();
 
       const formData = new FormData();
@@ -194,8 +196,11 @@ if (categoryCreateForm) {
       formData.append('parent', parent);
       formData.append('position', position);
       formData.append('status', status);
-      // formData.append('avatar', avatar);
+      if (avatar) {
+        formData.append('avatar', avatar, avatar.name);
+      }
       formData.append('description', description);
+      console.log('Avatar sent:', avatar);
       fetch(`/${pathAdmin}/category/create`, { // Thay đổi URL thành URL mới
         method: 'POST',
         body: formData,
