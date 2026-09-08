@@ -5,7 +5,7 @@ const schema = new mongoose.Schema({
   email: String,
   passWord: String,
   status: String,
-});
+},{timestamps: true});
 
 const AccountAdmin = mongoose.model('AccountAdmin', schema, 'accounts-admin');
 

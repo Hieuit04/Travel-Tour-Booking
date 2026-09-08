@@ -51,7 +51,6 @@ if (loginForm) {
         })
     });
 }
-
 // End validate login form
 
 

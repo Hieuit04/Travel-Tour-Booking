@@ -30,8 +30,8 @@ if (sider) {
   const pathNameSplit = pathname.split('/')
   listTagA.forEach((tagA) => {
     const href = tagA.getAttribute('href');
-    const hrefSplit= href.split('/')
-    if (hrefSplit[2]===pathNameSplit[2]) {
+    const hrefSplit = href.split('/')
+    if (hrefSplit[2] === pathNameSplit[2]) {
       tagA.classList.add('active')
     }
   })
@@ -180,15 +180,39 @@ if (categoryCreateForm) {
         errorMessage: 'Vui lòng nhập tên danh mục!',
       },
     ])
-    
+
     .onSuccess((event) => {
       const categoryName = event.target.categoryName.value;
       const parent = event.target.parent.value;
       const position = event.target.position.value;
       const status = event.target.status.value;
-      const avatar = filePond.avatar.getFile().file;
+      const avatar = filePond.avatar.getFile()?.file||null;
       const description = tinymce.get('description').getContent();
-      console.log(categoryName, parent, position, status,avatar, description);
+
+      const formData = new FormData();
+      formData.append('categoryName', categoryName);
+      formData.append('parent', parent);
+      formData.append('position', position);
+      formData.append('status', status);
+      // formData.append('avatar', avatar);
+      formData.append('description', description);
+      fetch(`/${pathAdmin}/category/create`, { // Thay đổi URL thành URL mới
+        method: 'POST',
+        body: formData,
+      })
+      .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
+            // drawNotyf("error", data.message); // In ra thông báo lỗi khi bị load lại trang
+          }
+          if (data.code === 'success') {
+            console.log(data)
+            //notyf.success(data.message); // In ra thông báo thành công khi ko bị load lại trang
+            drawNotyf(data.code, data.message);// In ra thông báo thành công khi bị load lại trang
+            window.location.reload();
+          }
+        })
     });
 }
 // End validate category create form
@@ -204,28 +228,28 @@ if (tourCreateForm) {
         errorMessage: 'Vui lòng nhập tên tour!',
       },
     ])
-    
+
     .onSuccess((event) => {
       const tourName = event.target.tourName.value;
       const category = event.target.category.value;
       const position = event.target.position.value;
       const status = event.target.status.value;
-      const avatar = filePond.avatar.getFile()?.file || null;      
-      const priceAdult = event.target.priceAdult.value;      
-      const priceChildren = event.target.priceChildren.value; 
-      const priceBaby = event.target.priceBaby.value;      
-      const newPriceAdult = event.target.newPriceAdult.value;      
-      const newPriceChildren = event.target.newPriceChildren.value;      
-      const newPriceBaby = event.target.newPriceBaby.value;      
-      const stockAdult = event.target.stockAdult.value;      
-      const stockChildren = event.target.stockChildren.value;      
-      const stockBaby = event.target.stockBaby.value;      
+      const avatar = filePond.avatar.getFile()?.file || null;
+      const priceAdult = event.target.priceAdult.value;
+      const priceChildren = event.target.priceChildren.value;
+      const priceBaby = event.target.priceBaby.value;
+      const newPriceAdult = event.target.newPriceAdult.value;
+      const newPriceChildren = event.target.newPriceChildren.value;
+      const newPriceBaby = event.target.newPriceBaby.value;
+      const stockAdult = event.target.stockAdult.value;
+      const stockChildren = event.target.stockChildren.value;
+      const stockBaby = event.target.stockBaby.value;
       const loaction = [];
       const time = event.target.time.value;
       const vihicle = event.target.vehicle.value;
       const departureDate = event.target.departureDate.value;
       const information = tinymce.get('information').getContent();
-      const schedule= [];
+      const schedule = [];
       // location
       const listLocationChecked = document.querySelectorAll('input[name="locations"]:checked');
       listLocationChecked.forEach((location) => {
@@ -234,7 +258,7 @@ if (tourCreateForm) {
       // end location
       // schedule
       const listSchedule = document.querySelectorAll('.section-8 .inner-schedule-list .inner-schedule-item');
-      listSchedule.forEach((item) => { 
+      listSchedule.forEach((item) => {
         const inputTitle = item.querySelector('.inner-schedule-head input');
         const title = inputTitle ? inputTitle.value : '';
         const textarea = item.querySelector('[textarea-mce]');
@@ -246,7 +270,7 @@ if (tourCreateForm) {
         });
       })
       // schedule
-      
+
 
       console.log(tourName);
       console.log(category);
@@ -295,15 +319,15 @@ if (orderEditForm) {
         errorMessage: 'Số điện thoại chưa đúng định dạng Việt Nam!',
       },
     ])
-    
+
     .onSuccess((event) => {
       const customerName = event.target.customerName.value;
       const phone = event.target.phone.value;
       const notes = event.target.notes.value;
       const paymentMethod = event.target.paymentMethod.value;
-      const paymentStatus = event.target.paymentStatus.value;      
-      const orderDate = event.target.orderDate.value; 
-      const status = event.target.status.value;      
+      const paymentStatus = event.target.paymentStatus.value;
+      const orderDate = event.target.orderDate.value;
+      const status = event.target.status.value;
       console.log(customerName);
       console.log(phone);
       console.log(notes);
@@ -460,7 +484,7 @@ if (roleCreateForm) {
         errorMessage: 'Vui lòng nhập tên nhóm quyền!',
       },
     ])
-    
+
     .onSuccess((event) => {
       const categoryName = event.target.nameRole.value;
       const description = event.target.description.value;
@@ -585,4 +609,3 @@ if (changePasswordForm) {
 // End validate profile change password form
 
 
-       
