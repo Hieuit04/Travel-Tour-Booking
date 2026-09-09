@@ -59,25 +59,31 @@ block main
           th Cập nhật bởi
           th Hành động
       tbody
-        tr
-          td
-            +checkbox-30("", "")
-          td Danh mục 1
-          td
-            img(src="/admin/assets/images/demo-tour-1.png" class="inner-avatar")
-          td 1
-          td
-            .tag.tag-green Hoạt động
-          td
-            div Lê Văn A
-            .inner-time 16:30 - 20/10/2024
-          td
-            div Lê Văn B
-            .inner-time 16:30 - 20/10/2024
-          td
-            .inner-action
-              a(href="#") <i class="fa-regular fa-pen-to-square"></i>
-              a(href="#" class="inner-remove") <i class="fa-regular fa-trash-can"></i>
+        each item in categoryList
+          tr 
+            td
+              +checkbox-30("", "")
+            td #{item.categoryName}
+            td
+              img(src=item.avatar class="inner-avatar")
+            td #{item.position}
+            td
+              if(item.status === "active")
+                .tag.tag-green Hoạt động
+              else if (item.status === "inactive")
+                .tag.tag-red Tạm dừng
+            td
+              if(item.createdBy)
+                div #{item.createdByName}
+                .inner-time #{item.createdAtFormat}
+            td
+              if(item.updatedBy)
+                div #{item.updatedByName}
+                .inner-time #{item.updatedAtFormat}
+            td
+              .inner-action
+                a(href="#") <i class="fa-regular fa-pen-to-square"></i>
+                a(href="#" class="inner-remove") <i class="fa-regular fa-trash-can"></i>
   //- End Section 6
 
   //- Section 7

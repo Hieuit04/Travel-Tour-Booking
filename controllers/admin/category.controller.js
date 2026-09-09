@@ -1,9 +1,29 @@
 const Category = require('../../models/category.model');
+const AccountAdmin = require('../../models/accounts-admin.model');
 const buildCategoryTree = require('../../helpers/categoryTree.helper');
-
-module.exports.list = (req, res) => {
+const moment = require('moment');
+module.exports.list = async (req, res) => {
+  const categoryList = await Category
+    .find({})
+    .sort({
+      position: "desc"
+    })
+    ;
+  for (const item of categoryList) {
+    if (item.createdBy) {
+      const createdBy = await AccountAdmin.findById(item.createdBy);
+      item.createdByName = createdBy ? createdBy.fullName : "";
+      item.createdAtFormat = moment(item.createdAt).format("HH:mm - DD/MM/YYYY");
+    }
+    if (item.updatedBy) {
+      const updatedBy = await AccountAdmin.findById(item.updatedBy);
+      item.updatedByName = updatedBy ? updatedBy.fullName : "";
+      item.updatedAtFormat = moment(item.updateAt).format("HH:mm - DD/MM/YYYY");
+    }
+  }
   res.render('admin/pages/category-list', {
     pageTitle: 'Danh sách danh mục',
+    categoryList: categoryList,
   });
 }
 
@@ -44,7 +64,7 @@ module.exports.createPost = async (req, res) => {
     })
   } catch (error) {
     console.log("===> LỖI CREATE POST:", error);
-    res.json({ 
+    res.json({
       code: "error",
       message: "Dữ liệu không hợp lệ!"
     })
