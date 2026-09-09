@@ -186,9 +186,8 @@ if (categoryCreateForm) {
       const parent = event.target.parent.value;
       const position = event.target.position.value;
       const status = event.target.status.value;
-      const avatar = filePond.avatar?.getFile()?.file
-        || document.querySelector('#avatar')?.files[0]
-        || null;
+       const avatar = filePond.avatar?.getFile()?.file || null;
+
       const description = tinymce.get('description').getContent();
 
       const formData = new FormData();

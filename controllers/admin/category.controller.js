@@ -39,7 +39,8 @@ module.exports.createPost = async (req, res) => {
       message: "Danh mục đã được tạo thành công",
     })
   } catch (error) {
-    res.json({
+    console.log("===> LỖI CREATE POST:", error);
+    res.json({ 
       code: "error",
       message: "Dữ liệu không hợp lệ!"
     })
