@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const categoryController = require('../../controllers/admin/category.controller');
+const categoryValidate = require('../../validates/admin/category.validate');
+
 
 const {storage} = require('../../helpers/cloundinary.helper'); // Import multer storage configuration
 
@@ -16,6 +18,7 @@ router.get('/create', categoryController.create);
 router.post(
   '/create',
   upload.single("avatar"),
+  categoryValidate.categoryCreatePost, 
   categoryController.createPost
 );
 
