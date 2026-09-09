@@ -1,5 +1,5 @@
 extends ../layouts/default.pug
-
+include ../mixins/select-tree.pug
 
 block main
   h1.box-title Tạo danh mục
@@ -14,8 +14,9 @@ block main
         label(for="parent") Danh mục cha
         select(name="parent" id="parent")
           option(value="") -- Chọn danh mục --
-          each item in categoryList 
-            option(value=item.id) #{item.categoryName}
+          //- 2. Gọi mixin truyền vào categoryTree từ backend
+          if categoryTree
+            +select-tree(categoryTree)
       .inner-group
         label(for="position") Vị trí
         input(type="number" name="position" id="position")

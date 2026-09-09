@@ -1,0 +1,10 @@
+//- 1. Khai báo mixin đệ quy để vẽ các option có thụt lề
+mixin select-tree(items, level = 1)
+  each item in items
+    //- Tạo tiền tố: cấp 1 không có, cấp 2 là "-- ", cấp 3 là "---- "
+    - const prefix = Array(level).join("--")
+    option(value=item._id) #{prefix} #{item.categoryName}
+    
+    //- Nếu có danh mục con thì tự gọi lại chính mixin này với level + 1
+    if item.children && item.children.length > 0
+      +select-tree(item.children, level + 1)
