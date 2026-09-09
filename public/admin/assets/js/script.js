@@ -109,10 +109,16 @@ if (listFilepondImage.length > 0) {
   FilePond.registerPlugin(FilePondPluginImagePreview);
   // FilePond.registerPlugin(FilePondPluginImageCrop);`
   FilePond.registerPlugin(FilePondPluginFileValidateType);
-
+  
   listFilepondImage.forEach((filepondImage) => {
+    const file = []
+    const imageDefault = filepondImage.getAttribute('image-default')
+    if (imageDefault) {
+      file.push(imageDefault);
+    }
     filePond[filepondImage.name] = FilePond.create(filepondImage, {
       labelIdle: '+',
+      files: file,
       // allowImageCrop: true,
       // imageCropAspectRatio: '1:1',
     });
@@ -220,6 +226,58 @@ if (categoryCreateForm) {
     });
 }
 // End validate category create form
+
+// Validate edit form
+const categoryEditForm = document.querySelector('.section-8 #category-edit-form');
+if (categoryEditForm) {
+  const validator = new JustValidate('#category-edit-form');
+  validator
+    .addField('#categoryName', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập tên danh mục!',
+      },
+    ])
+
+    .onSuccess((event) => {
+      const id = event.target.id.value;
+      const categoryName = event.target.categoryName.value;
+      const parent = event.target.parent.value;
+      const position = event.target.position.value;
+      const status = event.target.status.value;
+       const avatar = filePond.avatar?.getFile()?.file || null;
+
+      const description = tinymce.get('description').getContent();
+
+      const formData = new FormData();
+      formData.append('categoryName', categoryName);
+      formData.append('parent', parent);
+      formData.append('position', position);
+      formData.append('status', status);
+      if (avatar) {
+        formData.append('avatar', avatar, avatar.name);
+      }
+      formData.append('description', description);
+      console.log('Avatar sent:', avatar);
+      fetch(`/${pathAdmin}/category/edit/${id}`, { // Thay đổi URL thành URL mới
+        method: 'PATCH',
+        body: formData,
+      })
+      .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
+            // drawNotyf("error", data.message); // In ra thông báo lỗi khi bị load lại trang
+          }
+          if (data.code === 'success') {
+            console.log(data)
+            notyf.success(data.message); // In ra thông báo thành công khi ko bị load lại trang
+            
+          }
+        })
+    });
+}
+// End validate edit form
 
 // Validate tour create form
 const tourCreateForm = document.querySelector('.section-8 #tour-create-form');
