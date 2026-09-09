@@ -6,9 +6,11 @@ module.exports.list = (req, res) => {
   });
 }
 
-module.exports.create = (req, res) => {
+module.exports.create = async (req, res) => {
+  const categoryList = await Category.find({});
   res.render('admin/pages/category-create', {
     pageTitle: 'Tạo mới danh mục',
+    categoryList: categoryList,
   });
 }
 

@@ -14,8 +14,8 @@ block main
         label(for="parent") Danh mục cha
         select(name="parent" id="parent")
           option(value="") -- Chọn danh mục --
-          option(value="danh-muc-1") Danh mục 1
-          option(value="danh-muc-2") Danh mục 2
+          each item in categoryList 
+            option(value=item.id) #{item.categoryName}
       .inner-group
         label(for="position") Vị trí
         input(type="number" name="position" id="position")
