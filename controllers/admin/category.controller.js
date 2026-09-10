@@ -4,7 +4,9 @@ const buildCategoryTree = require('../../helpers/categoryTree.helper');
 const moment = require('moment');
 module.exports.list = async (req, res) => {
   const categoryList = await Category
-    .find({})
+    .find({
+      deleted: false
+    })
     .sort({
       position: "desc"
     })
@@ -28,7 +30,9 @@ module.exports.list = async (req, res) => {
 }
 
 module.exports.create = async (req, res) => {
-  const categoryList = await Category.find({});
+  const categoryList = await Category.find({
+    deleted: false,
+  });
   const categoryTree = buildCategoryTree(categoryList, "");
   res.render('admin/pages/category-create', {
     pageTitle: 'Tạo mới danh mục',
@@ -79,7 +83,9 @@ module.exports.edit = async (req, res) => {
       res.redirect('/${pathAdmin}/category/list');
       return;
     }
-    const categoryList = await Category.find({});
+    const categoryList = await Category.find({
+      deleted: false,
+    });
     const categoryTree = buildCategoryTree(categoryList, "");
     res.render('admin/pages/category-edit', {
       pageTitle: 'Sửa danh mục',
@@ -93,16 +99,17 @@ module.exports.edit = async (req, res) => {
 }
 
 module.exports.editPatch = async (req, res) => {
-  const id = req.params.id;
-  const categoryDetail = await Category.findById(id);
-  if (!categoryDetail) {
-    res.json({
-      code: "error",
-      message: "Danh mục không tồn tại!",
-    })
-    return;
-  }
+
   try {
+    const id = req.params.id;
+    const categoryDetail = await Category.findById(id);
+    if (!categoryDetail) {
+      res.json({
+        code: "error",
+        message: "Danh mục không tồn tại!",
+      })
+      return;
+    }
     if (req.body.position) {
       req.body.position = parseInt(req.body.position);
     }
@@ -127,6 +134,37 @@ module.exports.editPatch = async (req, res) => {
     res.json({
       code: "success",
       message: "Danh mục đã được cập nhật thành công",
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
+
+module.exports.deletePatch = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const categoryDetail = await Category.findById(id);
+    if (!categoryDetail) {
+      res.json({
+        code: "error",
+        message: "Danh mục không tồn tại!",
+      })
+      return;
+    }
+    
+    await Category.updateOne({
+      _id: id
+    }, {
+      deleted: true,
+      deletedBy: res.locals.account.id, 
+      deletedAt: new Date()
+    })
+    res.json({
+      code: "success",
+      message: "Đã xoá danh mục!",
     })
   } catch (error) {
     res.json({

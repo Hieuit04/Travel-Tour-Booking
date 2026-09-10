@@ -109,7 +109,7 @@ if (listFilepondImage.length > 0) {
   FilePond.registerPlugin(FilePondPluginImagePreview);
   // FilePond.registerPlugin(FilePondPluginImageCrop);`
   FilePond.registerPlugin(FilePondPluginFileValidateType);
-  
+
   listFilepondImage.forEach((filepondImage) => {
     const file = []
     const imageDefault = filepondImage.getAttribute('image-default')
@@ -188,11 +188,16 @@ if (categoryCreateForm) {
     ])
 
     .onSuccess((event) => {
+      const btnSubmit = event.target.querySelector('button[type="submit"]');
+      // 1. Khóa nút và đổi text thành đang xử lý
+      btnSubmit.disabled = true;
+      btnSubmit.innerText = "Đang xử lý..."
+
       const categoryName = event.target.categoryName.value;
       const parent = event.target.parent.value;
       const position = event.target.position.value;
       const status = event.target.status.value;
-       const avatar = filePond.avatar?.getFile()?.file || null;
+      const avatar = filePond.avatar?.getFile()?.file || null;
 
       const description = tinymce.get('description').getContent();
 
@@ -210,8 +215,11 @@ if (categoryCreateForm) {
         method: 'POST',
         body: formData,
       })
-      .then(res => res.json())
+        .then(res => res.json())
         .then(data => {
+          // 2. Mở lại nút nếu có lỗi
+          btnSubmit.disabled = false;
+          btnSubmit.innerText = "Tạo mới";
           if (data.code === 'error') {
             notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
             // drawNotyf("error", data.message); // In ra thông báo lỗi khi bị load lại trang
@@ -245,7 +253,7 @@ if (categoryEditForm) {
       const parent = event.target.parent.value;
       const position = event.target.position.value;
       const status = event.target.status.value;
-       const avatar = filePond.avatar?.getFile()?.file || null;
+      const avatar = filePond.avatar?.getFile()?.file || null;
 
       const description = tinymce.get('description').getContent();
 
@@ -263,7 +271,7 @@ if (categoryEditForm) {
         method: 'PATCH',
         body: formData,
       })
-      .then(res => res.json())
+        .then(res => res.json())
         .then(data => {
           if (data.code === 'error') {
             notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
@@ -272,12 +280,14 @@ if (categoryEditForm) {
           if (data.code === 'success') {
             console.log(data)
             notyf.success(data.message); // In ra thông báo thành công khi ko bị load lại trang
-            
+
           }
         })
     });
 }
 // End validate edit form
+
+
 
 // Validate tour create form
 const tourCreateForm = document.querySelector('.section-8 #tour-create-form');
@@ -671,3 +681,32 @@ if (changePasswordForm) {
 // End validate profile change password form
 
 
+
+// Button delete
+const listBtnDelete = document.querySelectorAll('[button-delete]');
+if (listBtnDelete.length > 0) {
+  listBtnDelete.forEach((button) => {
+    button.addEventListener('click', async (e) => {
+      const isConfirm = confirm('Vui lòng xác nhận xóa!');
+      if (!isConfirm) {
+        return;
+      }
+      const dataApi = button.getAttribute('data-api');
+      fetch(dataApi, {
+        method: 'PATCH',
+
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code === 'success') {
+            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
+            window.location.reload();
+          }
+        })
+    })
+  })
+}
+// End button delete 

@@ -15,7 +15,14 @@ const schema = new mongoose.Schema({
     type: String,
     slug: "categoryName",
     unique: true,
-  }
+  },
+  deleted: {
+    type: Boolean,
+    default: false,
+  },
+  deletedAt: Date,
+  deletedBy: String,
+
 },{timestamps: true});
 
 const Category = mongoose.model('Category', schema, 'categories');
