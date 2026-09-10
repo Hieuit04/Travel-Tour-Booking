@@ -19,7 +19,7 @@ module.exports.list = async (req, res) => {
   // Lọc theo ngày tạo
   if (req.query.startDate) {
     find.createdAt = {
-      $gte : new Date(req.query.startDate),
+      $gte: new Date(req.query.startDate),
     }
   }
   if (req.query.endDate) {
@@ -181,18 +181,71 @@ module.exports.deletePatch = async (req, res) => {
       })
       return;
     }
-    
+
     await Category.updateOne({
       _id: id
     }, {
       deleted: true,
-      deletedBy: res.locals.account.id, 
+      deletedBy: res.locals.account.id,
       deletedAt: new Date()
     })
     res.json({
       code: "success",
       message: "Đã xoá danh mục!",
     })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
+
+module.exports.changeMultiPatch = async (req, res) => {
+  try {
+    const adminId = res.locals.account.id;
+    const { listId, option } = req.body;
+
+    console.log("===> ", adminId, listId, option)
+    switch (option) {
+      case "active":
+      case "inactive":
+        await Category.updateMany({
+          _id: {
+            $in: listId
+          }
+        }, {
+          status: option,
+          updatedBy: adminId,
+        })
+        res.json({
+          code: 'success',
+          message: 'Cập nhật danh mục thành công!'
+        })
+        break;
+      case "delete":
+        await Category.updateMany({
+          _id: {
+            $in: listId
+          }
+        }, {
+          deleted: true,
+          deletedBy: adminId,
+          deletedAt: Date.now(),
+        })
+        res.json({
+          code: 'success',
+          message: 'Xoá danh mục thành công!'
+        })
+        break;
+      default:
+        res.json({
+          code: 'error',
+          message: 'Hành động không hợp lệ!'
+        })
+        break;
+    }
+
   } catch (error) {
     res.json({
       code: "error",

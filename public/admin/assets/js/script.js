@@ -715,7 +715,9 @@ if (listBtnDelete.length > 0) {
 const listFilter = document.querySelectorAll('[filter]');
 if (listFilter.length > 0) {
   const url = new URL(window.location.href)
+  const listName =[]
   listFilter.forEach((filter) => {
+    listName.push(filter.name);
     filter.addEventListener('change', () => {
       const name = filter.name;
       const value = filter.value;
@@ -733,7 +735,76 @@ if (listFilter.length > 0) {
       filter.value = valueCurent;
     }
   })
-
+  // Button reset filter 
+  const btnResetFilter = document.querySelector('[button-reset-filter]');
+  if (btnResetFilter) {
+    btnResetFilter.addEventListener('click', () => {
+      const url = new URL(window.location.href);
+      listName.forEach((name) => { 
+        url.searchParams.delete(name);
+      })
+      window.location.href = url.href;
+    })
+  }
+  // End Button reset filter 
 }
 
 // End Filter
+
+// Check All
+const checkAll = document.querySelector('[name="check-all"]');
+if (checkAll) {
+  checkAll.addEventListener('click', () => {
+    const listCheck = document.querySelectorAll('[name="check-item"]');
+    listCheck.forEach((check) => {
+      check.checked = checkAll.checked;
+    })
+  })
+}
+// End Check All
+
+// Change Multi 
+const changeMulti = document.querySelector('[change-multi]');
+if (changeMulti) {
+  const select = changeMulti.querySelector("select")
+  const button = changeMulti.querySelector("button")
+  const dataApi = changeMulti.getAttribute("data-api")
+  button.addEventListener("click", async () => { 
+    const option = select.value;
+    const listInputChecked = document.querySelectorAll('[name="check-item"]:checked');
+    const listId = [];
+    listInputChecked.forEach((input) => {
+      listId.push(input.value);
+    })
+    if (!option) {
+      notyf.error("Vui lòng chọn một hành động!");
+      return;
+    }
+    if (listId.length < 1) {
+      notyf.error("Vui lòng chọn ít nhất một danh mục!");
+      return;
+    }
+    dataFinal = {
+      option : option,
+      listId : listId,
+    }
+    fetch(dataApi, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataFinal),
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.code === "error") {
+          notyf.error(data.message);
+        }
+        if (data.code === "success") {
+          drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
+          window.location.reload();
+        }
+      })
+  })
+}
+// End Change Multi 

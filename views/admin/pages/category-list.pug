@@ -23,21 +23,21 @@ block main
         input(filter name="startDate" type="date")
         span -
         input(filter name="endDate" type="date")
-      .inner-item.inner-reset
+      .inner-item.inner-reset(button-reset-filter)
         <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
   //- End Section 4
 
   //- Section 5
   .section-5
-    form.inner-status
+    form.inner-status(change-multi data-api=`/${pathAdmin}/category/change-multi`)
       .inner-item
         select
           option(value="") -- Hành động --
-          option(value="") Hoạt động
-          option(value="") Tạm dừng
-          option(value="") Xóa
+          option(value="active") Hoạt động
+          option(value="inactive") Tạm dừng
+          option(value="delete") Xóa
       .inner-item
-        button Áp dụng
+        button(type="button") Áp dụng
     form.inner-search
       button <i class="fa-solid fa-magnifying-glass"></i>
       input(type="text" placeholder="Tìm kiếm")
@@ -50,7 +50,7 @@ block main
       thead
         tr
           th
-            +checkbox-30("", "")
+            +checkbox-30("check-all", "")
           th Tên danh mục
           th Ảnh đại diện
           th Vị trí
@@ -62,7 +62,7 @@ block main
         each item in categoryList
           tr 
             td
-              +checkbox-30("", "")
+              +checkbox-30("check-item", "",item.id)
             td #{item.categoryName}
             td
               img(src=item.avatar class="inner-avatar")
