@@ -712,25 +712,28 @@ if (listBtnDelete.length > 0) {
 // End button delete
 
 // Filter
-const filter = document.querySelector('[filter]');
-if (filter) {
+const listFilter = document.querySelectorAll('[filter]');
+if (listFilter.length > 0) {
   const url = new URL(window.location.href)
-  const name = filter.name;
-  filter.addEventListener('change', () => {
-    const value = filter.value;
-    if (value) {
-      url.searchParams.set(name, value);
+  listFilter.forEach((filter) => {
+    filter.addEventListener('change', () => {
+      const name = filter.name;
+      const value = filter.value;
+      if (value) {
+        url.searchParams.set(name, value);
+      }
+      else {
+        url.searchParams.delete(filter.name);
+      }
+      window.location.href = url.href;
+    })
+    // Hiển thị lựa chọn mặc định
+    const valueCurent = url.searchParams.get(filter.name);
+    if (valueCurent) {
+      filter.value = valueCurent;
     }
-    else {
-      url.searchParams.delete(name);
-    }
-    window.location.href = url.href;
   })
-  // Hiển thị lựa chọn mặc định
-  const valueCurent = url.searchParams.get(name);
-  if (valueCurent) {
-    filter.value = valueCurent;
-  }
+
 }
 
 // End Filter 

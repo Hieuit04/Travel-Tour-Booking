@@ -15,10 +15,10 @@ block main
           option(value="active") Hoạt động
           option(value="inactive") Tạm dừng
       .inner-item
-        select
+        select(filter name="createdBy")
           option(value="") Người tạo
-          option(value="") Lê Văn A
-          option(value="") Lê Văn B
+          each item in accountList 
+            option(value=item._id) #{item.fullName}
       .inner-item
         input(type="date")
         span -
