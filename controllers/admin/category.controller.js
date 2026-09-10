@@ -3,10 +3,16 @@ const AccountAdmin = require('../../models/accounts-admin.model');
 const buildCategoryTree = require('../../helpers/categoryTree.helper');
 const moment = require('moment');
 module.exports.list = async (req, res) => {
+  const find = {
+    deleted: false,
+  }
+  // Lọc theo trạng thái
+  if (req.query.status) {
+    find.status = req.query.status;
+  }
+  // End Lọc theo trạng thái
   const categoryList = await Category
-    .find({
-      deleted: false
-    })
+    .find(find)
     .sort({
       position: "desc"
     })

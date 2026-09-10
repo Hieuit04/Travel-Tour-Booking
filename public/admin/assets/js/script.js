@@ -709,4 +709,28 @@ if (listBtnDelete.length > 0) {
     })
   })
 }
-// End button delete 
+// End button delete
+
+// Filter
+const filter = document.querySelector('[filter]');
+if (filter) {
+  const url = new URL(window.location.href)
+  const name = filter.name;
+  filter.addEventListener('change', () => {
+    const value = filter.value;
+    if (value) {
+      url.searchParams.set(name, value);
+    }
+    else {
+      url.searchParams.delete(name);
+    }
+    window.location.href = url.href;
+  })
+  // Hiển thị lựa chọn mặc định
+  const valueCurent = url.searchParams.get(name);
+  if (valueCurent) {
+    filter.value = valueCurent;
+  }
+}
+
+// End Filter 
