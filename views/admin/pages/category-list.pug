@@ -20,9 +20,9 @@ block main
           each item in accountList 
             option(value=item._id) #{item.fullName}
       .inner-item
-        input(type="date")
+        input(filter name="startDate" type="date")
         span -
-        input(type="date")
+        input(filter name="endDate" type="date")
       .inner-item.inner-reset
         <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
   //- End Section 4

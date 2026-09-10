@@ -16,6 +16,20 @@ module.exports.list = async (req, res) => {
     find.createdBy = req.query.createdBy;
   }
   // End Lọc theo người tạo
+  // Lọc theo ngày tạo
+  if (req.query.startDate) {
+    find.createdAt = {
+      $gte : new Date(req.query.startDate),
+    }
+  }
+  if (req.query.endDate) {
+    const endDate = new Date(req.query.endDate); // Ngày kết thúc
+    find.createdAt = {
+      ...find.createdAt,
+      $lte: new Date(endDate.setUTCHours(23, 59, 59, 999)),
+    }
+  }
+  // End Lọc theo ngày tạo
   const categoryList = await Category
     .find(find)
     .sort({
