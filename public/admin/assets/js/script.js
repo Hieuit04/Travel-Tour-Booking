@@ -807,4 +807,26 @@ if (changeMulti) {
       })
   })
 }
-// End Change Multi 
+// End Change Multi
+
+// search
+const inputSearch = document.querySelector('[input-search]');
+if (inputSearch) {
+  const url = new URL(window.location.href);
+  inputSearch.addEventListener('keyup',(event) => {
+    if (event.code !== "Enter") return;
+    const value = event.target.value;
+    if (value) {
+      url.searchParams.set('keyword', value);
+    }
+    else {
+      url.searchParams.delete('keyword');
+    }
+    window.location.href = url.href;
+  })
+  const valueCurent = url.searchParams.get('keyword').trim().replace(/\s+/g," ");
+  if (valueCurent) {
+    inputSearch.value = valueCurent;
+  }
+}
+// end search

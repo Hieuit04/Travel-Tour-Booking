@@ -2,6 +2,7 @@ const Category = require('../../models/category.model');
 const AccountAdmin = require('../../models/accounts-admin.model');
 const buildCategoryTree = require('../../helpers/categoryTree.helper');
 const moment = require('moment');
+const slugify = require('slugify')
 module.exports.list = async (req, res) => {
   const find = {
     deleted: false,
@@ -30,6 +31,15 @@ module.exports.list = async (req, res) => {
     }
   }
   // End Lọc theo ngày tạo
+  // Tìm kiếm
+  if (req.query.keyword) {
+    const slug = slugify(req.query.keyword, {
+      lower: true,
+    });
+    const regex = new RegExp(slug, "i"); 
+    find.slug = regex;
+  }
+  // End Tìm kiếm
   const categoryList = await Category
     .find(find)
     .sort({
