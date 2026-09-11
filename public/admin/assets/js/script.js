@@ -824,9 +824,31 @@ if (inputSearch) {
     }
     window.location.href = url.href;
   })
-  const valueCurent = url.searchParams.get('keyword').trim().replace(/\s+/g," ");
+  const keyword = url.searchParams.get('keyword');
+  const valueCurent = keyword ? keyword.trim().replace(/\s+/g, " ") : "";
   if (valueCurent) {
     inputSearch.value = valueCurent;
   }
 }
 // end search
+
+// pagination
+const selectPagination = document.querySelector('[pagination]');
+if (selectPagination) {
+  const url = new URL(window.location.href);
+  selectPagination.addEventListener('change', () => { 
+    const value = selectPagination.value;
+    if (value) {
+      url.searchParams.set('page', value);
+    }
+    else {
+      url.searchParams.delete('page');
+    }
+    window.location.href = url.href;
+  })
+  const valueCurent = url.searchParams.get('page');
+  if (valueCurent) {
+    selectPagination.value = valueCurent;
+  }
+}
+// end pagination
