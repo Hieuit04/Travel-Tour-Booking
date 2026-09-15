@@ -342,29 +342,45 @@ if (tourCreateForm) {
         });
       })
       // schedule
-
-
-      console.log(tourName);
-      console.log(category);
-      console.log(position);
-      console.log(status);
-      console.log(avatar);
-      console.log(priceAdult);
-      console.log(priceChildren);
-      console.log(priceBaby);
-      console.log(newPriceAdult);
-      console.log(newPriceChildren);
-      console.log(newPriceBaby);
-      console.log(stockAdult);
-      console.log(stockChildren);
-      console.log(stockBaby);
-      console.log(loaction);
-      console.log(time);
-      console.log(vihicle);
-      console.log(departureDate);
-      console.log(information);
-      console.log(schedule);
-    });
+      const formData = new FormData();
+      formData.append('tourName', tourName);
+      formData.append('category', category);
+      formData.append('position', position);
+      formData.append('status', status);
+      if (avatar) {
+        formData.append('avatar', avatar);
+      }
+      formData.append('priceAdult', priceAdult);
+      formData.append('priceChildren', priceChildren);
+      formData.append('priceBaby', priceBaby);
+      formData.append('newPriceAdult', newPriceAdult);
+      formData.append('newPriceChildren', newPriceChildren);
+      formData.append('newPriceBaby', newPriceBaby);
+      formData.append('stockAdult', stockAdult);
+      formData.append('stockChildren', stockChildren);
+      formData.append('stockBaby', stockBaby);
+      formData.append('loaction', JSON.stringify(loaction));
+      formData.append('time', time);
+      formData.append('vihicle', vihicle);
+      formData.append('departureDate', departureDate);
+      formData.append('information', information);
+      formData.append('schedule', JSON.stringify(schedule));
+      fetch(`/${pathAdmin}/tour/create`, { // Thay đổi URL thành URL mới
+        method: 'POST',
+        body: formData,
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
+            // drawNotyf("error", data.message); // In ra thông báo lỗi khi bị load lại trang
+          }
+          if (data.code === 'success') {
+            drawNotyf(data.code, data.message);// In ra thông báo thành công khi bị load lại trang
+            window.location.reload();
+          }
+        });
+    })
 }
 // End validate tour create form
 
@@ -715,7 +731,7 @@ if (listBtnDelete.length > 0) {
 const listFilter = document.querySelectorAll('[filter]');
 if (listFilter.length > 0) {
   const url = new URL(window.location.href)
-  const listName =[]
+  const listName = []
   listFilter.forEach((filter) => {
     listName.push(filter.name);
     filter.addEventListener('change', () => {
@@ -740,7 +756,7 @@ if (listFilter.length > 0) {
   if (btnResetFilter) {
     btnResetFilter.addEventListener('click', () => {
       const url = new URL(window.location.href);
-      listName.forEach((name) => { 
+      listName.forEach((name) => {
         url.searchParams.delete(name);
       })
       window.location.href = url.href;
@@ -769,7 +785,7 @@ if (changeMulti) {
   const select = changeMulti.querySelector("select")
   const button = changeMulti.querySelector("button")
   const dataApi = changeMulti.getAttribute("data-api")
-  button.addEventListener("click", async () => { 
+  button.addEventListener("click", async () => {
     const option = select.value;
     const listInputChecked = document.querySelectorAll('[name="check-item"]:checked');
     const listId = [];
@@ -785,8 +801,8 @@ if (changeMulti) {
       return;
     }
     dataFinal = {
-      option : option,
-      listId : listId,
+      option: option,
+      listId: listId,
     }
     fetch(dataApi, {
       method: "PATCH",
@@ -794,7 +810,7 @@ if (changeMulti) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(dataFinal),
-      })
+    })
       .then(res => res.json())
       .then(data => {
         if (data.code === "error") {
@@ -813,7 +829,7 @@ if (changeMulti) {
 const inputSearch = document.querySelector('[input-search]');
 if (inputSearch) {
   const url = new URL(window.location.href);
-  inputSearch.addEventListener('keyup',(event) => {
+  inputSearch.addEventListener('keyup', (event) => {
     if (event.code !== "Enter") return;
     const value = event.target.value;
     if (value) {
@@ -836,7 +852,7 @@ if (inputSearch) {
 const selectPagination = document.querySelector('[pagination]');
 if (selectPagination) {
   const url = new URL(window.location.href);
-  selectPagination.addEventListener('change', () => { 
+  selectPagination.addEventListener('change', () => {
     const value = selectPagination.value;
     if (value) {
       url.searchParams.set('page', value);

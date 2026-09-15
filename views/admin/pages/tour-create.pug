@@ -1,5 +1,6 @@
 extends ../layouts/default.pug
 include ../mixins/checkbox.pug
+include ../mixins/select-tree.pug
 
 block main
   h1.box-title Tạo tour
@@ -14,16 +15,16 @@ block main
         label(for="category") Danh mục
         select(name="category" id="category")
           option(value="") -- Chọn danh mục --
-          option(value="danh-muc-1") Danh mục 1
-          option(value="danh-muc-2") Danh mục 2
+          if categoryTree
+            +select-tree(categoryTree)
       .inner-group
         label(for="position") Vị trí
         input(type="number" name="position" id="position")
       .inner-group
         label(for="status") Trạng thái
         select(name="status" id="status")
-          option(value="hoat-dong") Hoạt động
-          option(value="tam-dung") Tạm dừng
+          option(value="active") Hoạt động                          
+          option(value="inactive") Tạm dừng
       .inner-group.inner-two-col
         label(for="avatar") Ảnh đại diện
         input(type="file" name="avatar" id="avatar" accept="image/*" filepondImage).inner-upload-image
@@ -66,18 +67,10 @@ block main
       .inner-group
         label(for="") Những địa điểm có tour
         .inner-checkbox-list
-          .inner-checkbox-item
-            +checkbox-30("locations", "location-1", "1")
-            label(for="") Hà Nội
-          .inner-checkbox-item
-            +checkbox-30("locations", "location-2", "2")
-            label(for="") Đà Nẵng
-          .inner-checkbox-item
-            +checkbox-30("locations", "location-3", "3")
-            label(for="") Nha Trang
-          .inner-checkbox-item
-            +checkbox-30("locations", "location-4", "4")
-            label(for="") Hồ Chí Minh
+          each item in cityList
+            .inner-checkbox-item
+              +checkbox-30("locations", `location-${item.id}`, item.id)
+              label(for=`location-${item.id}`) #{item.name}
       .inner-group
         label(for="time") Thời gian
         input(type="text" name="time" id="time")

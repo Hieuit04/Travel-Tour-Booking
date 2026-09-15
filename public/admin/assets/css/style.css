@@ -457,6 +457,7 @@ input, textarea, select, button {
   height: calc(100vh - 70px);
   overflow: auto;
   border-right: 1px solid #E0E0E0;
+  z-index: 999;
 }
 
 .sider .inner-list {
