@@ -10,6 +10,14 @@ router.get('/list', tourController.list);
 router.get('/create', tourController.create);
 router.get('/trash', tourController.trash);
 
-router.post('/create', upload.single("avatar"),tourController.createPost);
+router.post('/create', upload.single("avatar"), tourController.createPost);
+
+router.get(
+  '/edit/:id',
+  upload.single("avatar"),
+  tourController.edit
+);
+
+router.patch('/edit/:id', upload.single("avatar"), tourController.editPatch);
 
 module.exports = router;

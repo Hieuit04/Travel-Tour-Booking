@@ -136,7 +136,7 @@ module.exports.edit = async (req, res) => {
     const id = req.params.id;
     const categoryDetail = await Category.findById(id);
     if (!categoryDetail) {
-      res.redirect('/${pathAdmin}/category/list');
+      res.redirect(`/${pathAdmin}/category/list`);
       return;
     }
     const categoryList = await Category.find({
@@ -148,7 +148,7 @@ module.exports.edit = async (req, res) => {
       categoryTree: categoryTree,
       categoryDetail: categoryDetail,
     });
-  } catch {
+  } catch (error){
     console.log(error)
     res.redirect('/${pathAdmin}/category/list');
   }

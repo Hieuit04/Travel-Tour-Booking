@@ -76,33 +76,37 @@ block main
           th Cập nhật bởi
           th Hành động
       tbody
-        tr
-          td
-            +checkbox-30("", "")
-          td Tour Hạ Long
-          td
-            img(src="/admin/assets/images/demo-tour-1.png" class="inner-avatar")
-          td
-            div NL: 1.900.000đ
-            div TE: 1.600.000đ
-            div EB: 1.000.000đ
-          td
-            div NL: 1
-            div TE: 1
-            div EB: 1
-          td 1
-          td
-            .tag.tag-green Hoạt động
-          td
-            div Lê Văn A
-            .inner-time 16:30 - 20/10/2024
-          td
-            div Lê Văn B
-            .inner-time 16:30 - 20/10/2024
-          td
-            .inner-action
-              a(href="#") <i class="fa-regular fa-pen-to-square"></i>
-              a(href="#" class="inner-remove") <i class="fa-regular fa-trash-can"></i>
+        each item in tourList
+          tr
+            td
+              +checkbox-30("", "")
+            td #{item.tourName}
+            td
+              img(src=item.avatar class="inner-avatar")
+            td
+              div NL: #{item.newPriceAdult.toLocaleString("vi-VN")}đ
+              div TE: #{item.newPriceChildren.toLocaleString("vi-VN")}đ
+              div EB: #{item.newPriceBaby.toLocaleString("vi-VN")}đ
+            td
+              div NL: item.stockAdult
+              div TE: item.stockChildren
+              div EB: item.stockBaby
+            td #{item.position} 
+            td
+              if(item.status == "active")
+                .tag.tag-green Hoạt động
+              else if(item.status == "inactive")
+                .tag.tag-red Tạm dừng
+            td
+              div #{item.createdByName}
+              .inner-time #{item.createdAtFormat}
+            td
+              div #{item.updatedByName}
+              .inner-time #{item.updatedAtFormat}
+            td
+              .inner-action
+                a(href=`/${pathAdmin}/tour/edit/${item.id}`) <i class="fa-regular fa-pen-to-square"></i>
+                a(href="#" class="inner-remove") <i class="fa-regular fa-trash-can"></i>
   //- End Section 6
 
   //- Section 7
