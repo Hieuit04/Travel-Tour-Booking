@@ -43,9 +43,28 @@ module.exports.create = async (req, res) => {
   });
 };
 
-module.exports.trash = (req, res) => {
+module.exports.trash = async (req, res) => {
+  const tourList = await Tour.find({
+    deleted: true,
+  }).sort({
+    deletedAt: "desc"
+  });
+  for (const item of tourList) {
+    if (item.createdBy) {
+      const createdBy = await AccountAdmin.findById(item.createdBy);
+      item.createdByName = createdBy.fullName;
+      item.createdAtFormat= moment(item.createdAt).format('HH:mm - DD/MM/YYYY');
+    }
+    if (item.updatedBy) {
+      const deletedBy = await AccountAdmin.findById(item.deletedBy);
+      item.deletedByName = deletedBy.fullName;
+      item.deletedAtFormat= moment(item.deletedAt).format('HH:mm - DD/MM/YYYY');
+    }
+  }
+
   res.render('admin/pages/tour-trash', {
     pageTitle: 'Thùng rác tour',
+    tourList: tourList,
   });
 };
 
@@ -190,7 +209,7 @@ module.exports.deletePatch = async (req, res) => {
     if (!tourDetail) {
       res.json({
         code: "error",
-        message: "Danh mục không tồn tại!",
+        message: "Tour không tồn tại!",
       })
       return;
     }
@@ -201,6 +220,33 @@ module.exports.deletePatch = async (req, res) => {
       deleted: true,
       deletedBy: res.locals.account.id,
       deletedAt: new Date()
+    })
+    res.json({
+      code: "success",
+      message: "Đã xoá tour!",
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
+
+module.exports.deleteDestroyPatch = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const tourDetail = await Tour.findById(id);
+    if (!tourDetail) {
+      res.json({
+        code: "error",
+        message: "Tour không tồn tại!",
+      })
+      return;
+    }
+
+    await Tour.deleteOne({
+      _id: id
     })
     res.json({
       code: "success",
@@ -258,6 +304,35 @@ module.exports.changeMultiPatch = async (req, res) => {
         break;
     }
 
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
+
+module.exports.restorePatch = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const tourDetail = await Tour.findById(id);
+    if (!tourDetail) {
+      res.json({
+        code: "error",
+        message: "Tour không tồn tại!",
+      })
+      return;
+    }
+
+    await Tour.updateOne({
+      _id: id
+    }, {
+      deleted: false,
+    })
+    res.json({
+      code: "success",
+      message: "Đã khôi phục tour!",
+    })
   } catch (error) {
     res.json({
       code: "error",

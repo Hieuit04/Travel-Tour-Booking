@@ -37,33 +37,48 @@ block main
           th Xóa bởi
           th Hành động
       tbody
-        tr
-          td
-            +checkbox-30("", "")
-          td Tour Hạ Long
-          td
-            img(src="/admin/assets/images/demo-tour-1.png" class="inner-avatar")
-          td
-            div NL: 1.900.000đ
-            div TE: 1.600.000đ
-            div EB: 1.000.000đ
-          td
-            div NL: 1
-            div TE: 1
-            div EB: 1
-          td 1
-          td
-            .tag.tag-green Hoạt động
-          td
-            div Lê Văn A
-            .inner-time 16:30 - 20/10/2024
-          td
-            div Lê Văn B
-            .inner-time 16:30 - 20/10/2024
-          td
-            .inner-action
-              a(href="#" title="Khôi phục") <i class="fa-solid fa-rotate-left"></i>
-              a(href="#" class="inner-remove" title="Xóa vĩnh viễn") <i class="fa-regular fa-trash-can"></i>
+        each item in tourList 
+          tr
+            td
+              +checkbox-30("check-item", "",item.id)
+            td #{item.tourName}
+            td
+              img(src=item.avatar class="inner-avatar")
+            td
+              div NL: #{item.newPriceAdult.toLocaleString("vi-VN")}đ
+              div TE: #{item.newPriceChildren.toLocaleString("vi-VN")}đ
+              div EB: #{item.newPriceBaby.toLocaleString("vi-VN")}đ
+            td
+              div NL: #{item.stockAdult}
+              div TE: #{item.stockChildren}
+              div EB: #{item.stockBaby}
+            td #{item.position}
+            td
+              if(item.status == "active")
+                .tag.tag-green Hoạt động
+              else if(item.status == "inactive")
+                .tag.tag-red Tạm dừng
+            td
+              div #{item.createdByName}
+              .inner-time #{item.createdAtFormat}
+            td
+              div #{item.deletedByName}
+              .inner-time #{item.deletedAtFormat}
+            td
+              .inner-action
+                a(
+                  href="javascript:;" 
+                  class="inner-restore"
+                  button-restore
+                  data-api=`/${pathAdmin}/tour/restore/${item.id}`
+                ) <i class="fa-solid fa-rotate-left"></i>
+                a(
+                  title="Xóa vĩnh viễn"
+                  href="javascript:;" 
+                  class="inner-remove"
+                  button-delete
+                  data-api=`/${pathAdmin}/tour/delete-destroy/${item.id}`
+                ) <i class="fa-regular fa-trash-can"></i>
   //- End Section 6
 
   //- Section 7

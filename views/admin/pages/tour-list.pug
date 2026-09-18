@@ -76,7 +76,7 @@ block main
           th Cập nhật bởi
           th Hành động
       tbody
-        each item in tourList
+        each item in tourList 
           tr
             td
               +checkbox-30("check-item", "",item.id)
@@ -88,9 +88,9 @@ block main
               div TE: #{item.newPriceChildren.toLocaleString("vi-VN")}đ
               div EB: #{item.newPriceBaby.toLocaleString("vi-VN")}đ
             td
-              div NL: item.stockAdult
-              div TE: item.stockChildren
-              div EB: item.stockBaby
+              div NL: #{item.stockAdult}
+              div TE: #{item.stockChildren}
+              div EB: #{item.stockBaby}
             td #{item.position} 
             td
               if(item.status == "active")

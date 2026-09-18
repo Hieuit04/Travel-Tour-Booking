@@ -821,6 +821,31 @@ if (listBtnDelete.length > 0) {
 }
 // End button delete
 
+// Button restore
+const listBtnRestore = document.querySelectorAll('[button-restore]');
+if (listBtnRestore.length > 0) {
+  listBtnRestore.forEach((button) => {
+    button.addEventListener('click', async (e) => {
+      const dataApi = button.getAttribute('data-api');
+      fetch(dataApi, {
+        method: 'PATCH',
+
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code === 'success') {
+            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
+            window.location.reload();
+          }
+        })
+    })
+  })
+}
+// End button restore
+
 // Filter
 const listFilter = document.querySelectorAll('[filter]');
 if (listFilter.length > 0) {
