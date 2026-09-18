@@ -115,11 +115,40 @@ module.exports.create = async (req, res) => {
 };
 
 module.exports.trash = async (req, res) => {
-  const tourList = await Tour.find({
+  const find = {
     deleted: true,
-  }).sort({
-    deletedAt: "desc"
-  });
+  }
+  // Tìm kiếm
+  if (req.query.keyword) {
+    const slug = slugify(req.query.keyword, {
+      lower: true,
+    });
+    const regex = new RegExp(slug, "i");
+    find.slug = regex;
+  }
+  // End Tìm kiếm
+  // Phân trang 
+  const limit = 3;
+  let page = 1;
+  if (req.query.page && parseInt(req.query.page) > 0) {
+    page = parseInt(req.query.page);
+  }
+  const skip = (page - 1) * limit
+  const totalRecord = await Tour.countDocuments(find);
+  const totalPages = Math.ceil(totalRecord / limit);
+  const pagination = {
+    totalPages: totalPages,
+    totalRecord: totalRecord,
+    skip: skip,
+  }
+  // End Phân trang
+  const tourList = await Tour
+    .find(find)
+    .skip(skip)
+    .limit(limit)
+    .sort({
+      deletedAt: "desc"
+    });
   for (const item of tourList) {
     if (item.createdBy) {
       const createdBy = await AccountAdmin.findById(item.createdBy);
@@ -136,6 +165,7 @@ module.exports.trash = async (req, res) => {
   res.render('admin/pages/tour-trash', {
     pageTitle: 'Thùng rác tour',
     tourList: tourList,
+    pagination: pagination,
   });
 };
 

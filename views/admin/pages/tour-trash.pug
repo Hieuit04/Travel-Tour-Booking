@@ -17,7 +17,7 @@ block main
         button Áp dụng
     form.inner-search
       button <i class="fa-solid fa-magnifying-glass"></i>
-      input(type="text" placeholder="Tìm kiếm")
+      input(type="text" placeholder="Tìm kiếm" input-search)
   //- End Section 5
 
   //- Section 6
@@ -83,9 +83,8 @@ block main
 
   //- Section 7
   .section-7
-    .inner-text Hiển thị 1 - 9 của 78
-    select
-      option(value="") Trang 1
-      option(value="") Trang 2
-      option(value="") Trang 3
+    .inner-text Hiển thị #{pagination.skip+1} - #{pagination.skip+tourList.length} của #{pagination.totalRecord}
+    select(pagination)
+      - for(let i=1; i<= pagination.totalPages; i++)
+        option(value=i) Trang #{i}
   //- End Section 7
