@@ -4,29 +4,100 @@ const Tour = require('../../models/tour.model');
 const AccountAdmin = require('../../models/accounts-admin.model');
 const moment = require('moment');
 const buildCategoryTree = require('../../helpers/categoryTree.helper');
+const slugify = require('slugify')
+
+
 module.exports.list = async (req, res) => {
-  const tourList = await Tour.find({
+  const find = {
     deleted: false,
-  }).sort({
-    position: "desc"
-  });
+  }
+  // Lọc theo trạng thái
+  if (req.query.status) {
+    find.status = req.query.status;
+  }
+  // End Lọc theo trạng thái
+  // Lọc theo người tạo
+  if (req.query.createdBy) {
+    find.createdBy = req.query.createdBy;
+  }
+  // End Lọc theo người tạo
+  // Lọc theo ngày tạo
+  if (req.query.startDate) {
+    find.createdAt = {
+      $gte: new Date(req.query.startDate),
+    }
+  }
+  if (req.query.endDate) {
+    const endDate = new Date(req.query.endDate); // Ngày kết thúc
+    find.createdAt = {
+      ...find.createdAt,
+      $lte: new Date(endDate.setUTCHours(23, 59, 59, 999)),
+    }
+  }
+  // End Lọc theo ngày tạo
+  // Lọc theo danh mục
+  if (req.query.category) {
+    find.category = req.query.category;
+  }
+  // End Lọc theo danh mục
+
+
+  // Tìm kiếm
+  if (req.query.keyword) {
+    const slug = slugify(req.query.keyword, {
+      lower: true,
+    });
+    const regex = new RegExp(slug, "i");
+    find.slug = regex;
+  }
+  // End Tìm kiếm
+  // Phân trang 
+  const limit = 3;
+  let page = 1;
+  if (req.query.page && parseInt(req.query.page) > 0) {
+    page = parseInt(req.query.page);
+  }
+  const skip = (page - 1) * limit
+  const totalRecord = await Tour.countDocuments(find);
+  const totalPages = Math.ceil(totalRecord / limit);
+  const pagination = {
+    totalPages: totalPages,
+    totalRecord: totalRecord,
+    skip: skip,
+  }
+  // End Phân trang 
+  const tourList = await Tour
+    .find(find)
+    .skip(skip)
+    .limit(limit)
+    .sort({
+      position: "desc"
+    });
 
   for (const item of tourList) {
     if (item.createdBy) {
       const createdBy = await AccountAdmin.findById(item.createdBy);
       item.createdByName = createdBy.fullName;
-      item.createdAtFormat= moment(item.createdAt).format('HH:mm - DD/MM/YYYY');
+      item.createdAtFormat = moment(item.createdAt).format('HH:mm - DD/MM/YYYY');
     }
     if (item.updatedBy) {
       const updatedBy = await AccountAdmin.findById(item.updatedBy);
       item.updatedByName = updatedBy.fullName;
-      item.updatedAtFormat= moment(item.updatedAt).format('HH:mm - DD/MM/YYYY');
+      item.updatedAtFormat = moment(item.updatedAt).format('HH:mm - DD/MM/YYYY');
     }
   }
-
+  const accountList = await AccountAdmin.find({});
+  const categoryList = await Category.find({
+    deleted: false,
+  });
+  const categoryTree = buildCategoryTree(categoryList, "");
   res.render('admin/pages/tour-list', {
     pageTitle: 'Danh sách tour',
     tourList: tourList,
+    accountList: accountList,
+    categoryList: categoryList,
+    categoryTree: categoryTree,
+    pagination: pagination,
   });
 };
 
@@ -53,12 +124,12 @@ module.exports.trash = async (req, res) => {
     if (item.createdBy) {
       const createdBy = await AccountAdmin.findById(item.createdBy);
       item.createdByName = createdBy.fullName;
-      item.createdAtFormat= moment(item.createdAt).format('HH:mm - DD/MM/YYYY');
+      item.createdAtFormat = moment(item.createdAt).format('HH:mm - DD/MM/YYYY');
     }
     if (item.updatedBy) {
       const deletedBy = await AccountAdmin.findById(item.deletedBy);
       item.deletedByName = deletedBy.fullName;
-      item.deletedAtFormat= moment(item.deletedAt).format('HH:mm - DD/MM/YYYY');
+      item.deletedAtFormat = moment(item.deletedAt).format('HH:mm - DD/MM/YYYY');
     }
   }
 
@@ -139,7 +210,7 @@ module.exports.edit = async (req, res) => {
       tourDetail: tourDetail,
       cityList: cityList,
     });
-  } catch (error){
+  } catch (error) {
     console.log(error)
     res.redirect('/${pathAdmin}/category/list');
   }
@@ -193,12 +264,12 @@ module.exports.editPatch = async (req, res) => {
       code: "success",
       message: "Tour đã được cập nhật thành công",
     })
-  } catch (error){
+  } catch (error) {
     console.log(error)
     res.json({
       code: "error",
       message: "Dữ liệu không hợp lệ!"
-      });
+    });
   }
 }
 

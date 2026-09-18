@@ -1,5 +1,6 @@
 extends ../layouts/default.pug
 include ../mixins/checkbox.pug
+include ../mixins/select-tree.pug
 
 block main
   h1.box-title Quản lý tour
@@ -10,26 +11,26 @@ block main
       .inner-item
         <i class="fa-solid fa-filter"></i> Bộ lọc
       .inner-item
-        select
+        select(filter name="status")
           option(value="") Trạng thái
-          option(value="") Hoạt động
-          option(value="") Tạm dừng
+          option(value="active") Hoạt động
+          option(value="inactive") Tạm dừng
       .inner-item
-        select
+        select(filter name="createdBy")
           option(value="") Người tạo
-          option(value="") Lê Văn A
-          option(value="") Lê Văn B
+          each item in accountList 
+            option(value=item._id) #{item.fullName}
       .inner-item
-        input(type="date")
+        input(filter name="startDate" type="date")
         span -
-        input(type="date")
+        input(filter name="endDate" type="date")
       .inner-item
-        select
-          option(value="") Danh mục
-          option(value="") Danh mục 1
-          option(value="") Danh mục 2
+        select(filter name="category")
+          option(value="") -- Chọn danh mục --
+          if categoryTree
+            +select-tree(categoryTree)
       .inner-item
-        select
+        select(filter name="price")
           option(value="") Mức giá
           option(value="") Dưới 1tr
           option(value="") Từ 1tr đến 3tr
@@ -37,7 +38,7 @@ block main
           option(value="") Từ 5tr đến 7tr
           option(value="") Từ 7tr đến 10tr
           option(value="") Trên 10tr
-      .inner-item.inner-reset
+      .inner-item.inner-reset(button-reset-filter)
         <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
   //- End Section 4
 
@@ -54,7 +55,7 @@ block main
         button(type="button") Áp dụng
     form.inner-search
       button <i class="fa-solid fa-magnifying-glass"></i>
-      input(type="text" placeholder="Tìm kiếm")
+      input(type="text" placeholder="Tìm kiếm" input-search)
     a.inner-create(href=`/${pathAdmin}/tour/create`) + Tạo mới
     a.inner-trash(href=`/${pathAdmin}/tour/trash`) Thùng rác
   //- End Section 5
@@ -116,9 +117,8 @@ block main
 
   //- Section 7
   .section-7
-    .inner-text Hiển thị 1 - 9 của 78
-    select
-      option(value="") Trang 1
-      option(value="") Trang 2
-      option(value="") Trang 3
+    .inner-text Hiển thị #{pagination.skip+1} - #{pagination.skip+tourList.length} của #{pagination.totalRecord}
+    select(pagination)
+      - for(let i=1; i<= pagination.totalPages; i++)
+        option(value=i) Trang #{i}
   //- End Section 7
