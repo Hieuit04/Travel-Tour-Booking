@@ -25,4 +25,6 @@ router.patch(
   tourController.deletePatch
 );
 
+router.patch('/change-multi',tourController.changeMultiPatch);
+
 module.exports = router;

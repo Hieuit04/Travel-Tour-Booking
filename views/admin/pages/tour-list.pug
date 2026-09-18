@@ -43,15 +43,15 @@ block main
 
   //- Section 5
   .section-5
-    form.inner-status
+    form.inner-status(change-multi data-api=`/${pathAdmin}/tour/change-multi`)
       .inner-item
         select
           option(value="") -- Hành động --
-          option(value="") Hoạt động
-          option(value="") Tạm dừng
-          option(value="") Xóa
+          option(value="active") Hoạt động
+          option(value="inactive") Tạm dừng
+          option(value="delete") Xóa
       .inner-item
-        button Áp dụng
+        button(type="button") Áp dụng
     form.inner-search
       button <i class="fa-solid fa-magnifying-glass"></i>
       input(type="text" placeholder="Tìm kiếm")
@@ -65,7 +65,7 @@ block main
       thead
         tr
           th
-            +checkbox-30("", "")
+            +checkbox-30("check-all", "")
           th Tên tour
           th Ảnh đại diện
           th Giá
@@ -79,7 +79,7 @@ block main
         each item in tourList
           tr
             td
-              +checkbox-30("", "")
+              +checkbox-30("check-item", "",item.id)
             td #{item.tourName}
             td
               img(src=item.avatar class="inner-avatar")

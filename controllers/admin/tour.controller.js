@@ -213,3 +213,55 @@ module.exports.deletePatch = async (req, res) => {
     })
   }
 }
+
+
+module.exports.changeMultiPatch = async (req, res) => {
+  try {
+    const adminId = res.locals.account.id;
+    const { listId, option } = req.body;
+    switch (option) {
+      case "active":
+      case "inactive":
+        await Tour.updateMany({
+          _id: {
+            $in: listId
+          }
+        }, {
+          status: option,
+          updatedBy: adminId,
+        })
+        res.json({
+          code: 'success',
+          message: 'Cập nhật tour thành công!'
+        })
+        break;
+      case "delete":
+        await Tour.updateMany({
+          _id: {
+            $in: listId
+          }
+        }, {
+          deleted: true,
+          deletedBy: adminId,
+          deletedAt: Date.now(),
+        })
+        res.json({
+          code: 'success',
+          message: 'Xoá tour thành công!'
+        })
+        break;
+      default:
+        res.json({
+          code: 'error',
+          message: 'Hành động không hợp lệ!'
+        })
+        break;
+    }
+
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
