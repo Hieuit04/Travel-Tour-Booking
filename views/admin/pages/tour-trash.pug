@@ -7,12 +7,12 @@ block main
 
   //- Section 5
   .section-5
-    form.inner-status
+    form.inner-status(change-multi data-api=`/${pathAdmin}/tour/change-multi`)
       .inner-item
         select
           option(value="") -- Hành động --
-          option(value="") Khôi phục
-          option(value="") Xóa vĩnh viễn
+          option(value="restore") Khôi phục
+          option(value="delete-destroy") Xóa vĩnh viễn
       .inner-item
         button Áp dụng
     form.inner-search
@@ -26,7 +26,7 @@ block main
       thead
         tr
           th
-            +checkbox-30("", "")
+            +checkbox-30("check-all", "")
           th Tên tour
           th Ảnh đại diện
           th Giá

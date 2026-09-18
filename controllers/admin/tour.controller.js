@@ -296,6 +296,30 @@ module.exports.changeMultiPatch = async (req, res) => {
           message: 'Xoá tour thành công!'
         })
         break;
+      case "restore":
+        await Tour.updateMany({
+          _id: {
+            $in: listId
+          }
+        }, {
+          deleted: false,
+        })
+        res.json({
+          code: 'success',
+          message: 'Khôi phục tour thành công!'
+        })
+        break;
+      case "delete-destroy":
+        await Tour.deleteMany({
+          _id: {
+            $in: listId
+          }
+        });
+        res.json({
+          code: 'success',
+          message: 'Xoá tour thành công!'
+        })
+        break;
       default:
         res.json({
           code: 'error',
