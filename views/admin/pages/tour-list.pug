@@ -106,7 +106,12 @@ block main
             td
               .inner-action
                 a(href=`/${pathAdmin}/tour/edit/${item.id}`) <i class="fa-regular fa-pen-to-square"></i>
-                a(href="#" class="inner-remove") <i class="fa-regular fa-trash-can"></i>
+                a(
+                  href="javascript:;" 
+                  class="inner-remove"
+                  button-delete
+                  data-api=`/${pathAdmin}/tour/delete/${item.id}` 
+                ) <i class="fa-regular fa-trash-can"></i>
   //- End Section 6
 
   //- Section 7

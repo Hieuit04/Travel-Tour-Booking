@@ -182,3 +182,34 @@ module.exports.editPatch = async (req, res) => {
       });
   }
 }
+
+module.exports.deletePatch = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const tourDetail = await Tour.findById(id);
+    if (!tourDetail) {
+      res.json({
+        code: "error",
+        message: "Danh mục không tồn tại!",
+      })
+      return;
+    }
+
+    await Tour.updateOne({
+      _id: id
+    }, {
+      deleted: true,
+      deletedBy: res.locals.account.id,
+      deletedAt: new Date()
+    })
+    res.json({
+      code: "success",
+      message: "Đã xoá tour!",
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
