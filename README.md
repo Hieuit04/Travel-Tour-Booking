@@ -11,8 +11,8 @@
 
 <!-- DEV_METADATA_START -->
 - **Trạng thái:** Đang phát triển (Active)
-- **Last-Processed-Commit:** `2688575`
-- **Last-Updated:** 2026-09-10
+- **Last-Processed-Commit:** `7f3b3e7`
+- **Last-Updated:** 2026-09-19
 - **Nhánh chính:** `main` / `master`
 - **Node.js yêu cầu:** >= 18.x
 - **Package Manager:** Yarn 1.x
@@ -165,6 +165,7 @@ project-5/
 | `nodemailer` | `^10.0.0` | Gửi email OTP qua Gmail SMTP khi admin quên mật khẩu. |
 | `mongoose-slug-updater` | `^3.3.0` | Plugin tự động sinh `slug` từ `categoryName` qua `pre-save` hook. Không cần code trong controller. |
 | `moment` | *(via yarn)* | Format ngày giờ trong danh sách (createdAt, updatedAt). |
+| `slugify` | `^1.6.9` | Chuẩn hóa từ khóa tìm kiếm thành slug trước khi tạo regex query MongoDB. Dùng trong tìm kiếm Tour và Category. |
 | `nodemon` | `^3.1.14` | Dev tool: tự restart server khi thay đổi file. |
 
 ### Frontend (Browser-side, CDN)
@@ -247,6 +248,28 @@ project-5/
   - Selector JS `[button-delete]` phải khớp với attribute trong Pug.
 
 <!-- NEW_PHASE_HOOK: AI chen Giai doan tiep theo ngay duoi dong nay khi cap nhat -->
+
+---
+
+### [Giai đoạn 5] – Module Quản lý Tour (Tour CRUD Full) & Bổ sung Category
+
+- **Phạm vi Commit:** `2688575` → `7f3b3e7`
+- **Tính năng & Module hoàn thành:**
+  - **Giai đoạn 4 (bổ sung Category):** Lọc theo trạng thái, người tạo, ngày tạo (startDate/endDate `$gte/$lte`); tìm kiếm theo slug dùng `slugify` + `RegExp`; phân trang (`skip/limit/totalPages`); thay đổi trạng thái & xóa nhiều danh mục (`changeMultiPatch` với `updateMany()`).
+  - **Tạo Tour:** Form đầy đủ giá vé (NL/TE/EB cả giá cũ/giá mới), số lượng vé, địa điểm (checkbox city), ngày khởi hành, lịch trình kéo thả (SortableJS + TinyMCE nhiều editor). Xử lý `JSON.parse` cho `loaction[]` và `schedule[]` từ FormData.
+  - **Danh sách Tour:** Bộ lọc theo trạng thái, người tạo, ngày tạo, danh mục; tìm kiếm theo slug; phân trang. Join tên admin (`createdByName`, `updatedByName`), format thời gian Moment.
+  - **Sửa Tour (`tour-edit`):** Load sẵn data cũ vào form, gán `departureDateFormat = moment(...).format('YYYY-MM-DD')` cho input date. Nếu không upload ảnh mới thì giữ nguyên avatar cũ (`delete req.body.avatar`).
+  - **Xóa mềm Tour:** `PATCH /delete/:id` → `deleted:true`, `deletedBy`, `deletedAt`.
+  - **Thùng rác Tour:** Hiển thị tour đã xóa, tìm kiếm, phân trang, sắp xếp theo `deletedAt`.
+  - **Khôi phục Tour:** `PATCH /restore/:id` → `deleted:false`.
+  - **Xóa vĩnh viễn Tour:** `PATCH /delete-destroy/:id` → `Tour.deleteOne()`.
+  - **Hành động hàng loạt Tour (`changeMultiPatch`):** Nhận `{listId[], option}` → xử lý `active`, `inactive`, `delete`, `restore`, `delete-destroy` bằng `updateMany()`/`deleteMany()`.
+- **Ghi chú kỹ thuật:**
+  - `slugify` import riêng trong controller để chuẩn hóa keyword trước khi tạo `new RegExp(slug, "i")` query MongoDB.
+  - `editPatch` phải kiểm tra `if (req.file)` trước khi gán `req.body.avatar` để tránh xóa ảnh cũ khi không upload mới.
+  - Route `GET /edit/:id` **không cần** `upload.single()` — chỉ route `PATCH /edit/:id` mới cần middleware Multer.
+  - `module.exports.editPatch` phải được export trong controller trước khi khai báo route, nếu không Express ném lỗi `argument handler must be a function`.
+  - TinyMCE có thể chưa khởi tạo xong khi bấm submit → dùng `tinymce.get(id)?.getContent()` (optional chaining) để tránh crash JS ngầm khiến nút bị kẹt.
 
 ---
 

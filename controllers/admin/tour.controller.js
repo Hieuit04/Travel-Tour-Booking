@@ -4,6 +4,7 @@ const Tour = require('../../models/tour.model');
 const AccountAdmin = require('../../models/accounts-admin.model');
 const moment = require('moment');
 const buildCategoryTree = require('../../helpers/categoryTree.helper');
+const categoryFilter = require('../../helpers/categoryFilter.helper');
 const slugify = require('slugify')
 
 
@@ -36,8 +37,13 @@ module.exports.list = async (req, res) => {
   }
   // End Lọc theo ngày tạo
   // Lọc theo danh mục
+  const categoryList = await Category.find({
+    deleted: false,
+  });
   if (req.query.category) {
-    find.category = req.query.category;
+    find.category = {
+      $in: categoryFilter (categoryList, req.query.category)
+    };
   }
   // End Lọc theo danh mục
 
@@ -87,9 +93,6 @@ module.exports.list = async (req, res) => {
     }
   }
   const accountList = await AccountAdmin.find({});
-  const categoryList = await Category.find({
-    deleted: false,
-  });
   const categoryTree = buildCategoryTree(categoryList, "");
   res.render('admin/pages/tour-list', {
     pageTitle: 'Danh sách tour',
