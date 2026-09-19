@@ -384,7 +384,7 @@ if (tourCreateForm) {
 }
 // End validate tour edit form
 
-// Validate tour create form
+// Validate tour edit form
 const tourEditForm = document.querySelector('.section-8 #tour-edit-form');
 if (tourEditForm) {
   const validator = new JustValidate('#tour-edit-form');
@@ -479,7 +479,7 @@ if (tourEditForm) {
 }
 // End validate tour edit form
 
-// Validate tour create form
+// Validate order edit form
 const orderEditForm = document.querySelector('.section-8 #order-edit-form');
 if (orderEditForm) {
   const validator = new JustValidate('#order-edit-form');
@@ -519,7 +519,7 @@ if (orderEditForm) {
       console.log(status);
     });
 }
-// End validate tour create form
+// End validate order edit form
 
 
 // Validate setting website info form
@@ -561,12 +561,32 @@ if (settingWebsiteInfoForm) {
       const address = event.target.address.value;
       const logo = filePond.logo.getFile()?.file || null;
       const favicon = filePond.favicon.getFile()?.file || null;
-      console.log(nameWebsite);
-      console.log(phone);
-      console.log(email);
-      console.log(address);
-      console.log(logo);
-      console.log(favicon);
+      
+      const formData = new FormData();
+      formData.append('nameWebsite', nameWebsite);
+      formData.append('phone', phone);
+      formData.append('email', email);
+      formData.append('address', address);
+      if (logo) {
+        formData.append('logo', logo);
+      }
+      if (favicon) {
+        formData.append('favicon', favicon);
+      }
+      fetch(`/${pathAdmin}/setting/website-info`, { 
+        method: 'PATCH',
+        body: formData,
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
+            // drawNotyf("error", data.message); // In ra thông báo lỗi khi bị load lại trang
+          }
+          if (data.code === 'success') {
+            notyf.success(data.message);
+          }
+        });
     });
 }
 // End validate setting website info form
