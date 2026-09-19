@@ -382,104 +382,10 @@ if (tourCreateForm) {
         });
     })
 }
-// End validate tour edit form
+// End validate tour create form
 
-// Validate tour edit form
-const tourEditForm = document.querySelector('.section-8 #tour-edit-form');
-if (tourEditForm) {
-  const validator = new JustValidate('#tour-edit-form');
-  validator
-    .addField('#tourName', [
-      {
-        rule: 'required',
-        errorMessage: 'Vui lòng nhập tên tour!',
-      },
-    ])
 
-    .onSuccess((event) => {
-      const id = event.target.id.value;
-      const tourName = event.target.tourName.value;
-      const category = event.target.category.value;
-      const position = event.target.position.value;
-      const status = event.target.status.value;
-      const avatar = filePond.avatar.getFile()?.file || null;
-      const priceAdult = event.target.priceAdult.value;
-      const priceChildren = event.target.priceChildren.value;
-      const priceBaby = event.target.priceBaby.value;
-      const newPriceAdult = event.target.newPriceAdult.value;
-      const newPriceChildren = event.target.newPriceChildren.value;
-      const newPriceBaby = event.target.newPriceBaby.value;
-      const stockAdult = event.target.stockAdult.value;
-      const stockChildren = event.target.stockChildren.value;
-      const stockBaby = event.target.stockBaby.value;
-      const loaction = [];
-      const time = event.target.time.value;
-      const vihicle = event.target.vehicle.value;
-      const departureDate = event.target.departureDate.value;
-      const information = tinymce.get('information').getContent();
-      const schedule = [];
-      // location
-      const listLocationChecked = document.querySelectorAll('input[name="locations"]:checked');
-      listLocationChecked.forEach((location) => {
-        loaction.push(location.value);
-      });
-      // end location
-      // schedule
-      const listSchedule = document.querySelectorAll('.section-8 .inner-schedule-list .inner-schedule-item');
-      listSchedule.forEach((item) => {
-        const inputTitle = item.querySelector('.inner-schedule-head input');
-        const title = inputTitle ? inputTitle.value : '';
-        const textarea = item.querySelector('[textarea-mce]');
-        const id = textarea ? textarea.id : '';
-        const content = id && tinymce.get(id) ? tinymce.get(id).getContent() : '';
-        schedule.push({
-          title: title,
-          content: content,
-        });
-      })
-      // schedule
-      const formData = new FormData();
-      formData.append('tourName', tourName);
-      formData.append('category', category);
-      formData.append('position', position);
-      formData.append('status', status);
-      if (avatar) {
-        formData.append('avatar', avatar);
-      }
-      formData.append('priceAdult', priceAdult);
-      formData.append('priceChildren', priceChildren);
-      formData.append('priceBaby', priceBaby);
-      formData.append('newPriceAdult', newPriceAdult);
-      formData.append('newPriceChildren', newPriceChildren);
-      formData.append('newPriceBaby', newPriceBaby);
-      formData.append('stockAdult', stockAdult);
-      formData.append('stockChildren', stockChildren);
-      formData.append('stockBaby', stockBaby);
-      formData.append('loaction', JSON.stringify(loaction));
-      formData.append('time', time);
-      formData.append('vihicle', vihicle);
-      formData.append('departureDate', departureDate);
-      formData.append('information', information);
-      formData.append('schedule', JSON.stringify(schedule));
-      fetch(`/${pathAdmin}/tour/edit/${id}`, { // Thay đổi URL thành URL mới
-        method: 'PATCH',
-        body: formData,
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.code === 'error') {
-            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
-            // drawNotyf("error", data.message); // In ra thông báo lỗi khi bị load lại trang
-          }
-          if (data.code === 'success') {
-            notyf.success(data.message);
-          }
-        });
-    })
-}
-// End validate tour edit form
-
-// Validate order edit form
+// Validate tour create form
 const orderEditForm = document.querySelector('.section-8 #order-edit-form');
 if (orderEditForm) {
   const validator = new JustValidate('#order-edit-form');
@@ -519,7 +425,7 @@ if (orderEditForm) {
       console.log(status);
     });
 }
-// End validate order edit form
+// End validate tour create form
 
 
 // Validate setting website info form
@@ -561,32 +467,12 @@ if (settingWebsiteInfoForm) {
       const address = event.target.address.value;
       const logo = filePond.logo.getFile()?.file || null;
       const favicon = filePond.favicon.getFile()?.file || null;
-      
-      const formData = new FormData();
-      formData.append('nameWebsite', nameWebsite);
-      formData.append('phone', phone);
-      formData.append('email', email);
-      formData.append('address', address);
-      if (logo) {
-        formData.append('logo', logo);
-      }
-      if (favicon) {
-        formData.append('favicon', favicon);
-      }
-      fetch(`/${pathAdmin}/setting/website-info`, { 
-        method: 'PATCH',
-        body: formData,
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.code === 'error') {
-            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
-            // drawNotyf("error", data.message); // In ra thông báo lỗi khi bị load lại trang
-          }
-          if (data.code === 'success') {
-            notyf.success(data.message);
-          }
-        });
+      console.log(nameWebsite);
+      console.log(phone);
+      console.log(email);
+      console.log(address);
+      console.log(logo);
+      console.log(favicon);
     });
 }
 // End validate setting website info form
@@ -680,7 +566,7 @@ const roleCreateForm = document.querySelector('.section-8 #setting-role-create-f
 if (roleCreateForm) {
   const validator = new JustValidate('#setting-role-create-form');
   validator
-    .addField('#nameRole', [
+    .addField('#roleName', [
       {
         rule: 'required',
         errorMessage: 'Vui lòng nhập tên nhóm quyền!',
@@ -688,16 +574,35 @@ if (roleCreateForm) {
     ])
 
     .onSuccess((event) => {
-      const categoryName = event.target.nameRole.value;
+      const roleName = event.target.roleName.value;
       const description = event.target.description.value;
       const rolePermissions = [];
       const listRolePermissionsChecked = document.querySelectorAll('input[name="rolePermissions"]:checked');
       listRolePermissionsChecked.forEach((permission) => {
         rolePermissions.push(permission.value);
       });
-      console.log(categoryName);
-      console.log(description);
-      console.log(rolePermissions);
+      const dataFinal = {
+        roleName,
+        description,
+        rolePermissions,
+      }
+      fetch(`/${pathAdmin}/setting/role/create`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataFinal),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code === 'success') {
+            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
+            window.location.reload();
+          }
+        })
     });
 }
 // End validate setting role create form
@@ -840,31 +745,6 @@ if (listBtnDelete.length > 0) {
   })
 }
 // End button delete
-
-// Button restore
-const listBtnRestore = document.querySelectorAll('[button-restore]');
-if (listBtnRestore.length > 0) {
-  listBtnRestore.forEach((button) => {
-    button.addEventListener('click', async (e) => {
-      const dataApi = button.getAttribute('data-api');
-      fetch(dataApi, {
-        method: 'PATCH',
-
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.code === 'error') {
-            notyf.error(data.message);
-          }
-          if (data.code === 'success') {
-            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
-            window.location.reload();
-          }
-        })
-    })
-  })
-}
-// End button restore
 
 // Filter
 const listFilter = document.querySelectorAll('[filter]');

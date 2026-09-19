@@ -8,29 +8,18 @@ block main
   .section-8
     form(id="setting-role-create-form")
       .inner-group
-        label(for="nameRole") Tên nhóm quyền
-        input(type="text" name="nameRole" id="nameRole")
+        label(for="roleName") Tên nhóm quyền
+        input(type="text" name="roleName" id="roleName")
       .inner-group
         label(for="description") Mô tả ngắn
         input(type="text" name="description" id="description")
       .inner-group
         label(for="permissions") Phân quyền
         .inner-checkbox-list
-          .inner-checkbox-item
-            +checkbox-30("rolePermissions", "overView", "overView")
-            label(for="") Xem trang Tổng quan
-          .inner-checkbox-item
-            +checkbox-30("rolePermissions", "viewCategories", "viewCategories")
-            label(for="") Xem danh mục
-          .inner-checkbox-item
-            +checkbox-30("rolePermissions", "createCategories", "createCategories")
-            label(for="") Tạo danh mục
-          .inner-checkbox-item
-            +checkbox-30("rolePermissions", "editCategories", "editCategories")
-            label(for="") Sửa danh mục
-          .inner-checkbox-item
-            +checkbox-30("rolePermissions", "deleteCategories", "deleteCategories")
-            label(for="") Xóa danh mục
+          each item in permissionList
+            .inner-checkbox-item
+              +checkbox-30("rolePermissions", item.value, item.value)
+              label(for=item.value) #{item.label}
       .inner-group.inner-two-col.text-center
         button.btn-create(type="submit") Tạo mới
     .inner-link
