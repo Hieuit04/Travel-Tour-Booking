@@ -46,7 +46,26 @@ module.exports.list = async (req, res) => {
     };
   }
   // End Lọc theo danh mục
+  // Lọc theo mức giá người lớn
+  if (req.query.price) {
+    const [minStr, maxStr] = req.query.price.split("-");
+    const minPrice = parseInt(minStr);
 
+    if (maxStr === "max") {
+      // Trường hợp 'Trên 10tr': newPriceAdult >= minPrice
+      find.newPriceAdult = {
+        $gte: minPrice,
+      };
+    } else {
+      // Trường hợp khoảng giá: minPrice <= newPriceAdult <= maxPrice
+      const maxPrice = parseInt(maxStr);
+      find.newPriceAdult = {
+        $gte: minPrice,
+        $lte: maxPrice,
+      };
+    }
+  }
+  // End Lọc theo mức giá người lớn
 
   // Tìm kiếm
   if (req.query.keyword) {
