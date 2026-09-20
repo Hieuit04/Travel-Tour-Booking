@@ -24,4 +24,16 @@ router.patch(
 
 router.post('/role/create', settingController.roleCreatePost);
 
+router.get(
+  '/role/edit/:id',
+  settingController.edit
+);
+
+router.patch(
+  '/role/edit/:id',
+  settingController.editPatch
+);
+
+
+
 module.exports = router;
