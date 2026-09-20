@@ -9,7 +9,12 @@ const upload = multer({ storage: storage })
 router.get('/list', settingController.list);
 router.get('/website-info', settingController.websiteInfo);
 router.get('/account-admin/list', settingController.accountAdminList);
+
 router.get('/account-admin/create', settingController.accountAdminCreate);
+
+router.post('/account-admin/create',upload.single('avatar'), settingController.accountAdminCreatePost);
+
+
 router.get('/role/list', settingController.roleList);
 router.get('/role/create', settingController.roleCreate);
 
@@ -26,14 +31,20 @@ router.post('/role/create', settingController.roleCreatePost);
 
 router.get(
   '/role/edit/:id',
-  settingController.edit
+  settingController.roleEdit
 );
 
 router.patch(
   '/role/edit/:id',
-  settingController.editPatch
+  settingController.roleEditPatch
 );
 
+router.patch(
+  '/role/delete/:id',
+  settingController.roleDeletePatch
+);
+
+router.patch('/role/change-multi',settingController.roleChangeMultiPatch);
 
 
 module.exports = router;

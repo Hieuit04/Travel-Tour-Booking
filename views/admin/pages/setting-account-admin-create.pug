@@ -7,30 +7,32 @@ block main
   .section-8
     form(id="setting-account-admin-create-form")
       .inner-group
-        label(for="name") Họ tên
-        input(type="text" name="name" id="name")
+        label(for="fullName") Họ tên *
+        input(type="text" name="fullName" id="fullName")
       .inner-group
-        label(for="email") Email
+        label(for="email") Email *
         input(type="email" name="email" id="email")
       .inner-group
         label(for="phone") Số điện thoại
         input(type="text" name="phone" id="phone")
       .inner-group
-        label(for="role") Nhóm quyền
+        label(for="role") Nhóm quyền *
         select(name="role" id="role")
-          option(value="admin") Quản trị viên
-          option(value="manager") Quản lý đơn hàng
+          option(value="") -- Chọn nhóm quyền --
+          each item in roleList
+            option(value=item.id) #{item.roleName}
       .inner-group
-        label(for="position") Chức vụ
-        input(type="text" name="position" id="position")
+        label(for="positionCompany") Chức vụ
+        input(type="text" name="positionCompany" id="positionCompany")
       .inner-group
         label(for="status") Trạng thái
         select(name="status" id="status")
+          option(value="initial") Khởi tạo 
           option(value="active") Hoạt động
           option(value="inactive") Tạm dừng
       .inner-group
-        label(for="password") Mật khẩu
-        input(type="text" name="password" id="password")
+        label(for="passWord") Mật khẩu *
+        input(type="text" name="passWord" id="passWord")
       .inner-group.inner-two-col
         label(for="avatar") Ảnh đại diện
         input(type="file" name="avatar" id="avatar" accept="image/*"  filepondImage).inner-upload-image

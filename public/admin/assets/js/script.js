@@ -580,7 +580,7 @@ const settingAccountAdminCreateForm = document.querySelector('.section-8 #settin
 if (settingAccountAdminCreateForm) {
   const validator = new JustValidate('#setting-account-admin-create-form');
   validator
-    .addField('#name', [
+    .addField('#fullName', [
       {
         rule: 'required',
         errorMessage: 'Vui lòng nhập tên!',
@@ -607,7 +607,13 @@ if (settingAccountAdminCreateForm) {
         errorMessage: 'Email chưa đúng định dạng!',
       }
     ])
-    .addField('#password', [
+    .addField('#role', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập nhóm quyền!',
+      },
+    ])
+    .addField('#passWord', [
       {
         rule: 'required',
         errorMessage: 'Vui lòng nhập mật khẩu!',
@@ -636,22 +642,40 @@ if (settingAccountAdminCreateForm) {
       }
     ])
     .onSuccess((event) => {
-      const name = event.target.name.value;
+      const fullName = event.target.fullName.value;
       const email = event.target.email.value;
       const phone = event.target.phone.value;
       const role = event.target.role.value;
-      const position = event.target.position.value;
+      const positionCompany = event.target.positionCompany.value;
       const status = event.target.status.value;
-      const password = event.target.password.value;
+      const passWord = event.target.passWord.value;
       const avatar = filePond.avatar.getFile()?.file || null;
-      console.log(name);
-      console.log(email);
-      console.log(phone);
-      console.log(role);
-      console.log(position);
-      console.log(status);
-      console.log(password);
-      console.log(avatar);
+      
+      const formData = new FormData();
+      formData.append('fullName', fullName);
+      formData.append('email', email);
+      formData.append('phone', phone);
+      formData.append('role', role);
+      formData.append('position', positionCompany);
+      formData.append('status', status);
+      formData.append('passWord', passWord);
+      if (avatar) {
+        formData.append('avatar', avatar);
+      }
+      fetch(`/${pathAdmin}/setting/account-admin/create`, {
+        method: 'POST',
+        body: formData,
+      })
+        .then(res => res.json())
+      .then(data => {
+        if (data.code === 'error') {
+          notyf.error(data.message);
+        }
+        if (data.code === 'success') {
+          drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
+          window.location.reload();
+        }
+      })
     });
 }
 // End validate setting account admin create form
@@ -959,7 +983,7 @@ if (changeMulti) {
       return;
     }
     if (listId.length < 1) {
-      notyf.error("Vui lòng chọn ít nhất một danh mục!");
+      notyf.error("Vui lòng chọn ít nhất một mục!");
       return;
     }
     dataFinal = {

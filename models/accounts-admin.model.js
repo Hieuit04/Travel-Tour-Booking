@@ -3,8 +3,20 @@ const mongoose = require('mongoose');
 const schema = new mongoose.Schema({
   fullName: String,
   email: String,
-  passWord: String,
+  phone: String,
+  role: String,
+  positionCompany: String,
   status: String,
+  passWord: String,
+  avatar: String,
+  createdBy: String,
+  updatedBy: String,
+  deleted: {
+    type: Boolean,
+    default: false
+  },
+  deletedAt: Date,
+  deletedBy: String,
 },{timestamps: true});
 
 const AccountAdmin = mongoose.model('AccountAdmin', schema, 'accounts-admin');
