@@ -295,7 +295,9 @@ module.exports.editPatch = async (req, res) => {
         req.body.position = 1;
       }
     }
-    req.body.avatar = req.file ? req.file.path : "";
+    if (req.file) {
+      req.body.avatar = req.file.path;
+    }
     req.body.createdBy = res.locals.account.id;
     req.body.priceAdult = req.body.priceAdult ? parseInt(req.body.priceAdult) : 0;
     req.body.priceChildren = req.body.priceChildren ? parseInt(req.body.priceChildren) : 0;

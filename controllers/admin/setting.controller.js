@@ -100,6 +100,59 @@ module.exports.accountAdminCreatePost = async (req, res) => {
   }
 }
 
+module.exports.accountAdminEdit = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const accountAdminDetail = await AccountAdmin.findById(id);
+    if (!accountAdminDetail) {
+      res.json({
+        code: "error",
+        message: "Tài khoản quản trị không tồn tại!"
+      })
+      res.redirect(`/${pathAdmin}/setting/account-admin/list`);
+      return;
+    }
+    const roleList = await Role.find({
+      deleted: false,
+    })
+    res.render('admin/pages/setting-account-admin-edit', {
+      pageTitle: 'Sửa thông tin tài khoản quản trị',
+      accountAdminDetail: accountAdminDetail,
+      permissionList: permissionList,
+      roleList: roleList,
+    });
+  } catch (error) {
+    console.log(error)
+    res.redirect('/${pathAdmin}/setting/account-admin/list');
+  }
+}
+
+module.exports.accountAdminEditPatch = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const accountAdminDetail = await AccountAdmin.findById(id);
+    if (!accountAdminDetail) {
+      res.json({
+        code: "error",
+        message: "Tài khoản quản trị không tồn tại!"
+      })
+      res.redirect(`/${pathAdmin}/setting/account-admin/list`);
+      return;
+    }
+    if (req.file) {
+      req.body.avatar = req.file.path;
+    }
+    await AccountAdmin.findByIdAndUpdate(id, req.body);
+    res.json({
+      code: "success",
+      message: "Tài khoản quản trị đã được cập nhật thành công",
+    })
+  } catch (error) {
+    console.log(error)
+    res.redirect('/${pathAdmin}/setting/account-admin/list');
+  }
+}
+
 
 
 module.exports.roleList = async (req, res) => {

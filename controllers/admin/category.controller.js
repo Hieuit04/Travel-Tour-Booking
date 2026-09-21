@@ -182,7 +182,9 @@ module.exports.editPatch = async (req, res) => {
         req.body.position = 1;
       }
     }
-    req.body.avatar = req.file ? req.file.path : "";
+    if (req.file) {
+      req.body.avatar = req.file.path;
+    }
     req.body.updatedBy = res.locals.account.id;
     await Category.updateOne({
       _id: id

@@ -235,7 +235,7 @@ if (categoryCreateForm) {
 }
 // End validate category create form
 
-// Validate edit form
+// Validate category edit form
 const categoryEditForm = document.querySelector('.section-8 #category-edit-form');
 if (categoryEditForm) {
   const validator = new JustValidate('#category-edit-form');
@@ -248,7 +248,7 @@ if (categoryEditForm) {
     ])
 
     .onSuccess((event) => {
-      const id = event.target.id.value;
+      const id = event.target.elements['id'].value;
       const categoryName = event.target.categoryName.value;
       const parent = event.target.parent.value;
       const position = event.target.position.value;
@@ -285,7 +285,7 @@ if (categoryEditForm) {
         })
     });
 }
-// End validate edit form
+// End validate category edit form
 
 
 
@@ -306,7 +306,7 @@ if (tourCreateForm) {
       const category = event.target.category.value;
       const position = event.target.position.value;
       const status = event.target.status.value;
-      const avatar = filePond.avatar.getFile()?.file || null;
+      const avatar = filePond.avatar?.getFile()?.file || null;
       const priceAdult = event.target.priceAdult.value;
       const priceChildren = event.target.priceChildren.value;
       const priceBaby = event.target.priceBaby.value;
@@ -398,12 +398,12 @@ if (tourEditForm) {
     ])
 
     .onSuccess((event) => {
-      const id = event.target.id.value;
+      const id = event.target.elements['id'].value;
       const tourName = event.target.tourName.value;
       const category = event.target.category.value;
       const position = event.target.position.value;
       const status = event.target.status.value;
-      const avatar = filePond.avatar.getFile()?.file || null;
+      const avatar = filePond.avatar?.getFile()?.file || null;
       const priceAdult = event.target.priceAdult.value;
       const priceChildren = event.target.priceChildren.value;
       const priceBaby = event.target.priceBaby.value;
@@ -445,7 +445,7 @@ if (tourEditForm) {
       formData.append('position', position);
       formData.append('status', status);
       if (avatar) {
-        formData.append('avatar', avatar);
+        formData.append('avatar', avatar, avatar.name || 'image.png');
       }
       formData.append('priceAdult', priceAdult);
       formData.append('priceChildren', priceChildren);
@@ -649,7 +649,7 @@ if (settingAccountAdminCreateForm) {
       const positionCompany = event.target.positionCompany.value;
       const status = event.target.status.value;
       const passWord = event.target.passWord.value;
-      const avatar = filePond.avatar.getFile()?.file || null;
+      const avatar = filePond.avatar?.getFile()?.file || null;
       
       const formData = new FormData();
       formData.append('fullName', fullName);
@@ -679,6 +679,81 @@ if (settingAccountAdminCreateForm) {
     });
 }
 // End validate setting account admin create form
+
+// Validate setting account admin edit form
+const settingAccountAdminEditForm = document.querySelector('.section-8 #setting-account-admin-edit-form');
+if (settingAccountAdminEditForm) {
+  const validator = new JustValidate('#setting-account-admin-edit-form');
+  validator
+    .addField('#fullName', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập tên!',
+      },
+    ])
+    .addField('#phone', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập số điện thoại!',
+      },
+      {
+        rule: 'customRegexp',
+        value: /^(0|\+?84)[35789]\d{8}$/,
+        errorMessage: 'Số điện thoại chưa đúng định dạng Việt Nam!',
+      },
+    ])
+    .addField('#email', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập email!',
+      },
+      {
+        rule: 'email',
+        errorMessage: 'Email chưa đúng định dạng!',
+      }
+    ])
+    .addField('#role', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập nhóm quyền!',
+      },
+    ])
+    .onSuccess((event) => {
+      const id = event.target.elements['id'].value;
+      const fullName = event.target.fullName.value;
+      const email = event.target.email.value;
+      const phone = event.target.phone.value;
+      const role = event.target.role.value;
+      const positionCompany = event.target.positionCompany.value;
+      const status = event.target.status.value;
+      const avatar = filePond.avatar?.getFile()?.file || null;
+      
+      const formData = new FormData();
+      formData.append('fullName', fullName);
+      formData.append('email', email);
+      formData.append('phone', phone);
+      formData.append('role', role);
+      formData.append('positionCompany', positionCompany);
+      formData.append('status', status);
+      if (avatar) {
+        formData.append('avatar', avatar, avatar.name || 'image.png');
+      }
+      fetch(`/${pathAdmin}/setting/account-admin/edit/${id}`, {
+        method: 'PATCH',
+        body: formData,
+      })
+        .then(res => res.json())
+      .then(data => {
+        if (data.code === 'error') {
+          notyf.error(data.message);
+        }
+        if (data.code === 'success') {
+          notyf.success(data.message);
+        }
+      })
+    });
+}
+// End validate setting account admin edit form
 
 
 
@@ -741,7 +816,7 @@ if (roleEditForm) {
     ])
 
     .onSuccess((event) => {
-      const id= event.target.id.value
+      const id = event.target.elements['id'].value;
       const roleName = event.target.roleName.value;
       const description = event.target.description.value;
       const rolePermissions = [];
@@ -813,7 +888,7 @@ if (profileEditForm) {
       const phone = event.target.phone.value;
       const position = event.target.position.value;
       const role = event.target.role.value;
-      const avatar = filePond.avatar.getFile()?.file || null;
+      const avatar = filePond.avatar?.getFile()?.file || null;
       console.log(name);
       console.log(email);
       console.log(phone);
