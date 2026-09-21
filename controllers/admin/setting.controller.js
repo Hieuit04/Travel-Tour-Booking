@@ -153,6 +153,37 @@ module.exports.accountAdminEditPatch = async (req, res) => {
   }
 }
 
+module.exports.deletePatch = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const accountAdminDetail = await AccountAdmin.findById(id);
+    if (!accountAdminDetail) {
+      res.json({
+        code: "error",
+        message: "Tài khoản quản trị không tồn tại!",
+      })
+      return;
+    }
+
+    await AccountAdmin.updateOne({
+      _id: id
+    }, {
+      status: "inactive",
+      deleted: true,
+      deletedBy: res.locals.account.id,
+      deletedAt: new Date()
+    })
+    res.json({
+      code: "success",
+      message: "Đã xoá tài khoản quản trị!",
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
 
 
 module.exports.roleList = async (req, res) => {
