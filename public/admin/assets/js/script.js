@@ -656,7 +656,7 @@ if (settingAccountAdminCreateForm) {
       formData.append('email', email);
       formData.append('phone', phone);
       formData.append('role', role);
-      formData.append('position', positionCompany);
+      formData.append('positionCompany', positionCompany);
       formData.append('status', status);
       formData.append('passWord', passWord);
       if (avatar) {

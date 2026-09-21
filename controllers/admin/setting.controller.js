@@ -31,9 +31,21 @@ module.exports.websiteInfoPatch = async (req, res) => {
   })
 };
 
-module.exports.accountAdminList = (req, res) => {
+module.exports.accountAdminList = async (req, res) => {
+  const find = {
+    deleted: false,
+  }
+  const accountAdminList = await AccountAdmin.find(find);
+  const roleList = await Role.find(find);
+  for (const item of accountAdminList) {
+    if (item.role) {
+      const roleInfo = roleList.find(r => r.id.toString() === item.role.toString());
+      item.roleName = roleInfo ? roleInfo.roleName : "";
+    }
+  }
   res.render('admin/pages/setting-account-admin-list', {
     pageTitle: 'Tài khoản quản trị',
+    accountAdminList: accountAdminList,
   });
 };
 

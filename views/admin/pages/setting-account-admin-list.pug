@@ -61,22 +61,26 @@ block main
           th Trạng thái
           th Hành động
       tbody
-        tr
-          td
-            +checkbox-30("", "")
-          td Lê Văn A
-          td
-            img(src="/admin/assets/images/demo-tour-1.png" class="inner-avatar")
-          td levana@gmail.com
-          td 0123456789
-          td Quản trị viên
-          td Giám đốc
-          td
-            .tag.tag-green Hoạt động
-          td
-            .inner-action
-              a(href="#") <i class="fa-regular fa-pen-to-square"></i>
-              a(href="#" class="inner-remove") <i class="fa-regular fa-trash-can"></i>
+        each item in accountAdminList
+          tr
+            td
+              +checkbox-30("", "")
+            td #{item.fullName}
+            td
+              img(src=item.avatar class="inner-avatar")
+            td #{item.email}
+            td #{item.phone}
+            td #{item.roleName}
+            td #{item.positionCompany}
+            td
+              if(item.status == "active")
+                .tag.tag-green Hoạt động
+              else if(item.status == "inactive")
+                .tag.tag-red Tạm dừng
+            td
+              .inner-action
+                a(href="#") <i class="fa-regular fa-pen-to-square"></i>
+                a(href="#" class="inner-remove") <i class="fa-regular fa-trash-can"></i>
   //- End Section 6
 
   //- Section 7
