@@ -20,8 +20,10 @@ router.patch('/account-admin/edit/:id', upload.single("avatar"), settingControll
 
 router.patch(
   '/account-admin/delete/:id',
-  settingController.deletePatch
+  settingController.accountAdminDeletePatch
 );
+
+router.patch('/account-admin/change-multi',settingController.accountAdminChangeMultiPatch);
 
 router.get('/role/list', settingController.roleList);
 

@@ -213,7 +213,7 @@ module.exports.accountAdminEditPatch = async (req, res) => {
   }
 }
 
-module.exports.deletePatch = async (req, res) => {
+module.exports.accountAdminDeletePatch = async (req, res) => {
   try {
     const id = req.params.id;
     const accountAdminDetail = await AccountAdmin.findById(id);
@@ -237,6 +237,60 @@ module.exports.deletePatch = async (req, res) => {
       code: "success",
       message: "Đã xoá tài khoản quản trị!",
     })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
+
+module.exports.accountAdminChangeMultiPatch = async (req, res) => {
+  try {
+    const adminId = res.locals.account.id;
+    const { listId, option } = req.body;
+
+    console.log("===> ", adminId, listId, option)
+    switch (option) {
+      case "initial":
+      case "active":
+      case "inactive":
+        await AccountAdmin.updateMany({
+          _id: {
+            $in: listId
+          }
+        }, {
+          status: option,
+          updatedBy: adminId,
+        })
+        res.json({
+          code: 'success',
+          message: 'Cập nhật tài khoản quản trị thành công!'
+        })
+        break;
+      case "delete":
+        await AccountAdmin.updateMany({
+          _id: {
+            $in: listId
+          }
+        }, {
+          deleted: true,
+          deletedBy: adminId,
+          deletedAt: Date.now(),
+        })
+        res.json({
+          code: 'success',
+          message: 'Xoá danh mục thành công!'
+        })
+        break;
+      default:
+        res.json({
+          code: 'error',
+          message: 'Hành động không hợp lệ!'
+        })
+        break;
+    }
+
   } catch (error) {
     res.json({
       code: "error",
