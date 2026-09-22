@@ -35,8 +35,66 @@ module.exports.accountAdminList = async (req, res) => {
   const find = {
     deleted: false,
   }
-  const accountAdminList = await AccountAdmin.find(find);
-  const roleList = await Role.find(find);
+  // Lọc theo trạng thái
+  if (req.query.status) {
+    find.status = req.query.status;
+  }
+  // End Lọc theo trạng thái
+  // Lọc theo nhóm quyền
+  if (req.query.role) {
+    find.role = req.query.role;
+  }
+  // End Lọc theo nhóm quyền
+  // Lọc theo ngày tạo
+  if (req.query.startDate) {
+    find.createdAt = {
+      $gte: new Date(req.query.startDate),
+    }
+  }
+  if (req.query.endDate) {
+    const endDate = new Date(req.query.endDate); // Ngày kết thúc
+    find.createdAt = {
+      ...find.createdAt,
+      $lte: new Date(endDate.setUTCHours(23, 59, 59, 999)),
+    }
+  }
+  // End Lọc theo ngày tạo
+  // Tìm kiếm
+  if (req.query.keyword) {
+    const slug = slugify(req.query.keyword, {
+      lower: true,
+    });
+    const regex = new RegExp(slug, "i");
+    find.slug = regex;
+  }
+  // End Tìm kiếm
+  // Phân trang 
+  const limit = 3;
+  let page = 1;
+  if (req.query.page && parseInt(req.query.page) > 0) {
+    page = parseInt(req.query.page);
+  }
+  const skip = (page - 1) * limit
+  const totalRecord = await AccountAdmin.countDocuments(find);
+  const totalPages = Math.ceil(totalRecord / limit);
+  const pagination = {
+    totalPages: totalPages,
+    totalRecord: totalRecord,
+    skip: skip,
+  }
+  // End Phân trang 
+
+  const accountAdminList = await AccountAdmin
+    .find(find)
+    .skip(skip)
+    .limit(limit)
+    .sort({
+      createdAt: "desc"
+    })
+    ;
+  const roleList = await Role.find({
+    deleted: false
+  });
   for (const item of accountAdminList) {
     if (item.role) {
       const roleInfo = roleList.find(r => r.id.toString() === item.role.toString());
@@ -46,6 +104,8 @@ module.exports.accountAdminList = async (req, res) => {
   res.render('admin/pages/setting-account-admin-list', {
     pageTitle: 'Tài khoản quản trị',
     accountAdminList: accountAdminList,
+    roleList: roleList,
+    pagination: pagination,
   });
 };
 

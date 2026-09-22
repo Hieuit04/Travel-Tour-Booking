@@ -10,21 +10,21 @@ block main
       .inner-item
         <i class="fa-solid fa-filter"></i> Bộ lọc
       .inner-item
-        select
+        select(filter name="status")
           option(value="") Trạng thái
-          option(value="") Hoạt động
-          option(value="") Tạm dừng
+          option(value="initial") Khởi tạo
+          option(value="active") Hoạt động
+          option(value="inactive") Tạm dừng
       .inner-item
-        input(type="date")
+        input(filter name="startDate" type="date")
         span -
-        input(type="date")
+        input(filter name="endDate" type="date")
       .inner-item
-        select
+        select(filter name="role")
           option(value="") Nhóm quyền
-          option(value="") Quản trị viên
-          option(value="") Quản lý đơn hàng
-          option(value="") Quản lý tour
-      .inner-item.inner-reset
+          each item in roleList
+            option(value=item.id) #{item.roleName}
+      .inner-item.inner-reset(button-reset-filter)
         <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
   //- End Section 4
 
@@ -41,7 +41,7 @@ block main
         button Áp dụng
     form.inner-search
       button <i class="fa-solid fa-magnifying-glass"></i>
-      input(type="text" placeholder="Tìm kiếm")
+      input(type="text" placeholder="Tìm kiếm" input-search)
     a.inner-create(href=`/${pathAdmin}/setting/account-admin/create`) + Tạo mới
   //- End Section 5
 
@@ -91,9 +91,8 @@ block main
 
   //- Section 7
   .section-7
-    .inner-text Hiển thị 1 - 9 của 78
-    select
-      option(value="") Trang 1
-      option(value="") Trang 2
-      option(value="") Trang 3
+    .inner-text Hiển thị #{pagination.skip+1} - #{pagination.skip+accountAdminList.length} của #{pagination.totalRecord}
+    select(pagination)
+      - for(let i=1; i<= pagination.totalPages; i++)
+        option(value=i) Trang #{i}
   //- End Section 7
