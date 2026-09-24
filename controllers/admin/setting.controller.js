@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const Role = require('../../models/role.model');
 const slugify = require('slugify');
 const AccountAdmin = require('../../models/accounts-admin.model');
+const { checkPermission } = require('../../helpers/permission.helper');
 
 module.exports.list = async (req, res) => {
 
@@ -289,6 +290,7 @@ module.exports.accountAdminChangeMultiPatch = async (req, res) => {
       case "initial":
       case "active":
       case "inactive":
+        if(!checkPermission(res,"account-admin-edit")) return;
         await AccountAdmin.updateMany({
           _id: {
             $in: listId
@@ -303,6 +305,7 @@ module.exports.accountAdminChangeMultiPatch = async (req, res) => {
         })
         break;
       case "delete":
+        if(!checkPermission(res,"account-admin-delete")) return;
         await AccountAdmin.updateMany({
           _id: {
             $in: listId
@@ -540,6 +543,7 @@ module.exports.roleChangeMultiPatch = async (req, res) => {
     const { listId, option } = req.body;
     switch (option) {
       case "delete":
+        if(!checkPermission(res,"role-delete")) return;
         await Role.updateMany({
           _id: {
             $in: listId

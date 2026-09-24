@@ -2,27 +2,28 @@ extends ../layouts/default.pug
 include ../mixins/checkbox.pug
 
 block main
-  h1.box-title Sửa nhóm quyền
+  if(pers.includes("role-edit"))
+    h1.box-title Sửa nhóm quyền
 
-  //- Section 8
-  .section-8
-    form(id="setting-role-edit-form")
-      input(type="hidden" name="id" value=roleDetail.id)
-      .inner-group
-        label(for="roleName") Tên nhóm quyền
-        input(type="text" name="roleName" id="roleName" value=roleDetail.roleName)
-      .inner-group
-        label(for="description") Mô tả ngắn
-        input(type="text" name="description" id="description" value=roleDetail.description)
-      .inner-group
-        label(for="permissions") Phân quyền
-        .inner-checkbox-list
-          each item in permissionList
-            .inner-checkbox-item
-              +checkbox-30("rolePermissions", item.value,item.value , roleDetail.rolePermissions && roleDetail.rolePermissions.includes(item.value))
-              label(for=item.value) #{item.label}
-      .inner-group.inner-two-col.text-center
-        button.btn-create(type="submit") Cập nhật
-    .inner-link
-      a(href=`/${pathAdmin}/setting/role/list`) Quay lại danh sách
-  //- End Section 8
+    //- Section 8
+    .section-8
+      form(id="setting-role-edit-form")
+        input(type="hidden" name="id" value=roleDetail.id)
+        .inner-group
+          label(for="roleName") Tên nhóm quyền
+          input(type="text" name="roleName" id="roleName" value=roleDetail.roleName)
+        .inner-group
+          label(for="description") Mô tả ngắn
+          input(type="text" name="description" id="description" value=roleDetail.description)
+        .inner-group
+          label(for="permissions") Phân quyền
+          .inner-checkbox-list
+            each item in permissionList
+              .inner-checkbox-item
+                +checkbox-30("rolePermissions", item.value,item.value , roleDetail.rolePermissions && roleDetail.rolePermissions.includes(item.value))
+                label(for=item.value) #{item.label}
+        .inner-group.inner-two-col.text-center
+          button.btn-create(type="submit") Cập nhật
+      .inner-link
+        a(href=`/${pathAdmin}/setting/role/list`) Quay lại danh sách
+    //- End Section 8

@@ -49,4 +49,48 @@ module.exports.permissionList = [
     label: "Xoá vĩnh viễn tour",
     value: "tour-trash-delete",
   },
+  {
+    label: "Xem thông tin website",
+    value: "website-info-view",
+  },
+  {
+    label: "Sửa thông tin website",
+    value: "website-info-edit",
+  },
+  {
+    label: "Xem tài khoản quản trị",
+    value: "account-admin-view",
+  },
+  {
+    label: "Tạo tài khoản quản trị",
+    value: "account-admin-create",
+  },
+  {
+    label: "Sửa tài khoản quản trị",
+    value: "account-admin-edit",
+  },
+  {
+    label: "Đổi mật khẩu tài khoản quản trị",
+    value: "account-admin-change-password",
+  },
+  {
+    label: "Xoá tài khoản quản trị",
+    value: "account-admin-delete",
+  },
+  {
+    label: "Xem danh sách nhóm quyền",
+    value: "role-list-view",
+  },
+  {
+    label: "Tạo nhóm quyền",
+    value: "role-create",
+  },
+  {
+    label: "Sửa nhóm quyền",
+    value: "role-edit",
+  },
+  {
+    label: "Xoá nhóm quyền",
+    value: "role-delete",
+  },
 ];

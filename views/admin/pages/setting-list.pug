@@ -5,13 +5,16 @@ block main
 
   //- Section 9
   .section-9
-    a.inner-item(href=`/${pathAdmin}/setting/website-info`)
-      img(src="/admin/assets/images/section-9-icon-1.svg")
-      span Thông tin website
-    a.inner-item(href=`/${pathAdmin}/setting/account-admin/list`)
-      img(src="/admin/assets/images/section-9-icon-2.svg")
-      span Tài khoản quản trị
-    a.inner-item(href=`/${pathAdmin}/setting/role/list`)
-      img(src="/admin/assets/images/section-9-icon-3.svg")
-      span Nhóm quyền
+    if(pers.includes("website-info-view"))
+      a.inner-item(href=`/${pathAdmin}/setting/website-info`)
+        img(src="/admin/assets/images/section-9-icon-1.svg")
+        span Thông tin website
+    if(pers.includes("account-admin-view"))
+      a.inner-item(href=`/${pathAdmin}/setting/account-admin/list`)
+        img(src="/admin/assets/images/section-9-icon-2.svg")
+        span Tài khoản quản trị
+    if(pers.includes("role-list-view"))
+      a.inner-item(href=`/${pathAdmin}/setting/role/list`)
+        img(src="/admin/assets/images/section-9-icon-3.svg")
+        span Nhóm quyền
   //- End Section 9

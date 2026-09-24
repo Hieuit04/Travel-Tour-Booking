@@ -1,31 +1,32 @@
 extends ../layouts/default.pug
 
 block main
-  h1.box-title Thông tin website
+  if(pers.includes("website-info-view"))
+    h1.box-title Thông tin website
 
-  //- Section 8
-  .section-8
-    form(id="setting-website-info-form")
-      .inner-group
-        label(for="nameWebsite") Tên website
-        input(type="text" name="nameWebsite" id="nameWebsite" value = settingWebsiteInfo.nameWebsite)
-      .inner-group
-        label(for="phone") Số điện thoại
-        input(type="text" name="phone" id="phone" value = settingWebsiteInfo.phone)
-      .inner-group
-        label(for="email") Email
-        input(type="email" name="email" id="email" value = settingWebsiteInfo.email)
-      .inner-group
-        label(for="address") Địa chỉ
-        input(type="text" name="address" id="address" value = settingWebsiteInfo.address)
-      .inner-group
-        label(for="logo") Logo
-        input(type="file" name="logo" id="logo" accept="image/*" filepondImage image-default = settingWebsiteInfo.logo).inner-upload-image
-      .inner-group
-        label(for="favicon") Favicon
-        input(type="file" name="favicon" id="favicon" accept="image/*" filepondImage image-default = settingWebsiteInfo.favicon).inner-upload-image
-      .inner-group.inner-two-col.text-center
-        button.btn-create(type="submit") Cập nhật
-    .inner-link
-      a(href=`/${pathAdmin}/setting/list`) Quay lại danh sách
-  //- End Section 8
+    //- Section 8
+    .section-8
+      form(id="setting-website-info-form")
+        .inner-group
+          label(for="nameWebsite") Tên website
+          input(type="text" name="nameWebsite" id="nameWebsite" value = settingWebsiteInfo.nameWebsite)
+        .inner-group
+          label(for="phone") Số điện thoại
+          input(type="text" name="phone" id="phone" value = settingWebsiteInfo.phone)
+        .inner-group
+          label(for="email") Email
+          input(type="email" name="email" id="email" value = settingWebsiteInfo.email)
+        .inner-group
+          label(for="address") Địa chỉ
+          input(type="text" name="address" id="address" value = settingWebsiteInfo.address)
+        .inner-group
+          label(for="logo") Logo
+          input(type="file" name="logo" id="logo" accept="image/*" filepondImage image-default = settingWebsiteInfo.logo).inner-upload-image
+        .inner-group
+          label(for="favicon") Favicon
+          input(type="file" name="favicon" id="favicon" accept="image/*" filepondImage image-default = settingWebsiteInfo.favicon).inner-upload-image
+        .inner-group.inner-two-col.text-center
+          button.btn-create(type="submit") Cập nhật
+      .inner-link
+        a(href=`/${pathAdmin}/setting/list`) Quay lại danh sách
+    //- End Section 8

@@ -558,14 +558,35 @@ if (settingWebsiteInfoForm) {
       const phone = event.target.phone.value;
       const email = event.target.email.value;
       const address = event.target.address.value;
-      const logo = filePond.logo.getFile()?.file || null;
-      const favicon = filePond.favicon.getFile()?.file || null;
-      console.log(nameWebsite);
-      console.log(phone);
-      console.log(email);
-      console.log(address);
-      console.log(logo);
-      console.log(favicon);
+      const logo = filePond.logo?.getFile()?.file || null;
+      const favicon = filePond.favicon?.getFile()?.file || null;
+      
+      const formData = new FormData();
+      formData.append('nameWebsite', nameWebsite);
+      formData.append('phone', phone);
+      formData.append('email', email);
+      formData.append('address', address);
+      if (logo) {
+        formData.append('logo', logo, logo.name || 'logo.png');
+      }
+      if (favicon) {
+        formData.append('favicon', favicon, favicon.name || 'favicon.png');
+      }
+
+      fetch(`/${pathAdmin}/setting/website-info`, {
+        method: 'PATCH',
+        body: formData,
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code === 'success') {
+            drawNotyf(data.code, data.message);
+            window.location.reload();
+          }
+        })
     });
 }
 // End validate setting website info form
