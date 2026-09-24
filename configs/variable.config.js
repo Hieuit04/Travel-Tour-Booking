@@ -37,4 +37,16 @@ module.exports.permissionList = [
     label: "Xoá tour",
     value: "tour-delete",
   },
+  {
+    label: "Xem thùng rác tour",
+    value: "tour-trash-view",
+  },
+  {
+    label: "Khôi phục tour đã xoá",
+    value: "tour-trash-restore",
+  },
+  {
+    label: "Xoá vĩnh viễn tour",
+    value: "tour-trash-delete",
+  },
 ];

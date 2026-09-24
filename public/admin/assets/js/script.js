@@ -12,9 +12,7 @@ const initTinyMCE = (selector) => {
   }
 }
 initTinyMCE()
-
 // End Init Tiny MCE 
-
 
 // Sider
 const sider = document.querySelector('.sider')
@@ -288,7 +286,6 @@ if (categoryEditForm) {
 // End validate category edit form
 
 
-
 // Validate tour create form
 const tourCreateForm = document.querySelector('.section-8 #tour-create-form');
 if (tourCreateForm) {
@@ -479,7 +476,6 @@ if (tourEditForm) {
     })
 }
 // End validate tour edit form
-
 
 
 // Validate order edit form
@@ -815,8 +811,6 @@ if (settingAccountAdminChangePasswordForm) {
 // End validate setting account admin change password form
 
 
-
-
 // Validate setting role create form
 const roleCreateForm = document.querySelector('.section-8 #setting-role-create-form');
 if (roleCreateForm) {
@@ -1080,6 +1074,34 @@ if (listBtnDelete.length > 0) {
 }
 // End button delete
 
+// Button restore
+const listBtnRestore = document.querySelectorAll('[button-restore]');
+if (listBtnRestore.length > 0) {
+  listBtnRestore.forEach((button) => {
+    button.addEventListener('click', async (e) => {
+      const isConfirm = confirm('Bạn có chắc chắn muốn khôi phục bản ghi này không?');
+      if (!isConfirm) {
+        return;
+      }
+      const dataApi = button.getAttribute('data-api');
+      fetch(dataApi, {
+        method: 'PATCH',
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code === 'success') {
+            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
+            window.location.reload();
+          }
+        })
+    })
+  })
+}
+// End button restore
+
 // Filter
 const listFilter = document.querySelectorAll('[filter]');
 if (listFilter.length > 0) {
@@ -1138,7 +1160,8 @@ if (changeMulti) {
   const select = changeMulti.querySelector("select")
   const button = changeMulti.querySelector("button")
   const dataApi = changeMulti.getAttribute("data-api")
-  button.addEventListener("click", async () => {
+  button.addEventListener("click", async (e) => {
+    e.preventDefault();
     const option = select.value;
     const listInputChecked = document.querySelectorAll('[name="check-item"]:checked');
     const listId = [];

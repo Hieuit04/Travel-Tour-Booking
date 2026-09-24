@@ -3,6 +3,7 @@ const AccountAdmin = require('../../models/accounts-admin.model');
 const buildCategoryTree = require('../../helpers/categoryTree.helper');
 const moment = require('moment');
 const slugify = require('slugify')
+const {checkPermission} = require('../../helpers/permission.helper')
 module.exports.list = async (req, res) => {
   const find = {
     deleted: false,
@@ -242,6 +243,7 @@ module.exports.changeMultiPatch = async (req, res) => {
     switch (option) {
       case "active":
       case "inactive":
+        if(!checkPermission(res,"category-edit")) return;
         await Category.updateMany({
           _id: {
             $in: listId
@@ -256,6 +258,7 @@ module.exports.changeMultiPatch = async (req, res) => {
         })
         break;
       case "delete":
+        if(!checkPermission(res,"category-delete")) return;
         await Category.updateMany({
           _id: {
             $in: listId

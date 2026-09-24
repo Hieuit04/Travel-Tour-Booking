@@ -3,104 +3,105 @@ include ../mixins/checkbox.pug
 include ../mixins/select-tree.pug
 
 block main
-  h1.box-title Tạo tour
+  if(pers.includes("tour-create"))
+    h1.box-title Tạo tour
 
-  //- Section 8
-  .section-8
-    form(id="tour-create-form")
-      .inner-group
-        label(for="tourName") Tên tour
-        input(type="text" name="tourName" id="tourName")
-      .inner-group
-        label(for="category") Danh mục
-        select(name="category" id="category")
-          option(value="") -- Chọn danh mục --
-          if categoryTree
-            +select-tree(categoryTree)
-      .inner-group
-        label(for="position") Vị trí
-        input(type="number" name="position" id="position")
-      .inner-group
-        label(for="status") Trạng thái
-        select(name="status" id="status")
-          option(value="active") Hoạt động                          
-          option(value="inactive") Tạm dừng
-      .inner-group.inner-two-col
-        label(for="avatar") Ảnh đại diện
-        input(type="file" name="avatar" id="avatar" accept="image/*" filepondImage).inner-upload-image
-      .inner-group
-        label(for="") Giá cũ
-        .inner-input-list
-          .inner-input-item
-            label(for="priceAdult") Người lớn
-            input(type="number" name="priceAdult" id="priceAdult")
-          .inner-input-item
-            label(for="priceChildren") Trẻ em
-            input(type="number" name="priceChildren" id="priceChildren")
-          .inner-input-item
-            label(for="priceBaby") Em bé
-            input(type="number" name="priceBaby" id="priceBaby")
-      .inner-group
-        label(for="") Giá mới
-        .inner-input-list
-          .inner-input-item
-            label(for="newPriceAdult") Người lớn
-            input(type="number" name="newPriceAdult" id="newPriceAdult")
-          .inner-input-item
-            label(for="newPriceChildren") Trẻ em
-            input(type="number" name="newPriceChildren" id="newPriceChildren")
-          .inner-input-item
-            label(for="newPriceBaby") Em bé
-            input(type="number" name="newPriceBaby" id="newPriceBaby")
-      .inner-group
-        label(for="") Còn lại
-        .inner-input-list
-          .inner-input-item
-            label(for="stockAdult") Người lớn
-            input(type="number" name="stockAdult" id="stockAdult")
-          .inner-input-item
-            label(for="stockChildren") Trẻ em
-            input(type="number" name="stockChildren" id="stockChildren")
-          .inner-input-item
-            label(for="stockBaby") Em bé
-            input(type="number" name="stockBaby" id="stockBaby")
-      .inner-group
-        label(for="") Những địa điểm có tour
-        .inner-checkbox-list
-          each item in cityList
-            .inner-checkbox-item
-              +checkbox-30("locations", `location-${item.id}`, item.id)
-              label(for=`location-${item.id}`) #{item.name}
-      .inner-group
-        label(for="time") Thời gian
-        input(type="text" name="time" id="time")
-      .inner-group
-        label(for="vehicle") Phương tiện
-        input(type="text" name="vehicle" id="vehicle")
-      .inner-group
-        label(for="departureDate") Ngày khởi hành
-        input(type="date" name="departureDate" id="departureDate")
-      .inner-group.inner-two-col
-        label(for="information") Thông tin tour
-        textarea(name="information" id="information" textarea-mce)
-      .inner-group.inner-two-col
-        label(for="") Lịch trình tour
-        .inner-schedule
-          .inner-schedule-list
-            .inner-schedule-item
-              .inner-schedule-head
-                .inner-schedule-button.inner-move
-                  <i class="fa-solid fa-arrows-up-down-left-right"></i>
-                input(type="text")
-                .inner-schedule-button.inner-remove
-                  <i class="fa-regular fa-trash-can"></i>
-                .inner-schedule-button.inner-more
-                  <i class="fa-solid fa-angle-down"></i>
-              .inner-schedule-body
-                textarea(textarea-mce)
-          .inner-schedule-create + Thêm lịch trình
-      .inner-group.inner-two-col.text-center
-        button.btn-create(type="submit") Tạo mới
-    .inner-link
-      a(href= `/${pathAdmin}/tour/list`) Quay lại danh sách
-  //- End Section 8
+    //- Section 8
+    .section-8
+      form(id="tour-create-form")
+        .inner-group
+          label(for="tourName") Tên tour
+          input(type="text" name="tourName" id="tourName")
+        .inner-group
+          label(for="category") Danh mục
+          select(name="category" id="category")
+            option(value="") -- Chọn danh mục --
+            if categoryTree
+              +select-tree(categoryTree)
+        .inner-group
+          label(for="position") Vị trí
+          input(type="number" name="position" id="position")
+        .inner-group
+          label(for="status") Trạng thái
+          select(name="status" id="status")
+            option(value="active") Hoạt động                          
+            option(value="inactive") Tạm dừng
+        .inner-group.inner-two-col
+          label(for="avatar") Ảnh đại diện
+          input(type="file" name="avatar" id="avatar" accept="image/*" filepondImage).inner-upload-image
+        .inner-group
+          label(for="") Giá cũ
+          .inner-input-list
+            .inner-input-item
+              label(for="priceAdult") Người lớn
+              input(type="number" name="priceAdult" id="priceAdult")
+            .inner-input-item
+              label(for="priceChildren") Trẻ em
+              input(type="number" name="priceChildren" id="priceChildren")
+            .inner-input-item
+              label(for="priceBaby") Em bé
+              input(type="number" name="priceBaby" id="priceBaby")
+        .inner-group
+          label(for="") Giá mới
+          .inner-input-list
+            .inner-input-item
+              label(for="newPriceAdult") Người lớn
+              input(type="number" name="newPriceAdult" id="newPriceAdult")
+            .inner-input-item
+              label(for="newPriceChildren") Trẻ em
+              input(type="number" name="newPriceChildren" id="newPriceChildren")
+            .inner-input-item
+              label(for="newPriceBaby") Em bé
+              input(type="number" name="newPriceBaby" id="newPriceBaby")
+        .inner-group
+          label(for="") Còn lại
+          .inner-input-list
+            .inner-input-item
+              label(for="stockAdult") Người lớn
+              input(type="number" name="stockAdult" id="stockAdult")
+            .inner-input-item
+              label(for="stockChildren") Trẻ em
+              input(type="number" name="stockChildren" id="stockChildren")
+            .inner-input-item
+              label(for="stockBaby") Em bé
+              input(type="number" name="stockBaby" id="stockBaby")
+        .inner-group
+          label(for="") Những địa điểm có tour
+          .inner-checkbox-list
+            each item in cityList
+              .inner-checkbox-item
+                +checkbox-30("locations", `location-${item.id}`, item.id)
+                label(for=`location-${item.id}`) #{item.name}
+        .inner-group
+          label(for="time") Thời gian
+          input(type="text" name="time" id="time")
+        .inner-group
+          label(for="vehicle") Phương tiện
+          input(type="text" name="vehicle" id="vehicle")
+        .inner-group
+          label(for="departureDate") Ngày khởi hành
+          input(type="date" name="departureDate" id="departureDate")
+        .inner-group.inner-two-col
+          label(for="information") Thông tin tour
+          textarea(name="information" id="information" textarea-mce)
+        .inner-group.inner-two-col
+          label(for="") Lịch trình tour
+          .inner-schedule
+            .inner-schedule-list
+              .inner-schedule-item
+                .inner-schedule-head
+                  .inner-schedule-button.inner-move
+                    <i class="fa-solid fa-arrows-up-down-left-right"></i>
+                  input(type="text")
+                  .inner-schedule-button.inner-remove
+                    <i class="fa-regular fa-trash-can"></i>
+                  .inner-schedule-button.inner-more
+                    <i class="fa-solid fa-angle-down"></i>
+                .inner-schedule-body
+                  textarea(textarea-mce)
+            .inner-schedule-create + Thêm lịch trình
+        .inner-group.inner-two-col.text-center
+          button.btn-create(type="submit") Tạo mới
+      .inner-link
+        a(href= `/${pathAdmin}/tour/list`) Quay lại danh sách
+    //- End Section 8

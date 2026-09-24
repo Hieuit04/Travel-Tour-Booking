@@ -3,122 +3,129 @@ include ../mixins/checkbox.pug
 include ../mixins/select-tree.pug
 
 block main
-  h1.box-title Quản lý tour
+  if(pers.includes("tour-view"))
+    h1.box-title Quản lý tour
 
-  //- Section 4
-  .section-4
-    .inner-wrap
-      .inner-item
-        <i class="fa-solid fa-filter"></i> Bộ lọc
-      .inner-item
-        select(filter name="status")
-          option(value="") Trạng thái
-          option(value="active") Hoạt động
-          option(value="inactive") Tạm dừng
-      .inner-item
-        select(filter name="createdBy")
-          option(value="") Người tạo
-          each item in accountList 
-            option(value=item._id) #{item.fullName}
-      .inner-item
-        input(filter name="startDate" type="date")
-        span -
-        input(filter name="endDate" type="date")
-      .inner-item
-        select(filter name="category")
-          option(value="") -- Chọn danh mục --
-          if categoryTree
-            +select-tree(categoryTree)
-      .inner-item
-        select(filter name="price")
-          option(value="") Mức giá
-          option(value="0-1000000") Dưới 1tr
-          option(value="1000000-3000000") Từ 1tr đến 3tr
-          option(value="3000000-5000000") Từ 3tr đến 5tr
-          option(value="5000000-7000000") Từ 5tr đến 7tr
-          option(value="7000000-10000000") Từ 7tr đến 10tr
-          option(value="10000000-max") Trên 10tr
-      .inner-item.inner-reset(button-reset-filter)
-        <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
-  //- End Section 4
+    //- Section 4
+    .section-4
+      .inner-wrap
+        .inner-item
+          <i class="fa-solid fa-filter"></i> Bộ lọc
+        .inner-item
+          select(filter name="status")
+            option(value="") Trạng thái
+            option(value="active") Hoạt động
+            option(value="inactive") Tạm dừng
+        .inner-item
+          select(filter name="createdBy")
+            option(value="") Người tạo
+            each item in accountList 
+              option(value=item._id) #{item.fullName}
+        .inner-item
+          input(filter name="startDate" type="date")
+          span -
+          input(filter name="endDate" type="date")
+        .inner-item
+          select(filter name="category")
+            option(value="") -- Chọn danh mục --
+            if categoryTree
+              +select-tree(categoryTree)
+        .inner-item
+          select(filter name="price")
+            option(value="") Mức giá
+            option(value="0-1000000") Dưới 1tr
+            option(value="1000000-3000000") Từ 1tr đến 3tr
+            option(value="3000000-5000000") Từ 3tr đến 5tr
+            option(value="5000000-7000000") Từ 5tr đến 7tr
+            option(value="7000000-10000000") Từ 7tr đến 10tr
+            option(value="10000000-max") Trên 10tr
+        .inner-item.inner-reset(button-reset-filter)
+          <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
+    //- End Section 4
 
-  //- Section 5
-  .section-5
-    form.inner-status(change-multi data-api=`/${pathAdmin}/tour/change-multi`)
-      .inner-item
-        select
-          option(value="") -- Hành động --
-          option(value="active") Hoạt động
-          option(value="inactive") Tạm dừng
-          option(value="delete") Xóa
-      .inner-item
-        button(type="button") Áp dụng
-    form.inner-search
-      button <i class="fa-solid fa-magnifying-glass"></i>
-      input(type="text" placeholder="Tìm kiếm" input-search)
-    a.inner-create(href=`/${pathAdmin}/tour/create`) + Tạo mới
-    a.inner-trash(href=`/${pathAdmin}/tour/trash`) Thùng rác
-  //- End Section 5
+    //- Section 5
+    .section-5
+      form.inner-status(change-multi data-api=`/${pathAdmin}/tour/change-multi`)
+        .inner-item
+          select
+            option(value="") -- Hành động --
+            if(pers.includes("tour-edit"))
+              option(value="active") Hoạt động
+              option(value="inactive") Tạm dừng
+            if(pers.includes("tour-delete"))
+              option(value="delete") Xóa
+        .inner-item
+          button(type="button") Áp dụng
+      form.inner-search
+        button <i class="fa-solid fa-magnifying-glass"></i>
+        input(type="text" placeholder="Tìm kiếm" input-search)
+      if(pers.includes("tour-create"))
+        a.inner-create(href=`/${pathAdmin}/tour/create`) + Tạo mới
+      if(pers.includes("tour-trash-view"))
+        a.inner-trash(href=`/${pathAdmin}/tour/trash`) Thùng rác
+    //- End Section 5
 
-  //- Section 6
-  .section-6
-    table
-      thead
-        tr
-          th
-            +checkbox-30("check-all", "")
-          th Tên tour
-          th Ảnh đại diện
-          th Giá
-          th Còn lại
-          th Vị trí
-          th Trạng thái
-          th Tạo bởi
-          th Cập nhật bởi
-          th Hành động
-      tbody
-        each item in tourList 
+    //- Section 6
+    .section-6
+      table
+        thead
           tr
-            td
-              +checkbox-30("check-item", "",item.id)
-            td #{item.tourName}
-            td
-              img(src=item.avatar class="inner-avatar")
-            td
-              div NL: #{item.newPriceAdult.toLocaleString("vi-VN")}đ
-              div TE: #{item.newPriceChildren.toLocaleString("vi-VN")}đ
-              div EB: #{item.newPriceBaby.toLocaleString("vi-VN")}đ
-            td
-              div NL: #{item.stockAdult}
-              div TE: #{item.stockChildren}
-              div EB: #{item.stockBaby}
-            td #{item.position} 
-            td
-              if(item.status == "active")
-                .tag.tag-green Hoạt động
-              else if(item.status == "inactive")
-                .tag.tag-red Tạm dừng
-            td
-              div #{item.createdByName}
-              .inner-time #{item.createdAtFormat}
-            td
-              div #{item.updatedByName}
-              .inner-time #{item.updatedAtFormat}
-            td
-              .inner-action
-                a(href=`/${pathAdmin}/tour/edit/${item.id}`) <i class="fa-regular fa-pen-to-square"></i>
-                a(
-                  href="javascript:;" 
-                  class="inner-remove"
-                  button-delete
-                  data-api=`/${pathAdmin}/tour/delete/${item.id}` 
-                ) <i class="fa-regular fa-trash-can"></i>
-  //- End Section 6
+            th
+              +checkbox-30("check-all", "")
+            th Tên tour
+            th Ảnh đại diện
+            th Giá
+            th Còn lại
+            th Vị trí
+            th Trạng thái
+            th Tạo bởi
+            th Cập nhật bởi
+            th Hành động
+        tbody
+          each item in tourList 
+            tr
+              td
+                +checkbox-30("check-item", "",item.id)
+              td #{item.tourName}
+              td
+                img(src=item.avatar class="inner-avatar")
+              td
+                div NL: #{item.newPriceAdult.toLocaleString("vi-VN")}đ
+                div TE: #{item.newPriceChildren.toLocaleString("vi-VN")}đ
+                div EB: #{item.newPriceBaby.toLocaleString("vi-VN")}đ
+              td
+                div NL: #{item.stockAdult}
+                div TE: #{item.stockChildren}
+                div EB: #{item.stockBaby}
+              td #{item.position} 
+              td
+                if(item.status == "active")
+                  .tag.tag-green Hoạt động
+                else if(item.status == "inactive")
+                  .tag.tag-red Tạm dừng
+              td
+                div #{item.createdByName}
+                .inner-time #{item.createdAtFormat}
+              td
+                div #{item.updatedByName}
+                .inner-time #{item.updatedAtFormat}
+              td
+                .inner-action
+                  if(pers.includes("tour-edit"))
+                    a(href=`/${pathAdmin}/tour/edit/${item.id}`) <i class="fa-regular fa-pen-to-square"></i>
+                  if(pers.includes("tour-delete"))
+                    a(
+                      href="javascript:;" 
+                      class="inner-remove"
+                      button-delete
+                      data-api=`/${pathAdmin}/tour/delete/${item.id}` 
+                    ) <i class="fa-regular fa-trash-can"></i>
+    //- End Section 6
 
-  //- Section 7
-  .section-7
-    .inner-text Hiển thị #{pagination.skip+1} - #{pagination.skip+tourList.length} của #{pagination.totalRecord}
-    select(pagination)
-      - for(let i=1; i<= pagination.totalPages; i++)
-        option(value=i) Trang #{i}
-  //- End Section 7
+    //- Section 7
+    .section-7
+      .inner-text Hiển thị #{pagination.skip+1} - #{pagination.skip+tourList.length} của #{pagination.totalRecord}
+      select(pagination)
+        - for(let i=1; i<= pagination.totalPages; i++)
+          option(value=i) Trang #{i}
+    //- End Section 7

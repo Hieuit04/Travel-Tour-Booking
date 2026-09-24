@@ -6,6 +6,7 @@ const moment = require('moment');
 const buildCategoryTree = require('../../helpers/categoryTree.helper');
 const categoryFilter = require('../../helpers/categoryFilter.helper');
 const slugify = require('slugify')
+const {checkPermission} = require('../../helpers/permission.helper')
 
 
 module.exports.list = async (req, res) => {
@@ -393,6 +394,7 @@ module.exports.changeMultiPatch = async (req, res) => {
     switch (option) {
       case "active":
       case "inactive":
+        if(!checkPermission(res,"tour-edit")) return;
         await Tour.updateMany({
           _id: {
             $in: listId
@@ -407,6 +409,7 @@ module.exports.changeMultiPatch = async (req, res) => {
         })
         break;
       case "delete":
+        if(!checkPermission(res,"tour-delete")) return;
         await Tour.updateMany({
           _id: {
             $in: listId
@@ -422,6 +425,7 @@ module.exports.changeMultiPatch = async (req, res) => {
         })
         break;
       case "restore":
+        if(!checkPermission(res,"tour-trash-restore")) return;
         await Tour.updateMany({
           _id: {
             $in: listId
@@ -435,6 +439,7 @@ module.exports.changeMultiPatch = async (req, res) => {
         })
         break;
       case "delete-destroy":
+        if(!checkPermission(res,"tour-trash-delete")) return;
         await Tour.deleteMany({
           _id: {
             $in: listId

@@ -2,38 +2,38 @@ extends ../layouts/default.pug
 include ../mixins/select-tree.pug
 
 block main
-  h1.box-title Tạo danh mục
-
-  //- Section 8
-  .section-8
-    form(id="category-create-form")
-      .inner-group
-        label(for="categoryName") Tên danh mục
-        input(type="text" name="categoryName" id="categoryName")
-      .inner-group
-        label(for="parent") Danh mục cha
-        select(name="parent" id="parent")
-          option(value="") -- Chọn danh mục --
-          //- 2. Gọi mixin truyền vào categoryTree từ backend
-          if categoryTree
-            +select-tree(categoryTree)
-      .inner-group
-        label(for="position") Vị trí
-        input(type="number" name="position" id="position")
-      .inner-group
-        label(for="status") Trạng thái
-        select(name="status" id="status")
-          option(value="") -- Chọn trạng thái --
-          option(value="active") Hoạt động
-          option(value="inactive") Tạm dừng
-      .inner-group.inner-two-col
-        label(for="avatar") Ảnh đại diện
-        input(type="file" name="avatar" id="avatar" accept="image/*"  filepondImage).inner-upload-image
-      .inner-group.inner-two-col
-        label(for="description") Mô tả
-        textarea(name="description" id="description" textarea-mce) 
-      .inner-group.inner-two-col.text-center 
-        button.btn-create(type="submit") Tạo mới
-    .inner-link
-      a(href=`/${pathAdmin}/category/list`) Quay lại danh sách
-  //- End Section 8
+  if(pers.includes("category-create"))
+    h1.box-title Tạo danh mục
+    //- Section 8
+    .section-8
+      form(id="category-create-form")
+        .inner-group
+          label(for="categoryName") Tên danh mục
+          input(type="text" name="categoryName" id="categoryName")
+        .inner-group
+          label(for="parent") Danh mục cha
+          select(name="parent" id="parent")
+            option(value="") -- Chọn danh mục --
+            //- 2. Gọi mixin truyền vào categoryTree từ backend
+            if categoryTree
+              +select-tree(categoryTree)
+        .inner-group
+          label(for="position") Vị trí
+          input(type="number" name="position" id="position")
+        .inner-group
+          label(for="status") Trạng thái
+          select(name="status" id="status")
+            option(value="") -- Chọn trạng thái --
+            option(value="active") Hoạt động
+            option(value="inactive") Tạm dừng
+        .inner-group.inner-two-col
+          label(for="avatar") Ảnh đại diện
+          input(type="file" name="avatar" id="avatar" accept="image/*"  filepondImage).inner-upload-image
+        .inner-group.inner-two-col
+          label(for="description") Mô tả
+          textarea(name="description" id="description" textarea-mce) 
+        .inner-group.inner-two-col.text-center 
+          button.btn-create(type="submit") Tạo mới
+      .inner-link
+        a(href=`/${pathAdmin}/category/list`) Quay lại danh sách
+    //- End Section 8

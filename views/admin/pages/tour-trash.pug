@@ -3,88 +3,93 @@ include ../mixins/checkbox.pug
 
 
 block main
-  h1.box-title Thùng rác tour
+  if(pers.includes("tour-trash-view"))
+    h1.box-title Thùng rác tour
 
-  //- Section 5
-  .section-5
-    form.inner-status(change-multi data-api=`/${pathAdmin}/tour/change-multi`)
-      .inner-item
-        select
-          option(value="") -- Hành động --
-          option(value="restore") Khôi phục
-          option(value="delete-destroy") Xóa vĩnh viễn
-      .inner-item
-        button Áp dụng
-    form.inner-search
-      button <i class="fa-solid fa-magnifying-glass"></i>
-      input(type="text" placeholder="Tìm kiếm" input-search)
-  //- End Section 5
+    //- Section 5
+    .section-5
+      form.inner-status(change-multi data-api=`/${pathAdmin}/tour/change-multi`)
+        .inner-item
+          select
+            option(value="") -- Hành động --
+            if(pers.includes("tour-trash-restore"))
+              option(value="restore") Khôi phục
+            if(pers.includes("tour-trash-delete"))
+              option(value="delete-destroy") Xóa vĩnh viễn
+        .inner-item
+          button Áp dụng
+      form.inner-search
+        button <i class="fa-solid fa-magnifying-glass"></i>
+        input(type="text" placeholder="Tìm kiếm" input-search)
+    //- End Section 5
 
-  //- Section 6
-  .section-6
-    table
-      thead
-        tr
-          th
-            +checkbox-30("check-all", "")
-          th Tên tour
-          th Ảnh đại diện
-          th Giá
-          th Còn lại
-          th Vị trí
-          th Trạng thái
-          th Tạo bởi
-          th Xóa bởi
-          th Hành động
-      tbody
-        each item in tourList 
+    //- Section 6
+    .section-6
+      table
+        thead
           tr
-            td
-              +checkbox-30("check-item", "",item.id)
-            td #{item.tourName}
-            td
-              img(src=item.avatar class="inner-avatar")
-            td
-              div NL: #{item.newPriceAdult.toLocaleString("vi-VN")}đ
-              div TE: #{item.newPriceChildren.toLocaleString("vi-VN")}đ
-              div EB: #{item.newPriceBaby.toLocaleString("vi-VN")}đ
-            td
-              div NL: #{item.stockAdult}
-              div TE: #{item.stockChildren}
-              div EB: #{item.stockBaby}
-            td #{item.position}
-            td
-              if(item.status == "active")
-                .tag.tag-green Hoạt động
-              else if(item.status == "inactive")
-                .tag.tag-red Tạm dừng
-            td
-              div #{item.createdByName}
-              .inner-time #{item.createdAtFormat}
-            td
-              div #{item.deletedByName}
-              .inner-time #{item.deletedAtFormat}
-            td
-              .inner-action
-                a(
-                  href="javascript:;" 
-                  class="inner-restore"
-                  button-restore
-                  data-api=`/${pathAdmin}/tour/restore/${item.id}`
-                ) <i class="fa-solid fa-rotate-left"></i>
-                a(
-                  title="Xóa vĩnh viễn"
-                  href="javascript:;" 
-                  class="inner-remove"
-                  button-delete
-                  data-api=`/${pathAdmin}/tour/delete-destroy/${item.id}`
-                ) <i class="fa-regular fa-trash-can"></i>
-  //- End Section 6
+            th
+              +checkbox-30("check-all", "")
+            th Tên tour
+            th Ảnh đại diện
+            th Giá
+            th Còn lại
+            th Vị trí
+            th Trạng thái
+            th Tạo bởi
+            th Xóa bởi
+            th Hành động
+        tbody
+          each item in tourList 
+            tr
+              td
+                +checkbox-30("check-item", "",item.id)
+              td #{item.tourName}
+              td
+                img(src=item.avatar class="inner-avatar")
+              td
+                div NL: #{item.newPriceAdult.toLocaleString("vi-VN")}đ
+                div TE: #{item.newPriceChildren.toLocaleString("vi-VN")}đ
+                div EB: #{item.newPriceBaby.toLocaleString("vi-VN")}đ
+              td
+                div NL: #{item.stockAdult}
+                div TE: #{item.stockChildren}
+                div EB: #{item.stockBaby}
+              td #{item.position}
+              td
+                if(item.status == "active")
+                  .tag.tag-green Hoạt động
+                else if(item.status == "inactive")
+                  .tag.tag-red Tạm dừng
+              td
+                div #{item.createdByName}
+                .inner-time #{item.createdAtFormat}
+              td
+                div #{item.deletedByName}
+                .inner-time #{item.deletedAtFormat}
+              td
+                .inner-action
+                  if(pers.includes("tour-trash-restore"))
+                    a(
+                      href="javascript:;" 
+                      class="inner-restore"
+                      button-restore
+                      data-api=`/${pathAdmin}/tour/restore/${item.id}`
+                    ) <i class="fa-solid fa-rotate-left"></i>
+                  if(pers.includes("tour-trash-delete"))
+                    a(
+                      title="Xóa vĩnh viễn"
+                      href="javascript:;" 
+                      class="inner-remove"
+                      button-delete
+                      data-api=`/${pathAdmin}/tour/delete-destroy/${item.id}`
+                    ) <i class="fa-regular fa-trash-can"></i>
+    //- End Section 6
 
-  //- Section 7
-  .section-7
-    .inner-text Hiển thị #{pagination.skip+1} - #{pagination.skip+tourList.length} của #{pagination.totalRecord}
-    select(pagination)
-      - for(let i=1; i<= pagination.totalPages; i++)
-        option(value=i) Trang #{i}
-  //- End Section 7
+    //- Section 7
+    .section-7
+      .inner-text Hiển thị #{pagination.skip+1} - #{pagination.skip+tourList.length} của #{pagination.totalRecord}
+      select(pagination)
+        - for(let i=1; i<= pagination.totalPages; i++)
+          option(value=i) Trang #{i}
+    //- End Section 7

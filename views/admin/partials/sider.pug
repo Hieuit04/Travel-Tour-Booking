@@ -1,14 +1,17 @@
 nav.sider
   .inner-list
-    a.inner-item(href=`/${pathAdmin}/dashboard`)
-      img(src="/admin/assets/images/icon-sider-1.svg")
-      span Tổng quan
-    a.inner-item(href=`/${pathAdmin}/category/list`)
-      img(src="/admin/assets/images/icon-sider-2.svg")
-      span Quản lý danh mục
-    a.inner-item(href=`/${pathAdmin}/tour/list`)
-      img(src="/admin/assets/images/icon-sider-3.svg")
-      span Quản lý tour
+    if(pers.includes("dashboard-view"))
+      a.inner-item(href=`/${pathAdmin}/dashboard`)
+        img(src="/admin/assets/images/icon-sider-1.svg")
+        span Tổng quan
+    if(pers.includes("category-view"))
+      a.inner-item(href=`/${pathAdmin}/category/list`)
+        img(src="/admin/assets/images/icon-sider-2.svg")
+        span Quản lý danh mục
+    if(pers.includes("tour-view"))
+      a.inner-item(href=`/${pathAdmin}/tour/list`)
+        img(src="/admin/assets/images/icon-sider-3.svg")
+        span Quản lý tour
     a.inner-item(href=`/${pathAdmin}/order/list`)
       img(src="/admin/assets/images/icon-sider-4.svg")
       span Quản lý đơn hàng

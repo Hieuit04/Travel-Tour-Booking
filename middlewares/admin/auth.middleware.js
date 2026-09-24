@@ -28,7 +28,7 @@ module.exports.verifyToken = async (req, res, next) => {
       _id: existAccount.role,
     })
     res.locals.role=role;
-
+    res.locals.pers=role.rolePermissions;
     next();
   } catch (error) {
     console.log(error);

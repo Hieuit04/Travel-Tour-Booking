@@ -2,39 +2,40 @@ extends ../layouts/default.pug
 include ../mixins/select-tree.pug
 
 block main
-  h1.box-title Tạo danh mục
+  if(pers.includes("category-edit"))
+    h1.box-title Tạo danh mục
 
-  //- Section 8
-  .section-8
-    form(id="category-edit-form")
-      input(type="hidden" name="id" value=categoryDetail.id)
-      .inner-group
-        label(for="categoryName") Tên danh mục
-        input(type="text" name="categoryName" id="categoryName" value=categoryDetail.categoryName)
-      .inner-group
-        label(for="parent") Danh mục cha
-        select(name="parent" id="parent")
-          option(value="") -- Chọn danh mục --
-          //- 2. Gọi mixin truyền vào categoryTree từ backend
-          if categoryTree
-            +select-tree(categoryTree, 1 , categoryDetail.parent)
-      .inner-group
-        label(for="position") Vị trí
-        input(type="number" name="position" id="position" value=categoryDetail.position)
-      .inner-group
-        label(for="status") Trạng thái
-        select(name="status" id="status")
-          option(value="") -- Chọn trạng thái --
-          option(value="active" selected=(categoryDetail.status == "active" ? true:false)) Hoạt động
-          option(value="inactive" selected=(categoryDetail.status == "inactive" ? true:false)) Tạm dừng
-      .inner-group.inner-two-col
-        label(for="avatar") Ảnh đại diện
-        input(type="file" name="avatar" id="avatar" accept="image/*"  filepondImage image-default=categoryDetail.avatar).inner-upload-image
-      .inner-group.inner-two-col
-        label(for="description") Mô tả
-        textarea(name="description" id="description" textarea-mce) #{categoryDetail.description}
-      .inner-group.inner-two-col.text-center 
-        button.btn-create(type="submit") Cập nhật
-    .inner-link
-      a(href=`/${pathAdmin}/category/list`) Quay lại danh sách
-  //- End Section 8
+    //- Section 8
+    .section-8
+      form(id="category-edit-form")
+        input(type="hidden" name="id" value=categoryDetail.id)
+        .inner-group
+          label(for="categoryName") Tên danh mục
+          input(type="text" name="categoryName" id="categoryName" value=categoryDetail.categoryName)
+        .inner-group
+          label(for="parent") Danh mục cha
+          select(name="parent" id="parent")
+            option(value="") -- Chọn danh mục --
+            //- 2. Gọi mixin truyền vào categoryTree từ backend
+            if categoryTree
+              +select-tree(categoryTree, 1 , categoryDetail.parent)
+        .inner-group
+          label(for="position") Vị trí
+          input(type="number" name="position" id="position" value=categoryDetail.position)
+        .inner-group
+          label(for="status") Trạng thái
+          select(name="status" id="status")
+            option(value="") -- Chọn trạng thái --
+            option(value="active" selected=(categoryDetail.status == "active" ? true:false)) Hoạt động
+            option(value="inactive" selected=(categoryDetail.status == "inactive" ? true:false)) Tạm dừng
+        .inner-group.inner-two-col
+          label(for="avatar") Ảnh đại diện
+          input(type="file" name="avatar" id="avatar" accept="image/*"  filepondImage image-default=categoryDetail.avatar).inner-upload-image
+        .inner-group.inner-two-col
+          label(for="description") Mô tả
+          textarea(name="description" id="description" textarea-mce) #{categoryDetail.description}
+        .inner-group.inner-two-col.text-center 
+          button.btn-create(type="submit") Cập nhật
+      .inner-link
+        a(href=`/${pathAdmin}/category/list`) Quay lại danh sách
+    //- End Section 8
