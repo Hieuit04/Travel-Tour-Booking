@@ -915,7 +915,7 @@ const profileEditForm = document.querySelector('.section-8 #profile-edit-form');
 if (profileEditForm) {
   const validator = new JustValidate('#profile-edit-form');
   validator
-    .addField('#name', [
+    .addField('#fullName', [
       {
         rule: 'required',
         errorMessage: 'Vui lòng nhập họ tên!',
@@ -943,18 +943,31 @@ if (profileEditForm) {
       },
     ])
     .onSuccess((event) => {
-      const name = event.target.name.value;
+      const fullName = event.target.fullName.value;
       const email = event.target.email.value;
       const phone = event.target.phone.value;
-      const position = event.target.position.value;
-      const role = event.target.role.value;
       const avatar = filePond.avatar?.getFile()?.file || null;
-      console.log(name);
-      console.log(email);
-      console.log(phone);
-      console.log(position);
-      console.log(role);
-      console.log(avatar);
+      const formData= new FormData();
+      formData.append('fullName', fullName);
+      formData.append('email', email);
+      formData.append('phone', phone);
+      if (avatar) {
+        formData.append('avatar', avatar, avatar.name || 'image.png');
+      }
+      fetch(`/${pathAdmin}/profile/edit`, {
+        method: 'PATCH',
+        body: formData,
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code === 'success') {
+            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
+            window.location.reload();
+          }
+        })
     });
 }
 // End validate profile edit form
@@ -1011,8 +1024,27 @@ if (changePasswordForm) {
       }
     ])
     .onSuccess((event) => {
-      console.log(event.target.password.value);
-      console.log(event.target.confirmPassword.value);
+      const passWord = event.target.password.value;
+      const finalData = {
+        passWord: passWord,
+      }
+      fetch(`/admin/account/reset-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(finalData),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
+          }
+          if (data.code === 'success') {
+            drawNotyf(data.code, data.message);// In ra thông báo thành công khi bị load lại trang
+            window.location.reload();
+          }
+        })
     });
 }
 // End validate profile change password form

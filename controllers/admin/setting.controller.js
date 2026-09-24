@@ -202,6 +202,36 @@ module.exports.accountAdminEditPatch = async (req, res) => {
     if (req.file) {
       req.body.avatar = req.file.path;
     }
+    const existEmail = await AccountAdmin.findOne({
+      email: req.body.email,
+      _id: {
+        $ne: id,
+      }
+    });
+    if (existEmail) {
+      res.json({
+        code: "error",
+        message: "Email đã tồn tại!"
+      })
+      return;
+    }
+    const existPhone = await AccountAdmin.findOne({
+      phone: req.body.phone,
+      _id: {
+        $ne: id,
+      }
+    });
+
+    if (existPhone) {
+      res.json({
+        code: "error",
+        message: "Số điện thoại đã tồn tại!"
+      })
+      return;
+    }
+    req.body.avatar = req.file ? req.file.path : "";
+    req.body.updatedBy = res.locals.account.id;
+
     await AccountAdmin.findByIdAndUpdate(id, req.body);
     res.json({
       code: "success",

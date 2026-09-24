@@ -1,15 +1,16 @@
 var jwt = require('jsonwebtoken');
 const AccountAdmin = require('../../models/accounts-admin.model');
+const Role = require('../../models/role.model');
+const systemConfig = require('../../configs/variable.config');
 
 module.exports.verifyToken = async (req, res, next) => {
   try {
     const token = req.cookies.token;
     if (!token) {
-      res.redirect(`/${pathAdmin}/account/login`);
+      res.redirect(`/${systemConfig.pathAdmin}/account/login`);
       return;
     }
     var decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded)
     const { id, email } = decoded;
     const existAccount = await AccountAdmin.findOne({
       _id: id,
@@ -18,15 +19,20 @@ module.exports.verifyToken = async (req, res, next) => {
     });
     if (!existAccount) {
       res.clearCookie('token');
-      res.redirect(`/${pathAdmin}/account/login`);
+      res.redirect(`/${systemConfig.pathAdmin}/account/login`);
       return;
     }
-    console.log(existAccount)
     res.locals.account = existAccount;
+
+    const role= await Role.findOne({
+      _id: existAccount.role,
+    })
+    res.locals.role=role;
+
     next();
   } catch (error) {
     console.log(error);
     res.clearCookie('token');
-    res.redirect(`/${pathAdmin}/account/login`);
+    res.redirect(`/${systemConfig.pathAdmin}/account/login`);
   }
 }

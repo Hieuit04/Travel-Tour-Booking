@@ -196,7 +196,6 @@ if (forgotPasswordForm) {
         })
     });
 }
-
 // End validate forgot password form
 
 // Validate OTP password form
@@ -238,7 +237,6 @@ if (otpPasswordForm) {
         })
     });
 }
-
 // End validate OTP password form
 
 // Validate reset password form
@@ -316,5 +314,4 @@ if (resetPasswordForm) {
         })
     });
 }
-
 // End validate reset password form
