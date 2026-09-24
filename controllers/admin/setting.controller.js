@@ -299,6 +299,59 @@ module.exports.accountAdminChangeMultiPatch = async (req, res) => {
   }
 }
 
+module.exports.accountAdminChangePassword = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const accountAdminDetail = await AccountAdmin.findById(id);
+    if (!accountAdminDetail) {
+      res.json({
+        code: "error",
+        message: "Tài khoản quản trị không tồn tại!"
+      })
+      res.redirect(`/${pathAdmin}/setting/account-admin/list`);
+      return;
+    }
+    res.render('admin/pages/setting-account-admin-change-password', {
+      pageTitle: 'Đổi mật khẩu tài khoản quản trị',
+      accountAdminDetail: accountAdminDetail,
+    });
+  } catch (error) {
+    console.log(error)
+    res.redirect('/${pathAdmin}/setting/account-admin/list');
+  }
+};
+
+module.exports.accountAdminChangePasswordPatch = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const exisitAccount = await AccountAdmin.findById(id);
+    if (!exisitAccount) {
+      res.json({
+        code: "error",
+        message: "Tài khoản không tồn tại!"
+      })
+      return;
+    }
+    const salt = await bcrypt.genSalt(10); // Tạo chuỗi ngẫu nhiên 10 ký tự 
+    req.body.passWord = await bcrypt.hash(req.body.passWord, salt); // Hash mật khẩu
+    req.body.updatedBy = res.locals.account.id;
+    await AccountAdmin.findByIdAndUpdate(id, req.body);
+    res.json({
+      code: "success",
+      message: "Đổi mật khẩu thành công",
+    })
+  } catch (error) {
+    console.log("===> LỖI CHANGE PASSWORD PATCH:", error);
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
+
+
+
+
 
 module.exports.roleList = async (req, res) => {
   const find = {

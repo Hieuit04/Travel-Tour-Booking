@@ -755,6 +755,66 @@ if (settingAccountAdminEditForm) {
 }
 // End validate setting account admin edit form
 
+// Validate setting account admin change password form
+const settingAccountAdminChangePasswordForm = document.querySelector('.section-8 #setting-account-admin-change-password-form');
+if (settingAccountAdminChangePasswordForm) {
+  const validator = new JustValidate('#setting-account-admin-change-password-form');
+  validator
+    .addField('#passWord', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập mật khẩu!',
+      },
+      {
+        rule: 'strongPassword',
+        errorMessage: (value) => {
+          let html = ``;
+          if (value.length < 8) {
+            html += `<div>Mật khẩu tối thiểu 8 ký tự!</div>`
+          }
+          if (!/[0-9]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ số!</div>`
+          }
+          if (!/[a-z]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết thường!</div>`
+          }
+          if (!/[A-Z]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết hoa!</div>`
+          }
+          if (!/[^A-Za-z0-9]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ký tự đặc biệt!</div>`
+          }
+          return html
+        }
+      }
+    ])
+    .onSuccess((event) => {
+      const id = event.target.elements['id'].value;
+      const passWord = event.target.passWord.value;
+      const dataFinal = {
+        passWord,
+      }
+      fetch(`/${pathAdmin}/setting/account-admin/change-password/${id}`, {
+        method: 'PATCH',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataFinal),
+      })
+        .then(res => res.json())
+      .then(data => {
+        if (data.code === 'error') {
+          notyf.error(data.message);
+        }
+        if (data.code === 'success') {
+          notyf.success(data.message);
+        }
+      })
+    });
+}
+// End validate setting account admin change password form
+
+
 
 
 // Validate setting role create form

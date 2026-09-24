@@ -23,7 +23,12 @@ router.patch(
   settingController.accountAdminDeletePatch
 );
 
-router.patch('/account-admin/change-multi',settingController.accountAdminChangeMultiPatch);
+router.patch('/account-admin/change-multi', settingController.accountAdminChangeMultiPatch);
+
+router.get('/account-admin/change-password/:id', settingController.accountAdminChangePassword);
+
+router.patch('/account-admin/change-password/:id', settingController.accountAdminChangePasswordPatch);
+
 
 router.get('/role/list', settingController.roleList);
 
