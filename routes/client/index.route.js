@@ -3,10 +3,12 @@ const router = express.Router();
 const tourRouters = require('./tour.route');
 const homeRouters = require('./home.route');
 const cartRouters = require('./cart.route');
-const settingWebsiteInfo = require('../../middlewares/client/setting.midelware');
+const settingMidelware = require('../../middlewares/client/setting.midelware');
+const categoryMidelware = require('../../middlewares/client/category.midelware');
 
 
-router.use(settingWebsiteInfo.websiteInfo)
+router.use(settingMidelware.websiteInfo)
+router.use(categoryMidelware.list)
 
 router.use('/tour', tourRouters);
 router.use('/cart', cartRouters);

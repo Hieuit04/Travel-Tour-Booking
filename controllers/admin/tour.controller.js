@@ -78,7 +78,7 @@ module.exports.list = async (req, res) => {
   }
   // End Tìm kiếm
   // Phân trang 
-  const limit = 3;
+  const limit = 5;
   let page = 1;
   if (req.query.page && parseInt(req.query.page) > 0) {
     page = parseInt(req.query.page);
