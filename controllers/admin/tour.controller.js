@@ -147,11 +147,11 @@ module.exports.trash = async (req, res) => {
       lower: true,
     });
     const regex = new RegExp(slug, "i");
-    find.slug = regex;
+    find.slug = regex;  
   }
   // End Tìm kiếm
   // Phân trang 
-  const limit = 3;
+  const limit = 10;
   let page = 1;
   if (req.query.page && parseInt(req.query.page) > 0) {
     page = parseInt(req.query.page);
