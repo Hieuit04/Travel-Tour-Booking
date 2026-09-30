@@ -7,6 +7,7 @@ const schema = new mongoose.Schema({
   address: String,
   logo: String,
   favicon: String,
+  categoryIdSection4: String,
 },{timestamps: true});
 
 const SettingWebsiteInfo = mongoose.model('SettingWebsiteInfo', schema, 'setting-website-info');

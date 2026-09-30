@@ -4,7 +4,9 @@ const bcrypt = require('bcryptjs');
 const Role = require('../../models/role.model');
 const slugify = require('slugify');
 const AccountAdmin = require('../../models/accounts-admin.model');
+const Category = require('../../models/category.model');
 const { checkPermission } = require('../../helpers/permission.helper');
+const buildCategoryTree = require('../../helpers/categoryTree.helper');
 
 module.exports.list = async (req, res) => {
 
@@ -15,9 +17,14 @@ module.exports.list = async (req, res) => {
 
 module.exports.websiteInfo = async (req, res) => {
   const settingWebsiteInfo = await SettingWebsiteInfo.findOne({})
+  const categoryList = await Category.find({
+    deleted: false,
+  });
+  const categoryTree = buildCategoryTree(categoryList, "");
   res.render('admin/pages/setting-website-info', {
     pageTitle: 'Thông tin website',
     settingWebsiteInfo: settingWebsiteInfo,
+    categoryTree: categoryTree,
   });
 };
 
@@ -203,7 +210,7 @@ module.exports.accountAdminEditPatch = async (req, res) => {
     if (req.file) {
       req.body.avatar = req.file.path;
     }
-    if(req.body.email!=res.locals.account.email){
+    if (req.body.email != res.locals.account.email) {
       const existEmail = await AccountAdmin.findOne({
         email: req.body.email,
         _id: {
@@ -218,7 +225,7 @@ module.exports.accountAdminEditPatch = async (req, res) => {
         return;
       }
     }
-    if(req.body.phone!=res.locals.account.phone){
+    if (req.body.phone != res.locals.account.phone) {
       const existPhone = await AccountAdmin.findOne({
         phone: req.body.phone,
         _id: {
@@ -290,7 +297,7 @@ module.exports.accountAdminChangeMultiPatch = async (req, res) => {
       case "initial":
       case "active":
       case "inactive":
-        if(!checkPermission(res,"account-admin-edit")) return;
+        if (!checkPermission(res, "account-admin-edit")) return;
         await AccountAdmin.updateMany({
           _id: {
             $in: listId
@@ -305,7 +312,7 @@ module.exports.accountAdminChangeMultiPatch = async (req, res) => {
         })
         break;
       case "delete":
-        if(!checkPermission(res,"account-admin-delete")) return;
+        if (!checkPermission(res, "account-admin-delete")) return;
         await AccountAdmin.updateMany({
           _id: {
             $in: listId
@@ -543,7 +550,7 @@ module.exports.roleChangeMultiPatch = async (req, res) => {
     const { listId, option } = req.body;
     switch (option) {
       case "delete":
-        if(!checkPermission(res,"role-delete")) return;
+        if (!checkPermission(res, "role-delete")) return;
         await Role.updateMany({
           _id: {
             $in: listId

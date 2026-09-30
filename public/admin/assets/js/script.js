@@ -558,6 +558,7 @@ if (settingWebsiteInfoForm) {
       const phone = event.target.phone.value;
       const email = event.target.email.value;
       const address = event.target.address.value;
+      const categoryIdSection4 = event.target.categoryIdSection4.value;
       const logo = filePond.logo?.getFile()?.file || null;
       const favicon = filePond.favicon?.getFile()?.file || null;
       
@@ -566,6 +567,7 @@ if (settingWebsiteInfoForm) {
       formData.append('phone', phone);
       formData.append('email', email);
       formData.append('address', address);
+      formData.append('categoryIdSection4', categoryIdSection4);
       if (logo) {
         formData.append('logo', logo, logo.name || 'logo.png');
       }

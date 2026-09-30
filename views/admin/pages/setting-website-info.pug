@@ -1,4 +1,5 @@
 extends ../layouts/default.pug
+include ../mixins/select-tree.pug
 
 block main
   if(pers.includes("website-info-view"))
@@ -19,6 +20,13 @@ block main
         .inner-group
           label(for="address") Địa chỉ
           input(type="text" name="address" id="address" value = settingWebsiteInfo.address)
+        .inner-group
+          label(for="categoryIdSection4") Danh mục của Section 4
+          select(name="categoryIdSection4" id="categoryIdSection4")
+            option(value="") -- Chọn danh mục --
+            //- 2. Gọi mixin truyền vào categoryTree từ backend
+            if categoryTree
+              +select-tree(categoryTree,1,settingWebsiteInfo.categoryIdSection4)
         .inner-group
           label(for="logo") Logo
           input(type="file" name="logo" id="logo" accept="image/*" filepondImage image-default = settingWebsiteInfo.logo).inner-upload-image
