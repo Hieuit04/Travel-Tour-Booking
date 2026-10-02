@@ -1,0 +1,108 @@
+extends ../layouts/default.pug
+include ../mixins/select-tree.pug
+
+block main
+  h1.box-title Tạo khuyến mãi
+
+  //- Section 8 - Thông tin khuyến mãi + Tour đã chọn
+  .section-8
+    form(id="promotion-create-form")
+      .inner-group
+        label(for="promotionName") Tên khuyến mãi
+        input(type="text" name="promotionName" id="promotionName")
+      .inner-group
+        label(for="status") Trạng thái
+        select(name="status" id="status")
+          option(value="active") Hoạt động
+          option(value="inactive") Tạm dừng
+      .inner-group
+        label(for="timeStart") Thời gian bắt đầu
+        input(type="datetime-local" name="timeStart" id="timeStart")
+      .inner-group
+        label(for="timeEnd") Thời gian kết thúc
+        input(type="datetime-local" name="timeEnd" id="timeEnd")
+      .inner-group
+        label(for="discountUpTo") Giảm đến (đ)
+        input(type="number" name="discountUpTo" id="discountUpTo" placeholder="VD: 990000")
+
+      //- Khu vực hiển thị tour đã chọn
+      .inner-group.inner-two-col
+        label Danh sách tour ưu đãi
+        .inner-promotion-selected(id="promotion-selected-list")
+          //- JS render vào đây
+
+      .inner-group.inner-two-col
+        label(for="description") Mô tả
+        textarea(name="description" id="description" textarea-mce)
+
+      .inner-group.inner-two-col.text-center
+        button.btn-create(type="submit") Tạo mới
+
+    .inner-link
+      a(href=`/${pathAdmin}/promotion/list`) Quay lại danh sách
+  //- End Section 8
+
+  hr.inner-divider
+
+  h2.box-title Chọn tour từ danh sách
+
+  //- Bộ lọc - Phần này dùng JS để trigger AJAX, không reload trang
+  .section-4#promotion-tour-filters
+    .inner-wrap
+      .inner-item
+        i.fa-solid.fa-filter
+        |  Bộ lọc
+      .inner-item
+        select(id="filter-status")
+          option(value="") Trạng thái
+          option(value="active") Hoạt động
+          option(value="inactive") Tạm dừng
+      .inner-item
+        select(id="filter-createdBy")
+          option(value="") Người tạo
+          each item in accountList
+            option(value=item._id) #{item.fullName}
+      .inner-item
+        select(id="filter-category")
+          option(value="") -- Chọn danh mục --
+          if categoryTree
+            +select-tree(categoryTree)
+      .inner-item.inner-reset(id="btn-reset-filter")
+        i.fa-solid.fa-rotate-left
+        |  Xóa bộ lọc
+
+  //- Tìm kiếm
+  .section-5
+    .inner-search-wrap
+      i.fa-solid.fa-magnifying-glass
+      input(type="text" id="filter-keyword" placeholder="Tìm kiếm tour...")
+
+    //- Nút thêm nhiều tour cùng lúc
+    .inner-bulk-actions
+      button.btn-add-selected-tours(type="button" id="btn-add-selected-tours" disabled)
+        i.fa-solid.fa-plus
+        span  Thêm tour đã chọn (0)
+
+  //- Bảng tour - JS sẽ render tbody
+  .section-6
+    table(id="promotion-tour-table")
+      thead
+        tr
+          th
+            input(type="checkbox" id="check-all-tours")
+          th Tên tour
+          th Ảnh
+          th Giá
+          th Còn lại
+          th Vị trí
+          th Trạng thái
+          th Tạo bởi
+          th Thêm vào ưu đãi
+      tbody(id="promotion-tour-tbody")
+        tr
+          td(colspan="9" style="text-align:center; padding:20px; color:#aaa;") Đang tải...
+
+  //- Phân trang
+  .section-7(id="promotion-tour-pagination")
+    .inner-text
+    select(id="ajax-pagination")

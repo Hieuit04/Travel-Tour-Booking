@@ -3,20 +3,71 @@ const Category = require("../../models/category.model")
 const { formatTourItem } = require("../../helpers/tour.helper")
 const categoryFilter = require('../../helpers/categoryFilter.helper');
 
+const Promotion = require("../../models/promotion.model");
+
 module.exports.home = async (req, res) => {
-  // section2
-  const tourListSection2 = await Tour
-    .find({
+  // section2 (Promotion)
+  const now = new Date();
+  
+  // 1. Tìm promotion đang diễn ra (ưu tiên sắp kết thúc)
+  let promotion = await Promotion.findOne({
+    deleted: false,
+    status: 'active',
+    timeStart: { $lte: now },
+    timeEnd: { $gte: now }
+  }).sort({ timeEnd: 1 });
+
+  let isUpcoming = false;
+
+  // 2. Nếu không có cái nào đang diễn ra, tìm cái sắp diễn ra gần nhất
+  if (!promotion) {
+    promotion = await Promotion.findOne({
       deleted: false,
-      status: "active",
-      // featured:"1"
-    })
-    .sort({
-      position: "desc"
-    })
-    .limit(6);
+      status: 'active',
+      timeStart: { $gt: now }
+    }).sort({ timeStart: 1 });
+    if (promotion) {
+      isUpcoming = true;
+    }
+  }
+
+  let tourListSection2 = [];
+  if (promotion) {
+    // Lấy tối đa 6 tour trong promotion này
+    const products = promotion.products.slice(0, 6);
+    const tourIds = products.map(p => p.tourId);
+    
+    // Lấy thông tin các tour
+    const tours = await Tour.find({
+      _id: { $in: tourIds },
+      deleted: false,
+      status: 'active'
+    });
+
+    for (const product of products) {
+      let tour = tours.find(t => t.id === product.tourId.toString());
+      if (tour) {
+        tour.newPriceAdult = product.specialPriceAdult;
+        tourListSection2.push(tour);
+      }
+    }
+  } else {
+    // Fallback: nếu không có promotion nào, lấy tour nổi bật như cũ
+    tourListSection2 = await Tour.find({
+      deleted: false,
+      status: "active"
+    }).sort({ position: "desc" }).limit(6);
+  }
+
   for (const item of tourListSection2) {
-    formatTourItem(item)
+    formatTourItem(item);
+    
+    // Nếu là upcoming promotion, che giấu giá và % giảm
+    if (promotion && isUpcoming) {
+      item.discountString = "??"; 
+      const priceStr = item.newPriceAdult.toLocaleString("vi-VN");
+      item.newPriceAdultString = priceStr.replace(/\d/g, (match, offset) => offset === 0 ? match : '?');
+    }
   }
   // end section2
 
@@ -51,5 +102,7 @@ module.exports.home = async (req, res) => {
     tourListSection2: tourListSection2,
     tourListSection4: tourListSection4,
     categorySection4: categorySection4,
+    promotion: promotion,
+    isUpcoming: isUpcoming,
   });
 }

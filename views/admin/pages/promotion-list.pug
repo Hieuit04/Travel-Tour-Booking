@@ -1,0 +1,114 @@
+extends ../layouts/default.pug
+include ../mixins/checkbox.pug
+
+block main
+  h1.box-title Quản lý khuyến mãi
+
+  //- Section 4 - Bộ lọc
+  .section-4
+    .inner-wrap
+      .inner-item
+        i.fa-solid.fa-filter
+        |  Bộ lọc
+      .inner-item
+        select(name="status" filter)
+          option(value="") Trạng thái
+          option(value="active") Hoạt động
+          option(value="inactive") Đã dừng
+      .inner-item
+        input(type="date" name="startDate" filter)
+        span  -  
+        input(type="date" name="endDate" filter)
+      .inner-item.inner-reset(button-reset-filter)
+        i.fa-solid.fa-rotate-left
+        |  Xóa bộ lọc
+  //- End Section 4
+
+  //- Section 5
+  .section-5
+    form.inner-status(change-multi data-api=`/${pathAdmin}/promotion/change-multi`)
+      .inner-item
+        select(name="option")
+          option(value="") -- Hành động --
+          option(value="active") Hoạt động
+          option(value="inactive") Tạm dừng
+          option(value="delete") Xóa
+      .inner-item
+        button(type="button") Áp dụng
+    form.inner-search
+      button
+        i.fa-solid.fa-magnifying-glass
+      input(type="text" placeholder="Tìm kiếm" input-search)
+    a.inner-create(href=`/${pathAdmin}/promotion/create`) + Tạo mới
+  //- End Section 5
+
+  //- Section 6 - Bảng dữ liệu
+  .section-6
+    table
+      thead
+        tr
+          th
+            +checkbox-30("check-all", "checkAll", "checkAll", false)
+          th STT
+          th Tên ưu đãi
+          th Ngày bắt đầu
+          th Ngày kết thúc
+          th Số tour
+          th Giảm đến
+          th Thời gian
+          th Trạng thái
+          th Thao tác
+      tbody
+        if promotionList && promotionList.length > 0
+          each item, index in promotionList
+            tr
+              td
+                +checkbox-30("check-item", `id-${item.id}`, item.id, false)
+              td #{index + 1}
+              td
+                div #{item.promotionName}
+              td
+                div #{item.timeStartFormat}
+              td
+                div #{item.timeEndFormat}
+              td
+                div #{item.products ? item.products.length : 0} tour
+              td
+                div
+                  | #{item.discountUpTo ? item.discountUpTo.toLocaleString('vi-VN') : 0}
+                  span đ
+              td
+                if item.timeStatus === 'upcoming'
+                  .tag.tag-orange Sắp diễn ra
+                else if item.timeStatus === 'ongoing'
+                  .tag.tag-green Đang diễn ra
+                else
+                  .tag.tag-red Đã kết thúc
+              td
+                if item.status === 'active'
+                  .tag.tag-green Hoạt động
+                else
+                  .tag.tag-red Tạm dừng
+              td
+                .inner-action
+                  a(href=`/${pathAdmin}/promotion/edit/${item.id}`)
+                    i.fa-regular.fa-pen-to-square
+                  a.inner-remove(
+                    href="javascript:;" 
+                    button-delete
+                    data-api=`/${pathAdmin}/promotion/delete/${item.id}`
+                  )
+                    i.fa-regular.fa-trash-can
+        else
+          tr
+            td(colspan="10") Không có khuyến mãi nào!
+  //- End Section 6
+
+  //- Section 7 - Phân trang
+  if pagination
+    .section-7
+      .inner-text Hiển thị #{pagination.skip + 1} - #{pagination.skip + promotionList.length} của #{pagination.totalRecord}
+      select(pagination)
+        - for(let i=1; i<= pagination.totalPages; i++)
+          option(value=i) Trang #{i}
+  //- End Section 7

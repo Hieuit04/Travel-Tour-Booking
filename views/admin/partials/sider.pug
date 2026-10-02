@@ -12,6 +12,11 @@ nav.sider
       a.inner-item(href=`/${pathAdmin}/tour/list`)
         img(src="/admin/assets/images/icon-sider-3.svg")
         span Quản lý tour
+    if(pers.includes("promotion-view"))
+      a.inner-item(href=`/${pathAdmin}/promotion/list`)
+        i.fa-solid.fa-percent
+        span Quản lý khuyến mãi
+
     a.inner-item(href=`/${pathAdmin}/order/list`)
       img(src="/admin/assets/images/icon-sider-4.svg")
       span Quản lý đơn hàng

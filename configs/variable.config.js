@@ -93,4 +93,20 @@ module.exports.permissionList = [
     label: "Xoá nhóm quyền",
     value: "role-delete",
   },
-];
+  {
+    label: "Xem khuyến mãi",
+    value: "promotion-view",
+  },
+  {
+    label: "Tạo khuyến mãi",
+    value: "promotion-create",
+  },
+  {
+    label: "Sửa khuyến mãi",
+    value: "promotion-edit",
+  },
+  {
+    label: "Xoá khuyến mãi",
+    value: "promotion-delete",
+  },
+];

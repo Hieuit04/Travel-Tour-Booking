@@ -1415,6 +1415,303 @@ input, textarea, select, button {
   display: none;
 }
 
-
-
 /* End File Pond  */
+
+/* Promotion - Danh sách tour đã chọn */
+#promotion-selected-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 60px;
+  border: 2px dashed #d0d0d0;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f9fafb;
+}
+
+#promotion-selected-list:empty::before {
+  content: "Chưa có tour nào được thêm. Bấm \"+ Thêm vào ưu đãi\" ở bảng phía dưới.";
+  color: #aaa;
+  font-size: 13px;
+  display: block;
+  text-align: center;
+  padding: 16px 0;
+}
+
+.inner-selected-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.inner-selected-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #202224;
+  min-width: 180px;
+  max-width: 220px;
+  line-height: 1.4;
+  padding-top: 4px;
+}
+
+.inner-selected-prices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  flex: 1;
+}
+
+.inner-price-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inner-price-group label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.inner-price-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inner-price-old {
+  font-size: 12px;
+  color: #999;
+  text-decoration: line-through;
+  white-space: nowrap;
+}
+
+.inner-price-input {
+  width: 130px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+.inner-price-input:focus {
+  border-color: var(--color-main);
+  box-shadow: 0 0 0 2px rgba(72, 128, 255, 0.15);
+}
+
+.btn-remove-selected {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.btn-remove-selected:hover {
+  background: #fdecea;
+}
+
+/* Nút thêm vào ưu đãi */
+.btn-add-to-promotion {
+  background: var(--color-main);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-add-to-promotion:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.btn-add-to-promotion.btn-added,
+.btn-add-to-promotion:disabled {
+  background: #27ae60;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* Đường kẻ phân cách */
+.inner-divider {
+  border: none;
+  border-top: 2px dashed #e0e0e0;
+  margin: 30px 0;
+}
+/* End Promotion */
+
+/* Promotion - Bulk add button & section-5 layout */
+.inner-bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-add-selected-tours {
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-add-selected-tours:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.btn-add-selected-tours:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* Section 5 trên trang promotion - có search + bulk action */
+.section-5 .inner-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  background: white;
+}
+
+.section-5 .inner-search-wrap input {
+  border: none;
+  outline: none;
+  font-size: 13px;
+  width: 220px;
+}
+
+
+/* Checkbox trong bảng tour */
+.tour-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--color-main);
+}
+
+/* Danh sách tour đã chọn (Promotion Edit/Create) */
+.inner-promotion-selected {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inner-selected-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px dashed #d5d5d5;
+  border-radius: 6px;
+  padding: 12px 16px;
+  background: white;
+  gap: 16px;
+}
+
+.inner-selected-name {
+  flex: 0 0 220px;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.inner-selected-prices {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.inner-price-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.inner-price-group label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.inner-price-input-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.inner-price-old {
+  font-size: 11px;
+  color: #999;
+  text-decoration: line-through;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.inner-price-input {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  background-color: #fafbfc;
+}
+
+.inner-price-input:focus {
+  outline: none;
+  border-color: var(--color-main);
+  background-color: white;
+}
+
+.btn-remove-selected {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #EF3826;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 15px;
+  transition: background 0.2s;
+}
+
+.btn-remove-selected:hover {
+  background: #fbeae9;
+}
+
+/* End Promotion extras */
+

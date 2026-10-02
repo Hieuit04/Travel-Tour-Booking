@@ -152,12 +152,19 @@ block main
         )
         .inner-info
           h2.inner-text-1
-            | ƯU ĐÃI 2024
-            br
-            | TOUR GIỜ CHÓT
-          .inner-text-2 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-          .inner-text-3 Kết thúc sau
-          .inner-clock(clock-expire="2026-09-30T00:00:00")
+            if promotion
+              | #{promotion.promotionName}
+            else
+              | ƯU ĐÃI 2024
+              br
+              | TOUR GIỜ CHÓT
+          .inner-text-2
+            if promotion && promotion.description
+              | !{promotion.description}
+            else
+              | Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+          .inner-text-3 #{isUpcoming ? 'Bắt đầu sau' : 'Kết thúc sau'}
+          .inner-clock(clock-expire=promotion ? (isUpcoming ? promotion.timeStart : promotion.timeEnd) : "2026-09-30T00:00:00")
             .inner-clock-item
               .inner-number 00
               .inner-text Ngày
@@ -172,8 +179,16 @@ block main
               .inner-text Giây
           .inner-text-4 GIẢM ĐẾN
           .inner-text-5
-            | 990.000
-            span đ
+            if promotion && promotion.discountUpTo
+              if isUpcoming
+                | #{promotion.discountUpTo.toLocaleString("vi-VN").replace(/\d/g, (match, offset) => offset === 0 ? match : '?')}
+                span đ
+              else
+                | #{promotion.discountUpTo.toLocaleString("vi-VN")}
+                span đ
+            else
+              | 990.000
+              span đ
         .inner-list
           .swiper.swiperSection2
             .swiper-wrapper

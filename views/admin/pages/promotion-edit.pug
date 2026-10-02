@@ -1,0 +1,138 @@
+extends ../layouts/default.pug
+include ../mixins/select-tree.pug
+
+block main
+  h1.box-title Sửa khuyến mãi
+
+  //- Section 8 - Thông tin khuyến mãi + Tour đã chọn
+  .section-8
+    form(id="promotion-edit-form")
+      input(type="hidden" name="id" value=promotionDetail.id)
+      .inner-group
+        label(for="promotionName") Tên khuyến mãi
+        input(type="text" name="promotionName" id="promotionName" value=promotionDetail.promotionName)
+      .inner-group
+        label(for="status") Trạng thái
+        select(name="status" id="status")
+          option(value="active" selected=(promotionDetail.status === 'active')) Hoạt động
+          option(value="inactive" selected=(promotionDetail.status === 'inactive')) Tạm dừng
+      .inner-group
+        label(for="timeStart") Thời gian bắt đầu
+        input(type="datetime-local" name="timeStart" id="timeStart" value=promotionDetail.timeStartFormat)
+      .inner-group
+        label(for="timeEnd") Thời gian kết thúc
+        input(type="datetime-local" name="timeEnd" id="timeEnd" value=promotionDetail.timeEndFormat)
+      .inner-group
+        label(for="discountUpTo") Giảm đến (đ)
+        input(type="number" name="discountUpTo" id="discountUpTo" placeholder="VD: 990000" value=promotionDetail.discountUpTo)
+
+      //- Khu vực hiển thị tour đã chọn
+      .inner-group.inner-two-col
+        label Danh sách tour ưu đãi
+        .inner-promotion-selected(id="promotion-selected-list")
+          //- Pug render sẵn các tour đã lưu trong CSDL
+          if tourList && promotionDetail.products && promotionDetail.products.length > 0
+            each tour in tourList
+              - const existing = productMap[tour.id.toString()]
+              if existing
+                .inner-selected-row(data-tour-id=tour.id)
+                  input(type="hidden" name="tourId[]" value=tour.id)
+                  .inner-selected-name #{tour.tourName}
+                  .inner-selected-prices
+                    .inner-price-group
+                      label Người lớn (NL)
+                      .inner-price-input-wrap
+                        span.inner-price-old #{tour.priceAdult ? tour.priceAdult.toLocaleString('vi-VN') : 0} đ
+                        input.inner-price-input(type="number" name="specialPriceAdult[]" placeholder="Giá ưu đãi NL" min="0" value=existing.specialPriceAdult)
+                    .inner-price-group
+                      label Trẻ em (TE)
+                      .inner-price-input-wrap
+                        span.inner-price-old #{tour.priceChildren ? tour.priceChildren.toLocaleString('vi-VN') : 0} đ
+                        input.inner-price-input(type="number" name="specialPriceChildren[]" placeholder="Giá ưu đãi TE" min="0" value=existing.specialPriceChildren)
+                    .inner-price-group
+                      label Em bé (EB)
+                      .inner-price-input-wrap
+                        span.inner-price-old #{tour.priceBaby ? tour.priceBaby.toLocaleString('vi-VN') : 0} đ
+                        input.inner-price-input(type="number" name="specialPriceBaby[]" placeholder="Giá ưu đãi EB" min="0" value=existing.specialPriceBaby)
+                    .inner-price-group
+                      label Số vé ưu đãi
+                      input.inner-price-input(type="number" name="stockLimit[]" placeholder="VD: 10" min="0" value=existing.stockLimit)
+                  button.btn-remove-selected(type="button" title="Xoá khỏi ưu đãi")
+                    i.fa-regular.fa-trash-can
+
+      .inner-group.inner-two-col
+        label(for="description") Mô tả
+        textarea(name="description" id="description" textarea-mce) #{promotionDetail.description}
+
+      .inner-group.inner-two-col.text-center
+        button.btn-create(type="submit") Cập nhật
+
+    .inner-link
+      a(href=`/${pathAdmin}/promotion/list`) Quay lại danh sách
+  //- End Section 8
+
+  hr.inner-divider
+
+  h2.box-title Chọn tour từ danh sách
+
+  //- Bộ lọc - Phần này dùng JS để trigger AJAX, không reload trang
+  .section-4#promotion-tour-filters
+    .inner-wrap
+      .inner-item
+        i.fa-solid.fa-filter
+        |  Bộ lọc
+      .inner-item
+        select(id="filter-status")
+          option(value="") Trạng thái
+          option(value="active") Hoạt động
+          option(value="inactive") Tạm dừng
+      .inner-item
+        select(id="filter-createdBy")
+          option(value="") Người tạo
+          if accountList
+            each item in accountList
+              option(value=item._id) #{item.fullName}
+      .inner-item
+        select(id="filter-category")
+          option(value="") -- Chọn danh mục --
+          if categoryTree
+            +select-tree(categoryTree)
+      .inner-item.inner-reset(id="btn-reset-filter")
+        i.fa-solid.fa-rotate-left
+        |  Xóa bộ lọc
+
+  //- Tìm kiếm
+  .section-5
+    .inner-search-wrap
+      i.fa-solid.fa-magnifying-glass
+      input(type="text" id="filter-keyword" placeholder="Tìm kiếm tour...")
+
+    //- Nút thêm nhiều tour cùng lúc
+    .inner-bulk-actions
+      button.btn-add-selected-tours(type="button" id="btn-add-selected-tours" disabled)
+        i.fa-solid.fa-plus
+        span  Thêm tour đã chọn (0)
+
+  //- Bảng tour - JS sẽ render tbody
+  .section-6
+    table(id="promotion-tour-table")
+      thead
+        tr
+          th
+            input(type="checkbox" id="check-all-tours")
+          th Tên tour
+          th Ảnh
+          th Giá
+          th Còn lại
+          th Vị trí
+          th Trạng thái
+          th Tạo bởi
+          th Thêm vào ưu đãi
+      tbody(id="promotion-tour-tbody")
+        tr
+          td(colspan="9" style="text-align:center; padding:20px; color:#aaa;") Đang tải...
+
+  //- Phân trang AJAX
+  .section-7(id="promotion-tour-pagination")
+    .inner-text
+    select(id="ajax-pagination")
