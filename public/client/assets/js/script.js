@@ -257,7 +257,26 @@ if (emailForm) {
       },
     ])
     .onSuccess((event) => {
-      console.log(event.target.elements.email.value) //email là thuộc tính name, element có thể bỏ bớt đc 
+      const email = event.target.elements.email.value;
+      const dataFinal = {
+        email: email,
+      }
+      fetch('/contact/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataFinal),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.code === 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code === 'success') {
+            notyf.success(data.message);
+          }
+        })
     })
 }
 // End Email Form

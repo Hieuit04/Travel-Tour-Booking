@@ -11,27 +11,25 @@ block main
       .inner-item
         <i class="fa-solid fa-filter"></i> Bộ lọc
       .inner-item
-        input(type="date")
+        input(filter name="startDate" type="date")
         span -
-        input(type="date")
-      .inner-item.inner-reset
+        input(filter name="endDate" type="date")
+      .inner-item.inner-reset(button-reset-filter)
         <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
   //- End Section 4
 
   //- Section 5
   .section-5
-    form.inner-status
+    form.inner-status(change-multi data-api=`/${pathAdmin}/contact/change-multi`)
       .inner-item
         select
           option(value="") -- Hành động --
-          option(value="") Hoạt động
-          option(value="") Tạm dừng
-          option(value="") Xóa
+          option(value="delete") Xóa
       .inner-item
         button Áp dụng
     form.inner-search
       button <i class="fa-solid fa-magnifying-glass"></i>
-      input(type="text" placeholder="Tìm kiếm")
+      input(type="text" placeholder="Tìm kiếm" input-search)
   //- End Section 5
 
   //- Section 6
@@ -40,26 +38,31 @@ block main
       thead
         tr
           th
-            +checkbox-30("", "")
+            +checkbox-30("check-all", "")
           th Email
           th Ngày tạo
           th Hành động
       tbody
-        tr
-          td
-            +checkbox-30("", "")
-          td levana@gmail.com
-          td 16:40 - 12/12/2024
-          td
-            .inner-action
-              a(href="#" class="inner-remove") <i class="fa-regular fa-trash-can"></i>
+        each record in recordList
+          tr
+            td
+              +checkbox-30("check-item", "", record.id)
+            td #{record.email}
+            td #{record.formattedCreatedAt}
+            td
+              .inner-action
+                a(
+                  href="javascript:;" 
+                  class="inner-remove"
+                  button-delete
+                  data-api=`/${pathAdmin}/contact/delete/${record.id}` 
+                ) <i class="fa-regular fa-trash-can"></i>
   //- End Section 6
 
   //- Section 7
   .section-7
-    .inner-text Hiển thị 1 - 9 của 78
-    select
-      option(value="") Trang 1
-      option(value="") Trang 2
-      option(value="") Trang 3
+    .inner-text Hiển thị #{pagination.skip+1} - #{pagination.skip+recordList.length} của #{pagination.totalRecord}
+    select(pagination)
+      - for(let i=1; i<= pagination.totalPages; i++)
+        option(value=i) Trang #{i}
   //- End Section 7

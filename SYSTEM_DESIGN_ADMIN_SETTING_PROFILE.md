@@ -2418,4 +2418,308 @@ sequenceDiagram
 
 ---
 
+## Phụ lục 3: Thiết kế chức năng Đăng ký, Phê duyệt & Phân quyền người dùng (RBAC)
+
+Chức năng này là sự kết hợp chặt chẽ giữa việc Quản lý tài khoản và Phân quyền người dùng. Thay vì Admin trực tiếp tạo tài khoản mới ngay từ đầu, luồng hệ thống được bảo mật thông qua 2 giai đoạn:
+1. **Nhân viên đăng ký tài khoản mới:** Tài khoản sẽ ở trạng thái chờ duyệt (inactive) và chưa được phân quyền (role_id rỗng).
+2. **Quản trị viên phê duyệt & cấp quyền:** Quản trị viên cấp cao sẽ xét duyệt, kích hoạt trạng thái (active) và gán Nhóm quyền cho tài khoản đó thông qua giao diện. Từ đây, `auth.middleware.js` mới cho phép nhân viên đăng nhập và thao tác dựa trên quyền được cấp.
+
+### 1. Sơ đồ Use Case chi tiết
+
+Sơ đồ này thể hiện chuỗi tương tác từ khi đăng ký, phê duyệt cho đến việc hệ thống ngầm kiểm tra quyền hạn.
+
+```mermaid
+graph LR
+    Employee((Nhân viên))
+    Admin((Admin))
+    
+    UC_Login(("Đăng nhập"))
+    
+    UC_Main(("Quản lý phê duyệt\nvà phân quyền"))
+    UC_Reg(("Đăng ký tài\nkhoản quản trị"))
+
+    UC_Approve(("Phê duyệt\ntài khoản (Active)"))
+    UC_Assign(("Cấp nhóm quyền\n(Role)"))
+    UC_Check(("Hệ thống ngầm\nkiểm tra quyền"))
+
+    Admin --- UC_Main
+    Employee --- UC_Reg
+
+    UC_Main -.->|<<Include>>| UC_Login
+    
+    UC_Approve -.->|<<Extend>>| UC_Main
+    UC_Assign -.->|<<Extend>>| UC_Main
+    UC_Check -.->|<<Extend>>| UC_Main
+```
+
+### 2. Kịch bản (Scenario)
+
+#### Kịch bản 3.1: Nhân viên đăng ký tài khoản quản trị (Chờ phê duyệt)
+| Trường | Nội dung |
+| :--- | :--- |
+| **Use Case** | Đăng ký tài khoản quản trị |
+| **Actor** | Nhân viên mới |
+| **Tiền điều kiện** | Nhân viên truy cập vào trang Đăng ký tài khoản quản trị (Admin Register). |
+| **Hậu điều kiện** | Tài khoản được tạo trong CSDL với trạng thái mặc định là `inactive` (Chưa phê duyệt) và `role_id` rỗng (Chưa cấp quyền). |
+| **Kịch bản chính** | 1. Nhân viên điền thông tin vào form đăng ký (Họ tên, Email, Mật khẩu, Số điện thoại).<br>2. Nhân viên nhấn nút **Đăng ký**.<br>3. Hệ thống kiểm tra Email đã tồn tại hay chưa.<br>4. Nếu hợp lệ, hệ thống băm (hash) mật khẩu và lưu tài khoản mới với `status: "inactive"`, `role: null`.<br>5. Hệ thống hiển thị thông báo: *"Đăng ký thành công! Vui lòng chờ Quản trị viên phê duyệt để có thể đăng nhập."* |
+| **Ngoại lệ** | - **Bước 3:** Email đã tồn tại ➔ Hệ thống báo lỗi "Email đã được sử dụng".<br>- **Sau Bước 5:** Nếu nhân viên cố tình đăng nhập ngay ➔ Hệ thống chặn và báo lỗi "Tài khoản của bạn chưa được phê duyệt!". |
+
+#### Kịch bản 3.2: Admin phê duyệt và Cấp quyền (Phân quyền)
+| Trường | Nội dung |
+| :--- | :--- |
+| **Use Case** | Phê duyệt và Cấp quyền tài khoản |
+| **Actor** | Quản trị viên (Super Admin) |
+| **Tiền điều kiện** | Quản trị viên đã đăng nhập và truy cập trang Quản lý tài khoản quản trị. |
+| **Hậu điều kiện** | Tài khoản nhân viên được đổi trạng thái thành `active` và được gán một Nhóm quyền (Role) hợp lệ. |
+| **Kịch bản chính** | 1. Admin truy cập danh sách tài khoản, lọc ra các tài khoản đang có trạng thái `inactive` (Chưa phê duyệt).<br>2. Admin chọn tài khoản của nhân viên mới và nhấn nút **Phê duyệt / Chỉnh sửa**.<br>3. Hệ thống hiển thị form với thông tin tài khoản, danh sách các Nhóm quyền (Roles) và Trạng thái.<br>4. Admin chuyển Trạng thái sang **"Hoạt động" (Active)** và chọn **Nhóm quyền** phù hợp.<br>5. Admin nhấn nút **Cập nhật**.<br>6. Lớp Controller gọi DAO để cập nhật `status` và `role_id` vào CSDL.<br>7. Hệ thống báo thành công. Nhân viên kia ngay lập tức nhận quyền và có thể đăng nhập. |
+| **Ngoại lệ** | - **Bước 5:** Admin quên chọn Nhóm quyền nhưng bật "Hoạt động" ➔ Hệ thống chặn lại, yêu cầu: "Vui lòng phân quyền cho tài khoản trước khi kích hoạt!". |
+
+### 3. Thiết kế tĩnh – Sơ đồ lớp (Design Class Diagram)
+
+Sơ đồ lớp cho chức năng phê duyệt, phân quyền và kiểm tra quyền.
+
+```mermaid
+classDiagram
+    direction TB
+
+    class AdminHomeFrm {
+        -btnManageRole : JButton
+        -btnManageAccount : JButton
+        -btnWebsiteInfo : JButton
+        -btnProfile : JButton
+        -user : AccountAdmin
+        +AdminHomeFrm(u : AccountAdmin)
+        +actionPerformed(e : ActionEvent) : void
+    }
+
+    class AccountAdminManageFrm {
+        -btnSearch : JButton
+        -cbxFilterStatus : JComboBox
+        -cbxFilterRole : JComboBox
+        -btnAddAccount : JButton
+        -btnEditAccount : JButton
+        -btnDeleteAccount : JButton
+        -btnApplyMulti : JButton
+        -tblAccount : JTable
+        -user : AccountAdmin
+        +AccountAdminManageFrm(u : AccountAdmin)
+        +actionPerformed(e : ActionEvent) : void
+    }
+
+    class AccountAdminEditFrm {
+        -a : AccountAdmin
+        -txtFullName : JTextField
+        -txtEmail : JTextField
+        -txtPhone : JTextField
+        -cbxStatus : JComboBox
+        -cbxRole : JComboBox
+        -txtPassword : JPasswordField
+        -btnSave : JButton
+        -btnReset : JButton
+        -user : AccountAdmin
+        +AccountAdminEditFrm(u : AccountAdmin, a : AccountAdmin)
+        +actionPerformed(e : ActionEvent) : void
+    }
+    
+    class RegisterAdminFrm {
+        -txtFullName : JTextField
+        -txtEmail : JTextField
+        -txtPhone : JTextField
+        -txtPassword : JPasswordField
+        -btnRegister : JButton
+        +RegisterAdminFrm()
+        +actionPerformed(e : ActionEvent) : void
+    }
+
+    class AccountAdminDAO {
+        +AccountAdminDAO()
+        +checkLogin(a : AccountAdmin) : boolean
+        +getAccountList(filters : Object, keyword : String, page : int, limit : int) : AccountAdmin[]
+        +getAccountById(id : String) : AccountAdmin
+        +checkEmailExist(email : String) : boolean
+        +addAccount(a : AccountAdmin) : boolean
+        +updateAccount(a : AccountAdmin) : boolean
+        +deleteAccount(id : String) : boolean
+        +changeMultiAccount(listId : String[], option : String) : boolean
+    }
+
+    class DAO {
+        -con : Connection
+        +DAO()
+    }
+
+    class AccountAdmin {
+        -id : String
+        -fullName : String
+        -email : String
+        -phone : String
+        -role : String
+        -positionCompany : String
+        -status : String
+        -passWord : String
+        -avatar : String
+        -slug : String
+        -createdBy : String
+        -deleted : Boolean
+    }
+    
+    class RoleDAO {
+        +getAllRoles() : Role[]
+    }
+
+    AdminHomeFrm --> AccountAdminManageFrm
+    AccountAdminManageFrm --> AccountAdminEditFrm
+    
+    AccountAdminManageFrm --> AccountAdminDAO
+    AccountAdminEditFrm --> AccountAdminDAO
+    RegisterAdminFrm --> AccountAdminDAO
+    AccountAdminEditFrm --> RoleDAO
+    
+    AccountAdminDAO --|> DAO
+    
+    AccountAdminDAO --> AccountAdmin
+    AccountAdminEditFrm --> AccountAdmin
+    AccountAdminManageFrm --> AccountAdmin
+    AdminHomeFrm --> AccountAdmin
+    RegisterAdminFrm --> AccountAdmin
+```
+
+### 4. Thiết kế động – Sơ đồ tuần tự (Design Sequence Diagram)
+
+**Sơ đồ 4.1: Sơ đồ tuần tự thiết kế chức năng Đăng ký tài khoản (Dành cho Nhân viên)**
+*(Tương ứng với Kịch bản 3.1)*
+
+```mermaid
+sequenceDiagram
+    actor Employee as Nhân viên
+    participant RegFrm as RegisterAdminFrm
+    participant ADAO as AccountAdminDAO
+    participant A as AccountAdmin
+
+    Employee->>RegFrm: Nhập thông tin (Tên, Email, Pass) và nhấn "Đăng ký"
+    RegFrm->>RegFrm: actionPerformed(e)
+    RegFrm->>ADAO: checkEmailExist(email)
+    ADAO-->>RegFrm: false (Email chưa tồn tại)
+    
+    RegFrm->>A: new AccountAdmin(thông tin, status="inactive", role=null)
+    RegFrm->>ADAO: addAccount(a)
+    ADAO->>ADAO: execute SQL INSERT
+    ADAO-->>RegFrm: true
+    RegFrm-->>Employee: Hiển thị thông báo "Chờ phê duyệt"
+```
+
+**Mô tả các bước (Sơ đồ 4.1):**
+1. Nhân viên nhập các thông tin cần thiết (Họ tên, Email, Mật khẩu) vào `RegisterAdminFrm` và nhấn nút "Đăng ký".
+2. `RegisterAdminFrm` bắt sự kiện click thông qua hàm `actionPerformed(e)`.
+3. Giao diện gọi hàm `checkEmailExist(email)` của `AccountAdminDAO` để kiểm tra xem email đã được đăng ký hay chưa.
+4. `AccountAdminDAO` truy vấn cơ sở dữ liệu và trả về `false` (Email hợp lệ, chưa từng được sử dụng).
+5. Giao diện khởi tạo đối tượng `AccountAdmin` bằng thông tin người dùng nhập vào, đồng thời gán cứng 2 giá trị bảo mật: `status="inactive"` (Chưa hoạt động) và `role=null` (Chưa có nhóm quyền).
+6. Giao diện gọi hàm `addAccount(a)` của `AccountAdminDAO` và truyền đối tượng vừa tạo vào.
+7. `AccountAdminDAO` thực thi câu lệnh truy vấn SQL INSERT để lưu bản ghi xuống cơ sở dữ liệu.
+8. `AccountAdminDAO` trả về kết quả `true` (thêm thành công) cho giao diện.
+9. Giao diện `RegisterAdminFrm` hiển thị thông báo thành công và nhắc nhở nhân viên đợi "Chờ phê duyệt" để có thể đăng nhập.
+
+**Sơ đồ 4.2: Sơ đồ tuần tự thiết kế chức năng Phê duyệt & Cấp quyền (Dành cho Admin)**
+*(Tương ứng với Kịch bản 3.2)*
+
+```mermaid
+sequenceDiagram
+    actor Admin as Quản trị viên
+    participant AMF as AccountAdminManageFrm
+    participant AEF as AccountAdminEditFrm
+    participant ADAO as AccountAdminDAO
+    participant RDAO as RoleDAO
+    participant A as AccountAdmin
+
+    Admin->>AMF: Chọn tài khoản "Chưa phê duyệt" và nhấn Phê duyệt/Edit
+    AMF->>AMF: actionPerformed(e)
+    AMF->>ADAO: getAccountById(id)
+    ADAO-->>AMF: a : AccountAdmin (status=inactive, role=null)
+    
+    AMF->>RDAO: getAllRoles()
+    RDAO-->>AMF: roles : Role[]
+    
+    AMF->>AEF: new AccountAdminEditFrm(a, roles)
+    AEF-->>Admin: Hiển thị form Phê duyệt & Gán quyền
+
+    Admin->>AEF: Đổi trạng thái -> "Active" & Chọn Nhóm quyền
+    Admin->>AEF: Nhấn btnSave (Cập nhật)
+    AEF->>AEF: actionPerformed(e)
+    
+    AEF->>A: Cập nhật status="active", role_id=selectedRole
+    AEF->>ADAO: updateAccount(a)
+    ADAO->>ADAO: execute SQL UPDATE
+    ADAO-->>AEF: true
+    AEF-->>Admin: Hiển thị thông báo Phê duyệt thành công
+```
+
+**Mô tả các bước (Sơ đồ 4.2):**
+1. Quản trị viên (Super Admin) chọn một tài khoản (hiện đang ở trạng thái chưa phê duyệt) trên giao diện `AccountAdminManageFrm` và nhấn nút Phê duyệt / Edit.
+2. `AccountAdminManageFrm` bắt sự kiện thông qua hàm `actionPerformed(e)`.
+3. Giao diện gọi hàm `getAccountById(id)` của `AccountAdminDAO` để lấy dữ liệu chi tiết của tài khoản đó.
+4. `AccountAdminDAO` trả về đối tượng `AccountAdmin` tương ứng.
+5. Giao diện tiếp tục gọi hàm `getAllRoles()` của `RoleDAO` để lấy toàn bộ danh sách các Nhóm quyền có sẵn trong hệ thống.
+6. `RoleDAO` truy xuất và trả về danh sách đối tượng `Role[]`.
+7. `AccountAdminManageFrm` tiến hành gọi khởi tạo giao diện `AccountAdminEditFrm`, truyền đối tượng tài khoản và danh sách quyền vào.
+8. Giao diện `AccountAdminEditFrm` được render và hiển thị lên màn hình cho Quản trị viên.
+9. Quản trị viên tiến hành đổi thuộc tính Trạng thái sang "Active" (Hoạt động), chọn một Nhóm quyền (Role) phù hợp và nhấn nút Lưu (btnSave).
+10. Giao diện `AccountAdminEditFrm` bắt sự kiện nút Lưu qua `actionPerformed(e)`.
+11. Giao diện trực tiếp cập nhật giá trị `status` và `role_id` mới vào đối tượng `AccountAdmin` hiện tại.
+12. Giao diện gọi hàm `updateAccount(a)` của `AccountAdminDAO` để lưu bản ghi.
+13. `AccountAdminDAO` thực thi câu lệnh SQL UPDATE xuống CSDL.
+14. `AccountAdminDAO` trả kết quả `true` về cho giao diện.
+15. Giao diện hiển thị thông báo "Phê duyệt thành công" cho Quản trị viên, từ lúc này tài khoản nhân viên đã có thể đăng nhập bình thường.
+
+---
+
 *Tài liệu được tổng hợp bởi System Architect – dựa trên phân tích mã nguồn dự án `project-5` và phương pháp thiết kế hướng đối tượng theo chuẩn [Software Design Blog](https://softwaredesign.home.blog/tutorials/hotel-reservation-management-application/).*
+
+---
+
+## Phụ lục 4: Sơ đồ Kiến trúc Tổng thể Hệ thống
+
+Hệ thống **Travel Tour Booking** được xây dựng theo kiến trúc **MVC** trên nền **Node.js + Express**, sử dụng **MongoDB Atlas** là cơ sở dữ liệu và **Pug** để render giao diện phía server (SSR).
+
+```mermaid
+graph TB
+    Browser["🖥️ Trình duyệt\n(Admin / Khách hàng)"]
+
+    subgraph SERVER["🖧  Server – Node.js / Express 5 (Port 3000)"]
+        direction TB
+
+        Middleware["🛡️ Middleware\n─────────────────\nverifyToken (JWT)\ncheckPermission (RBAC)"]
+
+        subgraph MVC["Kiến trúc MVC"]
+            direction LR
+
+            View["📄 View\n──────────\nPug SSR\n/views/admin\n/views/client"]
+
+            Controller["⚙️ Controller\n──────────────────\nAdmin:\n account · setting\n tour · category\n promotion · profile\nClient:\n home · tour · cart"]
+
+            Model["🗃️ Model (Mongoose)\n──────────────────\nAccountAdmin · Role\nTour · Category\nPromotion · City\nSettingWebsiteInfo\nForgotPassword"]
+        end
+
+        Helpers["🔧 Helpers / Services\n─────────────────────\nmail (OTP) · cloudinary\npermission · generate\ncategoryTree · tour"]
+    end
+
+    subgraph EXTERNAL["☁️  Dịch vụ ngoài"]
+        MongoDB[("MongoDB Atlas\n(Cloud DB)")]
+        Cloudinary["Cloudinary\n(Lưu ảnh)"]
+        Gmail["Gmail SMTP\n(Gửi mail OTP)"]
+    end
+
+    Browser -->|"HTTP Request"| Middleware
+    Middleware -->|"Xác thực & Phân quyền"| Controller
+    Controller --> View
+    Controller --> Model
+    Controller --> Helpers
+    View -->|"HTML Response"| Browser
+
+    Model --> MongoDB
+    Helpers --> Cloudinary
+    Helpers --> Gmail
+```
+
+
+### Mô tả Kiến trúc
+
