@@ -109,4 +109,12 @@ module.exports.permissionList = [
     label: "Xoá khuyến mãi",
     value: "promotion-delete",
   },
-];
+  {
+    label: "Xem thông tin liên hệ",
+    value: "contact-view",
+  },
+  {
+    label: "Xoá thông tin liên hệ",
+    value: "contact-delete",
+  }
+];

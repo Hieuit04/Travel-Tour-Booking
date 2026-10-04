@@ -1,6 +1,7 @@
 const Contact = require('../../models/contact.model');
 const moment = require('moment');
 const slugify = require('slugify')
+const {checkPermission} = require('../../helpers/permission.helper')
 
 module.exports.list = async (req, res) => {
   const find = {
@@ -99,6 +100,7 @@ module.exports.changeMultiPatch = async (req, res) => {
     const { listId, option } = req.body;
     switch (option) {
       case "delete":
+        if(!checkPermission(res,"contact-delete")) return;
         await Contact.updateMany({
           _id: {
             $in: listId
