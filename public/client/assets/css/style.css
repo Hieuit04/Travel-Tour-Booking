@@ -1469,7 +1469,8 @@ button {
   flex-wrap: wrap;
 }
 
-.box-breadcrumb .inner-list a {
+.box-breadcrumb .inner-list a,
+.box-breadcrumb .inner-list span.inner-current {
   font-weight: 400;
   font-size: 16px;
   color: white;
@@ -1493,7 +1494,8 @@ button {
     gap: 5px 10px;
   }
 
-  .box-breadcrumb .inner-list a {
+  .box-breadcrumb .inner-list a,
+  .box-breadcrumb .inner-list span.inner-current {
     font-size: 11px;
   }
 

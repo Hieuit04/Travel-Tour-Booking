@@ -1,0 +1,21 @@
+mixin breadcrumb()
+  - const lastIndex = breadcrumb.length - 1
+  - const currentItem = breadcrumb[lastIndex]
+
+  if currentItem
+    .box-breadcrumb
+      img.inner-image(
+        alt= currentItem.categoryName
+        src= currentItem.avatar
+        )
+      .inner-content
+        .container
+          h1.inner-title #{currentItem.categoryName}
+          .inner-list
+            a(href="/") Trang Chủ
+            each item, index in breadcrumb
+              i.fa-solid.fa-angles-right
+              if index === lastIndex
+                span.inner-current #{item.categoryName}
+              else
+                a(href=`/category/${item.slug}`) #{item.categoryName}
