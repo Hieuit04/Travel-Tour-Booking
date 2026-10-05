@@ -1,5 +1,6 @@
 const Category = require('../../models/category.model');
 const Tour = require('../../models/tour.model');
+const City = require('../../models/city.model');
 const buildBreadcrumb = require('../../helpers/breadcrumb.helper');
 const categoryFilter = require('../../helpers/categoryFilter.helper');
 const { formatTourItem } = require('../../helpers/tour.helper');
@@ -35,11 +36,15 @@ module.exports.list = async (req, res) => {
       formatTourItem(item)
     }
     // end Danh sách tour theo danh mục
+    // Danh sách tỉnh thành
+    const cityList = await City.find({})
+    // end Danh sách tỉnh thành
     res.render('client/pages/tour-list', {
       pageTitle: 'Danh sách tour',
       breadcrumb: breadcrumb,
       categoryDetail: categoryDetail,
       tourList: tourList,
+      cityList: cityList,
     });
   } catch (error) {
     console.error(error);

@@ -20,22 +20,20 @@ block main
                 )
             .inner-group
               label.inner-label(for="") Điểm đi
-              select(name="")
+              select(name="locationFrom")
                 option(value="") -- Chọn điểm đi --
-                option(value="") Hà Nội
-                option(value="") Đà Nẵng
-                option(value="") Nha Trang
+                each city in cityList
+                  option(value=city._id) #{city.name}
             .inner-group
               label.inner-label(for="") Điểm đến
-              select(name="")
+              select(name="locationTo")
                 option(value="") -- Chọn điểm đến --
-                option(value="") Hà Nội
-                option(value="") Đà Nẵng
-                option(value="") Nha Trang
+                each city in cityList
+                  option(value=city.name) #{city.name}
             .inner-group
               label.inner-label(for="") Ngày khởi hành
               input(
-                name="" 
+                name="departureDate" 
                 type="date"
                 )
             .inner-group
@@ -45,32 +43,32 @@ block main
                   label(for="") Người lớn:
                   input(
                     value="0" 
-                    name="" 
+                    name="stockAdult" 
                     type="number"
                     )
                 .inner-item
                   label(for="") Trẻ em:
                   input(
                     value="0" 
-                    name="" 
+                    name="stockChildren" 
                     type="number"
                     )
                 .inner-item
                   label(for="") Em bé:
                   input(
                     value="0" 
-                    name="" 
+                    name="stockBaby" 
                     type="number"
                     )
             .inner-group
               label.inner-label(for="") Mức giá
-              select(name="")
+              select(name="price")
                 option(value="") -- Chọn khoảng giá --
-                option(value="") Dưới 1tr
-                option(value="") Từ 1tr - 3tr
-                option(value="") Từ 3tr - 6tr
-                option(value="") Từ 6tr - 10tr
-                option(value="") Trên 10tr
+                option(value="0-2000000") Dưới 2tr
+                option(value="2000000-5000000") Từ 2tr - 5tr
+                option(value="5000000-10000000") Từ 5tr - 10tr
+                option(value="10000000-20000000") Từ 10tr - 20tr
+                option(value="20000000-1000000000") Trên 20tr
             button.inner-button Áp Dụng
           // End Box Filter
         .inner-right
@@ -101,7 +99,7 @@ block main
               | Bộ Lọc
               img(
                 alt="Filter" 
-                src="client/assets/images/icon-filter.svg"
+                src="/client/assets/images/icon-filter.svg"
                 )
           .inner-wrap-3
             each item in tourList 
