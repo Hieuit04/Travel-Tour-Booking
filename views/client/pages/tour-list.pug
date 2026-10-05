@@ -1,5 +1,6 @@
 extends ../layouts/default.pug
 include ../mixins/breadcrumb.pug
+include ../mixins/product-item.pug
 block main
   // Box Breadcrumb
   +breadcrumb()
@@ -74,12 +75,10 @@ block main
           // End Box Filter
         .inner-right
           .inner-wrap-1
-            h2.inner-title-main Tour Nước Ngoài
+            h2.inner-title-main 
+              | #{categoryDetail.categoryName}
             .inner-desc
-              p
-                | Du lịch Châu Á: là châu lục lớn và đông dân nhất thế giới. Châu Á cũng có nhiều danh lam thắng cảnh đẹp tại một số quốc gia như Hàn Quốc, Nhật Bản, Trung Quốc, Việt Nam,... và VK Travel là nhà tổ chức du lịch chuyên nghiệp hàng đầu Châu Á, đã 5 lần liên tiếp nhận giải TTG Travel Awards. Hãy cùng 28.Travel du lịch Châu Á để tận hưởng những dịch vụ tốt nhất.
-              p
-                | Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam nemo harum ipsam labore. Tempore sequi ipsam dolorum, vel consectetur voluptatem. Quos quam aspernatur quibusdam quasi assumenda ea maxime repudiandae iste.
+              | !{categoryDetail.description}
           .inner-wrap-2
             .inner-sort
               .inner-label Sắp xếp:
@@ -105,58 +104,8 @@ block main
                 src="client/assets/images/icon-filter.svg"
                 )
           .inner-wrap-3
-            .product-item
-              a.inner-image(href="#")
-                img(
-                  alt="" 
-                  src="/client/assets/images/demo/product-1.jpg"
-                  )
-              .inner-content
-                .inner-discount
-                  i.fa-solid.fa-bolt
-                  | Giảm -30%
-                h3.inner-title
-                  a(href="#") Tour 2026 Phú Quốc – Thiên Đường Đảo Ngọc (3N2D) Lorem ipsum dolor sit amet consectetur
-                .inner-prices
-                  .inner-price-old
-                    del 13.650.000
-                    span đ
-                  .inner-price-new
-                    | 10.650.000
-                    span đ
-                .inner-desc
-                  div
-                    | Mã Tour:
-                    b 123456789
-                  div
-                    | Ngày Khởi Hành:
-                    b 22/07/2024
-                  div
-                    | Thời Gian:
-                    b 10 Ngày 9 Đêm
-                .inner-footer
-                  .inner-rating
-                    .inner-stars
-                      i.fa-solid.fa-star
-                      i.fa-solid.fa-star
-                      i.fa-solid.fa-star
-                      i.fa-solid.fa-star
-                      i.fa-regular.fa-star
-                    .inner-number (5)
-                  .inner-stock
-                    .inner-label Số chỗ còn:
-                    .inner-number 10
-            .product-item Item
-            .product-item Item
-            .product-item Item
-            .product-item Item
-            .product-item Item
-            .product-item Item
-            .product-item Item
-            .product-item Item
-            .product-item Item
-            .product-item Item
-            .product-item Item
+            each item in tourList 
+              +product-item(item)
           .box-pagination
             button
               i.fa-solid.fa-angles-left

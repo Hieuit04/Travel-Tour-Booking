@@ -1532,6 +1532,9 @@ button {
   color: #747578;
   margin-bottom: 10px;
 }
+.section-9 .inner-wrap-1 img{
+  max-width: 100%;
+}
 
 .section-9 .inner-wrap-2 {
   display: flex;
