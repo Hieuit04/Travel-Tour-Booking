@@ -336,7 +336,7 @@ if (orderForm) {
       console.log(event.target.note.value)
       console.log(event.target.paymentMethod.value)
     })
-  
+
   // Bank info section12
   const bankInfo = orderForm.querySelector('.inner-bank ');
   const paymentMethods = orderForm.querySelectorAll('input[name="paymentMethod"]');
@@ -359,7 +359,7 @@ if (orderForm) {
 
 // Box filter
 const boxFilter = document.querySelector('.box-filter');
-if (boxFilter) { 
+if (boxFilter) {
   const url = new URL(`${window.location.origin}/search`);
   const filterList = [
     "locationFrom",
@@ -371,7 +371,7 @@ if (boxFilter) {
     "price"
   ]
   const buttonApply = boxFilter.querySelector('.inner-button');
-  buttonApply.addEventListener('click', () => { 
+  buttonApply.addEventListener('click', () => {
     for (const filter of filterList) {
       const input = boxFilter.querySelector(`[name="${filter}"]`);
       if (input) {
@@ -387,3 +387,32 @@ if (boxFilter) {
   })
 }
 // end Box filter
+
+// Form serch 
+const formSearch = document.querySelector('[formSearch]');
+if (formSearch) {
+  const url = new URL(`${window.location.origin}/search`);
+  const filterList = [
+    "locationTo",
+    "departureDate",
+    "stockAdult",
+    "stockChildren",
+    "stockBaby",
+  ]
+  formSearch.addEventListener('submit', (e) => {
+    e.preventDefault();
+    for (const filter of filterList) {
+      const input = formSearch.querySelector(`[name="${filter}"]`);
+      if (input) {
+        const value = input.value;
+        if (value) {
+          url.searchParams.set(filter, value);
+        } else {
+          url.searchParams.delete(filter);
+        }
+      }
+    }
+    window.location.href = url.toString();
+  })
+}
+// end Form serch 
