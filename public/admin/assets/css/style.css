@@ -1128,6 +1128,11 @@ input, textarea, select, button {
   height: 150px; 
 }
 
+.section-8 .inner-upload-image-multi{
+  max-height: 800px; 
+  overflow-y: auto;
+}
+
 .section-8 .filepond--drop-label.filepond--drop-label label{
   font-size: 50px;
 }
@@ -1714,4 +1719,4 @@ input, textarea, select, button {
 }
 
 /* End Promotion extras */
-
+

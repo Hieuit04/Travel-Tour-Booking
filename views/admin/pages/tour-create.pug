@@ -29,6 +29,9 @@ block main
         .inner-group.inner-two-col
           label(for="avatar") Ảnh đại diện
           input(type="file" name="avatar" id="avatar" accept="image/*" filepondImage).inner-upload-image
+        .inner-group.inner-two-col
+          label(for="images") Danh sách ảnh 
+          input(type="file" name="images" id="images" accept="image/*" filepondImage multiple data-allow-reorder="true").inner-upload-image-multi 
         .inner-group
           label(for="") Giá cũ
           .inner-input-list

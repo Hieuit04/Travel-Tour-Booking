@@ -114,6 +114,13 @@ if (listFilepondImage.length > 0) {
     if (imageDefault) {
       file.push(imageDefault);
     }
+    const imageMultiDefault = filepondImage.getAttribute('image-multi-default')
+    if (imageMultiDefault) {
+      const images = JSON.parse(imageMultiDefault);
+      if (Array.isArray(images)) {
+        file.push(...images);
+      }
+    }
     filePond[filepondImage.name] = FilePond.create(filepondImage, {
       labelIdle: '+',
       files: file,
@@ -345,7 +352,12 @@ if (tourCreateForm) {
       formData.append('position', position);
       formData.append('status', status);
       if (avatar) {
-        formData.append('avatar', avatar);
+        formData.append('avatar', avatar, avatar.name || 'image.png');
+      }
+      if (filePond.images?.getFiles()) {
+        for (const item of filePond.images.getFiles()) { 
+          formData.append('images', item.file);
+        }
       }
       formData.append('priceAdult', priceAdult);
       formData.append('priceChildren', priceChildren);
@@ -443,6 +455,11 @@ if (tourEditForm) {
       formData.append('status', status);
       if (avatar) {
         formData.append('avatar', avatar, avatar.name || 'image.png');
+      }
+      if (filePond.images?.getFiles()) {
+        for (const item of filePond.images.getFiles()) { 
+          formData.append('images', item.file);
+        }
       }
       formData.append('priceAdult', priceAdult);
       formData.append('priceChildren', priceChildren);

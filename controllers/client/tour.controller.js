@@ -35,7 +35,7 @@ module.exports.detail = async (req, res) => {
     });
     res.render('client/pages/tour-detail', {
       pageTitle: tourDetail.tourName,
-      tour: tourDetail,
+      tourDetail: tourDetail,
       breadcrumb: breadcrumb  
     });
   } catch (error) {

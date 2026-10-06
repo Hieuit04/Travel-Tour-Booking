@@ -15,35 +15,17 @@ block main
             .inner-image-main
               .swiper.swiperMainSection10
                 .swiper-wrapper
-                  .swiper-slide
-                    img(src="https://swiperjs.com/demos/images/abstract-1.jpg")
-                  .swiper-slide
-                    img(src="https://swiperjs.com/demos/images/abstract-2.jpg")
-                  .swiper-slide
-                    img(src="https://swiperjs.com/demos/images/abstract-3.jpg")
-                  .swiper-slide
-                    img(src="https://swiperjs.com/demos/images/abstract-4.jpg")
-                  .swiper-slide
-                    img(src="https://swiperjs.com/demos/images/abstract-5.jpg")
-                  .swiper-slide
-                    img(src="https://swiperjs.com/demos/images/abstract-6.jpg")
+                  each image in tourDetail.images
+                    .swiper-slide
+                      img(src=image)
                 .swiper-button-next
                 .swiper-button-prev
             .inner-image-thumb
               .swiper.swiperThumbSection10
                 .swiper-wrapper
-                  .swiper-slide
-                    img(src="https://swiperjs.com/demos/images/abstract-1.jpg")
-                  .swiper-slide
-                    img(src="https://swiperjs.com/demos/images/abstract-2.jpg")
-                  .swiper-slide
-                    img(src="https://swiperjs.com/demos/images/abstract-3.jpg")
-                  .swiper-slide
-                    img(src="https://swiperjs.com/demos/images/abstract-4.jpg")
-                  .swiper-slide
-                    img(src="https://swiperjs.com/demos/images/abstract-5.jpg")
-                  .swiper-slide
-                    img(src="https://swiperjs.com/demos/images/abstract-6.jpg")
+                  each image in tourDetail.images
+                    .swiper-slide
+                      img(src=image)
           // Hết Danh sách ảnh
           // Thông Tin Tour
           .box-tour-info

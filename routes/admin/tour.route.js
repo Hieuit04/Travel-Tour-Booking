@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const tourController = require('../../controllers/admin/tour.controller');
-const {storage} = require('../../helpers/cloundinary.helper'); // Import multer storage configuration
+const { storage } = require('../../helpers/cloundinary.helper'); // Import multer storage configuration
 const multer = require('multer')
 const upload = multer({ storage: storage })
-const {checkPermission} = require('../../middlewares/admin/permission.middleware');
+const { checkPermission } = require('../../middlewares/admin/permission.middleware');
 
 
 router.get('/list', tourController.list);
@@ -14,8 +14,11 @@ router.get('/trash', tourController.trash);
 router.post(
   '/create',
   checkPermission("tour-create"),
-   upload.single("avatar"), 
-   tourController.createPost);
+  upload.fields([
+    { name: "avatar", maxCount: 1 },
+    { name: "images", maxCount: 15 }
+  ]),
+  tourController.createPost);
 
 router.get(
   '/edit/:id',
@@ -26,7 +29,10 @@ router.get(
 router.patch(
   '/edit/:id',
   checkPermission("tour-edit"),
-  upload.single("avatar"), 
+  upload.fields([
+    { name: "avatar", maxCount: 1 },
+    { name: "images", maxCount: 15 }
+  ]),
   tourController.editPatch
 );
 
@@ -48,6 +54,6 @@ router.patch(
   tourController.deleteDestroyPatch
 );
 
-router.patch('/change-multi',tourController.changeMultiPatch);
+router.patch('/change-multi', tourController.changeMultiPatch);
 
 module.exports = router;

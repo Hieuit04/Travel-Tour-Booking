@@ -210,7 +210,22 @@ module.exports.createPost = async (req, res) => {
         req.body.position = 1;
       }
     }
-    req.body.avatar = req.file ? req.file.path : "";
+    // Avatar
+    if (req.files.avatar && req.files.avatar.length > 0) { 
+      req.body.avatar = req.files.avatar[0].path;
+    }
+    else {
+      req.body.avatar = "";
+    }
+    // end Avatar
+    // Images
+    if (req.files.images && req.files.images.length > 0) { 
+      req.body.images = req.files.images.map(file => file.path);
+    }
+    else {
+      req.body.images = "";
+    }
+    // end Images
     req.body.createdBy = res.locals.account.id;
     req.body.priceAdult = req.body.priceAdult ? parseInt(req.body.priceAdult) : 0;
     req.body.priceChildren = req.body.priceChildren ? parseInt(req.body.priceChildren) : 0;
@@ -296,9 +311,22 @@ module.exports.editPatch = async (req, res) => {
         req.body.position = 1;
       }
     }
-    if (req.file) {
-      req.body.avatar = req.file.path;
+    // Avatar
+    if (req.files.avatar && req.files.avatar.length > 0) { 
+      req.body.avatar = req.files.avatar[0].path;
     }
+    else {
+      req.body.avatar = "";
+    }
+    // end Avatar
+    // Images
+    if (req.files.images && req.files.images.length > 0) { 
+      req.body.images = req.files.images.map(file => file.path);
+    }
+    else {
+      req.body.images = "";
+    }
+    // end Images
     req.body.createdBy = res.locals.account.id;
     req.body.priceAdult = req.body.priceAdult ? parseInt(req.body.priceAdult) : 0;
     req.body.priceChildren = req.body.priceChildren ? parseInt(req.body.priceChildren) : 0;
