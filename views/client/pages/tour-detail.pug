@@ -1,23 +1,9 @@
 extends ../layouts/default.pug
+include ../mixins/breadcrumb.pug
 
 block main 
   // Box Breadcrumb
-  .box-breadcrumb
-    img.inner-image(
-      alt="" 
-      src="/client/assets/images/demo/banner-6.jpg"
-      )
-    .inner-content
-      .container
-        h1.inner-title Tour Hà Nội - Ninh Bình - Hạ Long - Yên Tử - Sapa | 6N5D
-        .inner-list
-          a(href="#") Trang Chủ
-          i.fa-solid.fa-angles-right
-          a(href="#") Tour Trong Nước
-          i.fa-solid.fa-angles-right
-          a(href="#") Tour Miền Bắc
-          i.fa-solid.fa-angles-right
-          a(href="#") Tour Hà Nội - Ninh Bình - Hạ Long - Yên Tử - Sapa | 6N5D
+  +breadcrumb()
   // End Box Breadcrumb
   // Section 10
   .section-10

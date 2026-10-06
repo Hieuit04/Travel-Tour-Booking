@@ -8,8 +8,10 @@ const buildBreadcrumb = (currentCategory, categoryList) => {
     breadcrumb.unshift(parent);
     current = parent;
   }
-  // Thêm danh mục hiện tại vào cuối mảng
-  breadcrumb.push(currentCategory);
+  // Thêm danh mục hiện tại vào cuối mảng (nếu có)
+  if (currentCategory) {
+    breadcrumb.push(currentCategory);
+  }
   return breadcrumb;
 };
 
