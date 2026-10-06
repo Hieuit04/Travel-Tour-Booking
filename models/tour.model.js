@@ -17,7 +17,7 @@ const schema = new mongoose.Schema({
   stockAdult: Number,
   stockChildren: Number,
   stockBaby: Number,
-  loaction: Array,
+  location: Array,
   time: String,
   vihicle: String,
   departureDate: Date,

@@ -2,9 +2,6 @@ extends ../layouts/default.pug
 include ../mixins/breadcrumb.pug
 include ../mixins/product-item.pug
 block main
-  // Box Breadcrumb
-  +breadcrumb()
-  // End Box Breadcrumb
   // Section 9
   .section-9
     .container
@@ -74,9 +71,7 @@ block main
         .inner-right
           .inner-wrap-1
             h2.inner-title-main 
-              | #{categoryDetail.categoryName}
-            .inner-desc
-              | !{categoryDetail.description}
+              | #{pageTitle}
           .inner-wrap-2
             .inner-sort
               .inner-label Sắp xếp:
@@ -94,7 +89,7 @@ block main
                 i.fa-solid.fa-eye
             .inner-total
               | Tất cả:
-              b #{tourList.length} tour
+              b  #{tourList.length} tour
             button.inner-button-filter
               | Bộ Lọc
               img(

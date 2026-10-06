@@ -376,7 +376,7 @@ if (boxFilter) {
       const input = boxFilter.querySelector(`[name="${filter}"]`);
       if (input) {
         const value = input.value;
-        if (value) {
+        if (value && value !== "0") {
           url.searchParams.set(filter, value);
         } else {
           url.searchParams.delete(filter);
@@ -385,6 +385,15 @@ if (boxFilter) {
     }
     window.location.href = url.toString();
   })
+  // Hiển thị filter đã chọn
+  const urlCurrent = new URL(window.location.href);
+  filterList.forEach((filter) => {
+    const valueCurrent = urlCurrent.searchParams.get(filter);
+    if (valueCurrent) {
+      boxFilter.querySelector(`[name="${filter}"]`).value = valueCurrent;
+    }
+  })
+  // end Hiển thị filter đã chọn
 }
 // end Box filter
 
@@ -405,7 +414,7 @@ if (formSearch) {
       const input = formSearch.querySelector(`[name="${filter}"]`);
       if (input) {
         const value = input.value;
-        if (value) {
+        if (value && value !== "0") {
           url.searchParams.set(filter, value);
         } else {
           url.searchParams.delete(filter);

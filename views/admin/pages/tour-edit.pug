@@ -70,7 +70,7 @@ block main
         .inner-checkbox-list
           each item in cityList
             .inner-checkbox-item
-              +checkbox-30("locations", `location-${item.id}`, item.id, tourDetail.loaction && tourDetail.loaction.includes(item.id.toString()))
+              +checkbox-30("locations", `location-${item.id}`, item.id, tourDetail.location && tourDetail.location.includes(item.id.toString()))
               label(for=`location-${item.id}`) #{item.name}
       .inner-group
         label(for="time") Thời gian

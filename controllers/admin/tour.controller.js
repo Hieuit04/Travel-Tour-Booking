@@ -221,7 +221,7 @@ module.exports.createPost = async (req, res) => {
     req.body.stockAdult = req.body.stockAdult ? parseInt(req.body.stockAdult) : 0;
     req.body.stockChildren = req.body.stockChildren ? parseInt(req.body.stockChildren) : 0;
     req.body.stockBaby = req.body.stockBaby ? parseInt(req.body.stockBaby) : 0;
-    req.body.loaction = req.body.loaction ? JSON.parse(req.body.loaction) : [];
+    req.body.location = req.body.location ? JSON.parse(req.body.location) : [];
     req.body.departureDate = req.body.departureDate ? new Date(req.body.departureDate) : null;
     req.body.schedule = req.body.schedule ? JSON.parse(req.body.schedule) : [];
     req.body.createdBy = res.locals.account.id;
@@ -309,7 +309,7 @@ module.exports.editPatch = async (req, res) => {
     req.body.stockAdult = req.body.stockAdult ? parseInt(req.body.stockAdult) : 0;
     req.body.stockChildren = req.body.stockChildren ? parseInt(req.body.stockChildren) : 0;
     req.body.stockBaby = req.body.stockBaby ? parseInt(req.body.stockBaby) : 0;
-    req.body.loaction = req.body.loaction ? JSON.parse(req.body.loaction) : [];
+    req.body.location = req.body.location ? JSON.parse(req.body.location) : [];
     req.body.departureDate = req.body.departureDate ? new Date(req.body.departureDate) : null;
     req.body.schedule = req.body.schedule ? JSON.parse(req.body.schedule) : [];
     req.body.updatedBy = res.locals.account.id;

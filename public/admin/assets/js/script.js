@@ -313,7 +313,7 @@ if (tourCreateForm) {
       const stockAdult = event.target.stockAdult.value;
       const stockChildren = event.target.stockChildren.value;
       const stockBaby = event.target.stockBaby.value;
-      const loaction = [];
+      const locations = [];
       const time = event.target.time.value;
       const vihicle = event.target.vehicle.value;
       const departureDate = event.target.departureDate.value;
@@ -322,7 +322,7 @@ if (tourCreateForm) {
       // location
       const listLocationChecked = document.querySelectorAll('input[name="locations"]:checked');
       listLocationChecked.forEach((location) => {
-        loaction.push(location.value);
+        locations.push(location.value);
       });
       // end location
       // schedule
@@ -356,7 +356,7 @@ if (tourCreateForm) {
       formData.append('stockAdult', stockAdult);
       formData.append('stockChildren', stockChildren);
       formData.append('stockBaby', stockBaby);
-      formData.append('loaction', JSON.stringify(loaction));
+      formData.append('location', JSON.stringify(locations));
       formData.append('time', time);
       formData.append('vihicle', vihicle);
       formData.append('departureDate', departureDate);
@@ -410,7 +410,7 @@ if (tourEditForm) {
       const stockAdult = event.target.stockAdult.value;
       const stockChildren = event.target.stockChildren.value;
       const stockBaby = event.target.stockBaby.value;
-      const loaction = [];
+      const locations = [];
       const time = event.target.time.value;
       const vihicle = event.target.vehicle.value;
       const departureDate = event.target.departureDate.value;
@@ -419,7 +419,7 @@ if (tourEditForm) {
       // location
       const listLocationChecked = document.querySelectorAll('input[name="locations"]:checked');
       listLocationChecked.forEach((location) => {
-        loaction.push(location.value);
+        locations.push(location.value);
       });
       // end location
       // schedule
@@ -453,7 +453,7 @@ if (tourEditForm) {
       formData.append('stockAdult', stockAdult);
       formData.append('stockChildren', stockChildren);
       formData.append('stockBaby', stockBaby);
-      formData.append('loaction', JSON.stringify(loaction));
+      formData.append('location', JSON.stringify(locations));
       formData.append('time', time);
       formData.append('vihicle', vihicle);
       formData.append('departureDate', departureDate);
