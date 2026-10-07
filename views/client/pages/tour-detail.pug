@@ -92,7 +92,7 @@ block main
                   span.text-main  #{tourDetail.departureDateFormat}
             .inner-group
               label.inner-label(for="") Khởi Hành Tại:
-              select(name="")
+              select(name="locationForm")
                 each city in cityList
                   option(value=city._id) #{city.name}
             .inner-group
@@ -102,35 +102,51 @@ block main
                   label(for="") Người lớn:
                   input(
                     value="1" 
-                    name="" 
+                    name="stockAdult" 
                     type="number"
+                    min="0"
+                    max= tourDetail.stockAdult
+                    price= tourDetail.newPriceAdult
+                    inputQuantity
                     )
                   span.inner-price
-                    | 1 x
+                    span(stockLabel="stockAdult") 1
+                    span x
                     span.text-main  #{tourDetail.newPriceAdult.toLocaleString("vi-VN")}
                 .inner-item
                   label(for="") Trẻ em:
                   input(
                     value="0" 
-                    name="" 
+                    name="stockChildren" 
                     type="number"
+                    min= "0"
+                    max=  tourDetail.stockChildren
+                    price= tourDetail.newPriceChildren
+                    inputQuantity
                     )
                   span.inner-price
-                    | 0 x
+                    span(stockLabel="stockChildren") 0
+                    span x
                     span.text-main #{tourDetail.newPriceChildren.toLocaleString("vi-VN")}
                 .inner-item
                   label(for="") Em bé:
                   input(
                     value="0" 
-                    name="" 
+                    name="stockBaby" 
                     type="number"
+                    min= "0"
+                    max=  tourDetail.stockBaby
+                    price= tourDetail.newPriceBaby
+                    inputQuantity
                     )
                   span.inner-price
-                    | 0 x
+                    span(stockLabel="stockBaby") 0
+                    span x
                     span.text-main #{tourDetail.newPriceBaby.toLocaleString("vi-VN")}
             .inner-total
               .inner-label Tổng cộng:
-              .inner-price.text-main #{tourDetail.newPriceAdult.toLocaleString("vi-VN")}đ
-            button.inner-button Thêm Vào Giỏ Hàng
+              .inner-price.text-main 
+                span(total) #{tourDetail.newPriceAdult.toLocaleString("vi-VN")}đ
+            button.inner-button(button-add-cart tour-id=tourDetail._id) Thêm Vào Giỏ Hàng
           // Hết Chuyến Đi Của Bạn
   // End Section 10

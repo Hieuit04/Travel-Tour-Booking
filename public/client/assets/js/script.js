@@ -1,3 +1,5 @@
+
+
 // Khởi tạo AOS\
 AOS.init();
 // Hết khởi tạo AOS
@@ -424,4 +426,76 @@ if (formSearch) {
     window.location.href = url.toString();
   })
 }
-// end Form serch 
+// end Form serch
+
+
+// box tour detail
+const boxTourDetail = document.querySelector(".box-tour-detail")
+if (boxTourDetail) {
+  const listInputQuantity = boxTourDetail.querySelectorAll("[inputQuantity]")
+  listInputQuantity.forEach(input => {
+    input.addEventListener("input", () => {
+      const name = input.name
+      let value = parseInt(input.value) || 0
+      const min = parseInt(input.min) || 0
+      const max = parseInt(input.max)
+      if (value < min) {
+        value = min;
+        input.value = min
+        notyf.error(`Số lượng tối thiểu là ${min}`)
+      }
+      if (value > max) {
+        value = max;
+        input.value = max
+        notyf.error(`Số lượng tối đa là ${max}`)
+      }
+      boxTourDetail.querySelector(`[stockLabel=${name}]`).innerHTML = value
+      let total = 0
+      listInputQuantity.forEach(item => {
+        total += parseInt(item.value) * parseInt(item.getAttribute("price"))
+      })
+      boxTourDetail.querySelector("[total]").innerHTML = total.toLocaleString("vi-VN")
+    })
+  })
+  // Thêm vào giỏ hàng
+  const buttonAddToCart = boxTourDetail.querySelector("[button-add-cart]")
+  buttonAddToCart.addEventListener("click", () => {
+    const tourId = buttonAddToCart.getAttribute("tour-id")
+    const locationForm = document.querySelector(`[name="locationForm"]`).value
+    const quantityAdult = parseInt(document.querySelector(`[name="stockAdult"]`).value)
+    const quantityChildren = parseInt(document.querySelector(`[name="stockChildren"]`).value)
+    const quantityBaby = parseInt(document.querySelector(`[name="stockBaby"]`).value)
+
+    const cart = JSON.parse(localStorage.getItem('cart'));
+
+    const existItem = cart.find(item => item.tourId === tourId);
+    if (existItem) {
+      existItem.locationForm = locationForm;
+      existItem.quantityAdult = quantityAdult;
+      existItem.quantityChildren = quantityChildren;
+      existItem.quantityBaby = quantityBaby;
+      notyf.success("Đã cập nhật giỏ hàng");
+    } else {
+      const cartItem = {
+        tourId: tourId,
+        locationForm: locationForm,
+        quantityAdult: quantityAdult,
+        quantityChildren: quantityChildren,
+        quantityBaby: quantityBaby,
+      };
+      cart.unshift(cartItem)
+      notyf.success("Đã thêm vào giỏ hàng");
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+  })
+  // Thêm vào giỏ hàng
+}
+//  end box tour detail
+
+// Khởi tạo giỏ hàng
+const cart = localStorage.getItem('cart');
+if (!cart) {
+  localStorage.setItem('cart', JSON.stringify([]));
+}
+// end Khởi tạo giỏ hàng
