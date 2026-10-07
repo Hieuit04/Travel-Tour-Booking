@@ -428,7 +428,17 @@ if (formSearch) {
 }
 // end Form serch
 
+// Hiển thị mini cart
+const drawMiniCart = () => {
+  const miniCart = document.querySelector("[miniCart]");
+  if (miniCart) {
+    const cart = JSON.parse(localStorage.getItem('cart'));
+    miniCart.innerHTML = cart.length > 0 ? cart.length : "0";
+  }
+}
+// end Hiển thị mini cart
 
+drawMiniCart();
 // box tour detail
 const boxTourDetail = document.querySelector(".box-tour-detail")
 if (boxTourDetail) {
@@ -486,8 +496,8 @@ if (boxTourDetail) {
       cart.unshift(cartItem)
       notyf.success("Đã thêm vào giỏ hàng");
     }
-
     localStorage.setItem('cart', JSON.stringify(cart));
+    drawMiniCart();
   })
   // Thêm vào giỏ hàng
 }
