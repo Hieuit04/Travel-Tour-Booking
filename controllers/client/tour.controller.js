@@ -1,6 +1,8 @@
 const Tour = require('../../models/tour.model');
+const City = require('../../models/city.model');
 const Category = require('../../models/category.model');
 const buildBreadcrumb = require('../../helpers/breadcrumb.helper');
+const moment = require('moment'); 
 module.exports.list = async (req, res) => {
   const tourList = await Tour.find({});
   res.render('client/pages/tour-list', {
@@ -25,9 +27,12 @@ module.exports.detail = async (req, res) => {
       res.redirect('/');
       return;
     }
+    tourDetail.departureDateFormat = moment(tourDetail.departureDate).format('DD/MM/YYYY');
     const currentCategory = categoryList.find(cat => cat._id.toString() === tourDetail.category);
     const breadcrumb = buildBreadcrumb(currentCategory, categoryList);
-    // Push thông tin tour vào cuối mảng breadcrumb
+    const cityList = await City.find({
+      _id: { $in: tourDetail.location}
+    }).lean();
     breadcrumb.push({
       categoryName: tourDetail.tourName,
       avatar: tourDetail.avatar,
@@ -36,6 +41,7 @@ module.exports.detail = async (req, res) => {
     res.render('client/pages/tour-detail', {
       pageTitle: tourDetail.tourName,
       tourDetail: tourDetail,
+      cityList: cityList,
       breadcrumb: breadcrumb  
     });
   } catch (error) {

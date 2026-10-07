@@ -139,11 +139,11 @@ if (boxnTourInfo) {
   buttonShowAll.addEventListener('click', () => {
     if (boxTourContent.classList.contains('show')) {
       boxTourContent.classList.remove('show');
-      buttonShowAll.innerHTML = 'Xem tất cả';
+      buttonShowAll.innerHTML = 'Thu gọn';
     }
     else {
       boxTourContent.classList.add('show');
-      buttonShowAll.innerHTML = 'Thu gọn';
+      buttonShowAll.innerHTML = 'Xem tất cả';
     }
   })
   new Viewer(boxTourContent)
