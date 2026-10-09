@@ -475,7 +475,10 @@ if (boxTourDetail) {
     const quantityAdult = parseInt(document.querySelector(`[name="stockAdult"]`).value)
     const quantityChildren = parseInt(document.querySelector(`[name="stockChildren"]`).value)
     const quantityBaby = parseInt(document.querySelector(`[name="stockBaby"]`).value)
-
+    if (quantityAdult + quantityChildren + quantityBaby == 0) {
+      notyf.error("Vui lòng chọn số lượng ");
+      return;
+    }
     const cart = JSON.parse(localStorage.getItem('cart'));
 
     const existItem = cart.find(item => item.tourId === tourId);
@@ -509,3 +512,114 @@ if (!cart) {
   localStorage.setItem('cart', JSON.stringify([]));
 }
 // end Khởi tạo giỏ hàng
+
+// Trang giỏ hàng
+const pageCart = document.querySelector("[page-cart]")
+if (pageCart) {
+  const cartItems = localStorage.getItem('cart');
+  fetch("/cart/detail", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: cartItems,
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 'error') {
+        localStorage.setItem('cart', JSON.stringify([]));
+        drawMiniCart();
+        notyf.error(data.message);
+      }
+      if (data.code === 'success') {
+        let subTotal = 0;
+        const htmlArray = data.cartDetail.map(item => {
+          const { detail } = item;
+          subTotal += parseInt(detail.newPriceAdult) * parseInt(item.quantityAdult);
+          subTotal += parseInt(detail.newPriceChildren) * parseInt(item.quantityChildren);
+          subTotal += parseInt(detail.newPriceBaby) * parseInt(item.quantityBaby);
+          return `
+          <div class="inner-tour-item">
+            <div class="inner-actions"><span class="inner-remove"><i class="fa-solid fa-xmark"></i></span>
+              <input class="inner-check" type="checkbox"/>
+            </div>
+            <div class="inner-product"><a class="inner-image" href="/tour/detail/${detail.slug}"><img alt="${detail.tourName}" src="${detail.avatar}" onerror="this.src='https://placehold.co/140x100?text=No+Image'"/></a>
+              <div class="inner-content">
+                <h3 class="inner-title">
+                  <a href="/tour/detail/${detail.slug}">${detail.tourName}</a>
+                </h3>
+                <div class="inner-desc">
+                  <div>Ngày Khởi Hành: <b>${detail.departureDate}</b></div>
+                  <div>Khởi Hành Tại: <b>${detail.cityName}</b></div>
+                </div>
+              </div>
+            </div>
+            <div class="inner-quantity">
+              <div class="inner-label">Số Lượng Hành Khách</div>
+              <div class="inner-list">
+                <div class="inner-item">
+                  <label for="">Người lớn:</label>
+                  <div style="position:relative; display:flex; flex-direction:column; align-items:center;">
+                    <input
+                      value="${item.quantityAdult}" 
+                      name=""
+                      type="number"
+                      min = "0"
+                      max = "${detail.stockAdult}"
+                    />
+                    ${
+                      detail.stockAdult < item.quantityAdult? `<span class="inner-error" style="position:absolute; top: 100%; white-space: nowrap;"> Còn lại ${detail.stockAdult}</span>`:""
+                    }
+                  </div>
+                  <span>1 x<span class="text-main">${detail.newPriceAdult.toLocaleString("vi-VN")}</span></span>
+                </div>
+                <div class="inner-item">
+                  <label for="">Trẻ em:</label>
+                  <div style="position:relative; display:flex; flex-direction:column; align-items:center;">
+                    <input
+                      value="${item.quantityChildren}" 
+                      name="" type="number"
+                      min = "0"
+                      max = "${detail.stockChildren}" 
+                    />
+                    ${
+                      detail.stockChildren < item.quantityChildren? `<span class="inner-error" style="position:absolute; top: 100%; white-space: nowrap;"> Còn lại ${detail.stockChildren}</span>`:""
+                    }
+                  </div>
+                  <span>0 x<span class="text-main">${detail.newPriceChildren.toLocaleString("vi-VN")}</span></span>
+                </div>
+                <div class="inner-item">
+                  <label for="">Em bé:</label>
+                  <div style="position:relative; display:flex; flex-direction:column; align-items:center;">
+                    <input
+                      value="${item.quantityBaby}" 
+                      name=""
+                      type="number"
+                      min = "0"
+                      max = "${detail.stockBaby}"
+                    />
+                    ${
+                      detail.stockBaby < item.quantityBaby? `<span class="inner-error" style="position:absolute; top: 100%; white-space: nowrap;"> Còn lại ${detail.stockBaby}</span>` : ""
+                    }
+                  </div>
+                  <span>0 x<span class="text-main">${detail.newPriceBaby.toLocaleString("vi-VN")}</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          `
+        })
+        const discount = 0
+        const total = subTotal - discount;
+        const elementCartList = document.querySelector("[cart-list]");
+        elementCartList.innerHTML = htmlArray.join('');
+        const elementSubTotal = pageCart.querySelector("[sub-total]");
+        elementSubTotal.innerHTML = subTotal.toLocaleString("vi-VN");
+        const elementDiscount = pageCart.querySelector("[discount]");
+        elementDiscount.innerHTML = discount.toLocaleString("vi-VN");
+        const elementTotal = pageCart.querySelector("[total]");
+        elementTotal.innerHTML = total.toLocaleString("vi-VN");
+      }
+    })
+}
+// end Trang giỏ hàng

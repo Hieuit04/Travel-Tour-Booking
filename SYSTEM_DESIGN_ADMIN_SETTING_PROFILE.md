@@ -13,6 +13,7 @@
 
 ## MỤC LỤC
 
+- [PHẦN MỞ ĐẦU – KHẢO SÁT CÁC HỆ THỐNG LIÊN QUAN](#phần-mở-đầu--khảo-sát-các-hệ-thống-liên-quan)
 1. [PHẦN I – PHÂN TÍCH (ANALYSIS)](#phần-i--phân-tích-analysis)
    - 1.0 [Sơ đồ Use Case (Use Case Diagram)](#10-sơ-đồ-use-case-use-case-diagram)
    - 1.1 [Kịch bản chuẩn và ngoại lệ (Scenarios)](#11-kịch-bản-chuẩn-và-ngoại-lệ-scenarios)
@@ -24,6 +25,29 @@
    - 2.2 [Thiết kế Cơ sở dữ liệu (Database Design)](#22-thiết-kế-cơ-sở-dữ-liệu-database-design)
    - 2.3 [Thiết kế tĩnh – Sơ đồ lớp (Design Class Diagram)](#23-thiết-kế-tĩnh--sơ-đồ-lớp-design-class-diagram)
    - 2.4 [Thiết kế động – Sơ đồ tuần tự (Design Sequence Diagram)](#24-thiết-kế-động--sơ-đồ-tuần-tự-design-sequence-diagram)
+
+---
+
+# PHẦN MỞ ĐẦU – KHẢO SÁT CÁC HỆ THỐNG LIÊN QUAN
+
+Trước khi tiến hành phân tích và thiết kế hệ thống **Travel Tour Booking (Admin Panel)**, nhóm đã tiến hành khảo sát các mô hình quản trị nội dung linh hoạt và các website du lịch thực tế đang hoạt động. Việc khảo sát chuyên sâu giúp hệ thống định hình rõ ràng phương pháp quản lý quyền hạn (RBAC), tối ưu hóa luồng duyệt tài khoản, và thiết kế giao diện cấu hình thân thiện cho người quản trị. Dưới đây là phân tích chi tiết về 2 nhóm hệ thống tiêu biểu được chọn làm hình mẫu để ứng dụng các ưu điểm vào đồ án.
+
+### 1. Hệ thống Strapi (Headless CMS)
+Strapi là một trong những hệ thống Headless CMS mã nguồn mở hàng đầu hiện nay, nổi bật với kiến trúc quản lý dữ liệu linh hoạt. Ưu điểm lớn nhất của Strapi là cơ chế Role-Based Access Control (RBAC) được xây dựng dưới dạng "Ma trận phân quyền" (Permission Matrix) cực kỳ trực quan và mạnh mẽ. Thay vì tạo ra các quyền (roles) cứng nhắc, Strapi liệt kê toàn bộ các module và các thao tác (Create, Read, Update, Delete) dưới dạng bảng ma trận checkbox, cho phép quản trị viên tự do định nghĩa các nhóm quyền mới và cấp quyền chi tiết đến từng trường dữ liệu.
+
+**Ứng dụng vào dự án:** Nhóm đã ứng dụng triệt để mô hình Ma trận phân quyền này vào tính năng *Quản lý Nhóm quyền (Roles)* của hệ thống. Thay vì hard-code các cấp độ quyền hạn, thiết kế bảng `roles` trong MongoDB sử dụng trường `permissions` là một mảng chuỗi (ví dụ: `["tours_view", "tours_create", "accounts_edit"]`) để lưu trữ động các quyền. Trên giao diện Admin, Super Admin thao tác trực tiếp qua ma trận Checkbox để phân quyền một cách dễ hiểu và linh hoạt nhất.
+
+### 2. Các Website lữ hành nội địa tiêu biểu (Vietravel / Saigontourist)
+Đây là các hệ thống được phát triển với đặc thù nghiệp vụ quản lý Tour và Khuyến mãi (Promotion) cực kỳ chặt chẽ. Điểm sáng của các hệ thống này là tính đồng bộ thông tin rất cao: các thông tin liên hệ cốt lõi của doanh nghiệp (như Logo, số điện thoại Hotline, Email hỗ trợ, Địa chỉ, thông tin Bản quyền) luôn được hiển thị nhất quán ở mọi vị trí trên trang khách hàng (Client Site). Đồng thời, nghiệp vụ quản lý danh mục (Category) được kết hợp mượt mà với tính năng Khuyến mãi áp dụng cho từng tour cụ thể, mang lại hiệu quả vận hành tối đa.
+
+**Ứng dụng vào dự án:** Kế thừa ưu điểm về tính đồng bộ thông tin, nhóm đã thiết kế một module độc lập mang tên **"Cài đặt Website" (Setting Website Info)**. Thay vì gắn cứng (hard-code) dữ liệu vào giao diện frontend như một số hệ thống cũ, mọi cấu hình được lưu trữ tại model `setting-website-info.model.js` trong Database. Trên giao diện Admin, một form tổng hợp được cung cấp để người quản lý tự do cập nhật Tên website, Logo, SĐT, Link mạng xã hội. Khi có thay đổi, toàn bộ giao diện Client sẽ tự động lấy dữ liệu mới nhất từ CSDL, giúp tối ưu hóa thời gian và triệt tiêu sự phụ thuộc vào bộ phận IT.
+
+### 3. Định hướng thiết kế lõi cho hệ thống Travel Tour Booking (Đồ án)
+Đúc kết từ việc phân tích và học hỏi những ưu điểm của các hệ thống trên, kiến trúc Admin Panel của dự án được định hướng phát triển dựa trên 3 trụ cột chính:
+
+- **Phân quyền động (Dynamic RBAC) chặn từ phía Server:** Kế thừa từ Strapi, toàn bộ hệ thống không phụ thuộc vào tên của Role mà phụ thuộc vào mảng quyền hạn. Bất kỳ một request nào (Thêm, Sửa, Xóa) gửi lên Server đều phải đi qua một Middleware kiểm tra quyền (`checkPermission` trong `auth.middleware.js`). Middleware này ngầm đối chiếu hành động của người dùng với danh sách `permissions` lưu trong token/CSDL, đảm bảo tính bảo mật tuyệt đối dù người dùng cố tình truy cập bằng đường dẫn trực tiếp.
+- **Bảo mật tối đa luồng tạo tài khoản quản trị:** Hệ thống không cho phép tạo tài khoản và sử dụng được ngay. Áp dụng cơ chế **Kiểm duyệt 2 bước**: Nhân viên đăng ký tài khoản mới sẽ bị đưa vào trạng thái mặc định là `inactive` (vô hiệu hóa) và không có nhóm quyền (`role_id = null`). Quản trị viên cấp cao (Super Admin) bắt buộc phải kiểm tra, sau đó thao tác "Phê duyệt" (đổi sang `active`) và gán Nhóm quyền thì tài khoản mới có hiệu lực đăng nhập.
+- **Tập trung hóa cấu hình và cá nhân hóa:** Kế thừa bài học từ các trang web lữ hành lớn, mọi thao tác cấu hình hệ thống (Setting) và chỉnh sửa thông tin cá nhân (Profile / Đổi mật khẩu) được quy tụ về một giao diện tập trung, thân thiện. Giúp giảm thiểu sự phụ thuộc vào đội ngũ kỹ thuật, tăng cường tính tự chủ và năng suất làm việc cho người vận hành hệ thống.
 
 ---
 
@@ -2426,24 +2450,32 @@ Chức năng này là sự kết hợp chặt chẽ giữa việc Quản lý tà
 
 ### 1. Sơ đồ Use Case chi tiết
 
-Sơ đồ này thể hiện chuỗi tương tác từ khi đăng ký, phê duyệt cho đến việc hệ thống ngầm kiểm tra quyền hạn.
+Sơ đồ được chia thành 2 phần: Tạo tài khoản quản trị (dành cho Nhân viên) và Phân quyền & xác thực tài khoản quản trị (dành cho Admin).
+
+**1.1. Sơ đồ Use case Tạo tài khoản quản trị**
 
 ```mermaid
 graph LR
     Employee((Nhân viên))
+    UC_Reg(("Tạo tài khoản\nquản trị"))
+
+    Employee --- UC_Reg
+```
+
+**1.2. Sơ đồ Use case Phân quyền và xác thực tài khoản quản trị**
+
+```mermaid
+graph LR
     Admin((Admin))
     
     UC_Login(("Đăng nhập"))
-    
-    UC_Main(("Quản lý phê duyệt\nvà phân quyền"))
-    UC_Reg(("Đăng ký tài\nkhoản quản trị"))
+    UC_Main(("Phân quyền và\nxác thực tài khoản"))
 
     UC_Approve(("Phê duyệt\ntài khoản (Active)"))
     UC_Assign(("Cấp nhóm quyền\n(Role)"))
     UC_Check(("Hệ thống ngầm\nkiểm tra quyền"))
 
     Admin --- UC_Main
-    Employee --- UC_Reg
 
     UC_Main -.->|<<Include>>| UC_Login
     
@@ -2586,16 +2618,21 @@ classDiagram
 
 ### 4. Thiết kế động – Sơ đồ tuần tự (Design Sequence Diagram)
 
-**Sơ đồ 4.1: Sơ đồ tuần tự thiết kế chức năng Đăng ký tài khoản (Dành cho Nhân viên)**
-*(Tương ứng với Kịch bản 3.1)*
+**Sơ đồ 4.1: Sơ đồ tuần tự thiết kế Đăng ký tài khoản và Phê duyệt cấp quyền**
+*(Tương ứng với Kịch bản 3.1 và 3.2)*
 
 ```mermaid
 sequenceDiagram
     actor Employee as Nhân viên
+    actor Admin as Quản trị viên
     participant RegFrm as RegisterAdminFrm
+    participant AMF as AccountAdminManageFrm
+    participant AEF as AccountAdminEditFrm
     participant ADAO as AccountAdminDAO
+    participant RDAO as RoleDAO
     participant A as AccountAdmin
 
+    Note over Employee, A: Giai đoạn 1: Nhân viên đăng ký tài khoản (chờ phê duyệt)
     Employee->>RegFrm: Nhập thông tin (Tên, Email, Pass) và nhấn "Đăng ký"
     RegFrm->>RegFrm: actionPerformed(e)
     RegFrm->>ADAO: checkEmailExist(email)
@@ -2606,31 +2643,8 @@ sequenceDiagram
     ADAO->>ADAO: execute SQL INSERT
     ADAO-->>RegFrm: true
     RegFrm-->>Employee: Hiển thị thông báo "Chờ phê duyệt"
-```
 
-**Mô tả các bước (Sơ đồ 4.1):**
-1. Nhân viên nhập các thông tin cần thiết (Họ tên, Email, Mật khẩu) vào `RegisterAdminFrm` và nhấn nút "Đăng ký".
-2. `RegisterAdminFrm` bắt sự kiện click thông qua hàm `actionPerformed(e)`.
-3. Giao diện gọi hàm `checkEmailExist(email)` của `AccountAdminDAO` để kiểm tra xem email đã được đăng ký hay chưa.
-4. `AccountAdminDAO` truy vấn cơ sở dữ liệu và trả về `false` (Email hợp lệ, chưa từng được sử dụng).
-5. Giao diện khởi tạo đối tượng `AccountAdmin` bằng thông tin người dùng nhập vào, đồng thời gán cứng 2 giá trị bảo mật: `status="inactive"` (Chưa hoạt động) và `role=null` (Chưa có nhóm quyền).
-6. Giao diện gọi hàm `addAccount(a)` của `AccountAdminDAO` và truyền đối tượng vừa tạo vào.
-7. `AccountAdminDAO` thực thi câu lệnh truy vấn SQL INSERT để lưu bản ghi xuống cơ sở dữ liệu.
-8. `AccountAdminDAO` trả về kết quả `true` (thêm thành công) cho giao diện.
-9. Giao diện `RegisterAdminFrm` hiển thị thông báo thành công và nhắc nhở nhân viên đợi "Chờ phê duyệt" để có thể đăng nhập.
-
-**Sơ đồ 4.2: Sơ đồ tuần tự thiết kế chức năng Phê duyệt & Cấp quyền (Dành cho Admin)**
-*(Tương ứng với Kịch bản 3.2)*
-
-```mermaid
-sequenceDiagram
-    actor Admin as Quản trị viên
-    participant AMF as AccountAdminManageFrm
-    participant AEF as AccountAdminEditFrm
-    participant ADAO as AccountAdminDAO
-    participant RDAO as RoleDAO
-    participant A as AccountAdmin
-
+    Note over Admin, A: Giai đoạn 2: Quản trị viên phê duyệt và cấp quyền
     Admin->>AMF: Chọn tài khoản "Chưa phê duyệt" và nhấn Phê duyệt/Edit
     AMF->>AMF: actionPerformed(e)
     AMF->>ADAO: getAccountById(id)
@@ -2653,7 +2667,20 @@ sequenceDiagram
     AEF-->>Admin: Hiển thị thông báo Phê duyệt thành công
 ```
 
-**Mô tả các bước (Sơ đồ 4.2):**
+**Mô tả các bước (Sơ đồ 4.1):**
+
+- **Chức năng đăng ký tài khoản quản trị**
+1. Nhân viên nhập các thông tin cần thiết (Họ tên, Email, Mật khẩu) vào `RegisterAdminFrm` và nhấn nút "Đăng ký".
+2. `RegisterAdminFrm` bắt sự kiện click thông qua hàm `actionPerformed(e)`.
+3. Giao diện gọi hàm `checkEmailExist(email)` của `AccountAdminDAO` để kiểm tra xem email đã được đăng ký hay chưa.
+4. `AccountAdminDAO` truy vấn cơ sở dữ liệu và trả về `false` (Email hợp lệ, chưa từng được sử dụng).
+5. Giao diện khởi tạo đối tượng `AccountAdmin` bằng thông tin người dùng nhập vào, đồng thời gán cứng 2 giá trị bảo mật: `status="inactive"` (Chưa hoạt động) và `role=null` (Chưa có nhóm quyền).
+6. Giao diện gọi hàm `addAccount(a)` của `AccountAdminDAO` và truyền đối tượng vừa tạo vào.
+7. `AccountAdminDAO` thực thi câu lệnh truy vấn SQL INSERT để lưu bản ghi xuống cơ sở dữ liệu.
+8. `AccountAdminDAO` trả về kết quả `true` (thêm thành công) cho giao diện.
+9. Giao diện `RegisterAdminFrm` hiển thị thông báo thành công và nhắc nhở nhân viên đợi "Chờ phê duyệt" để có thể đăng nhập.
+
+- **Chức năng phê duyệt và cấp quyền tài khoản quản trị**
 1. Quản trị viên (Super Admin) chọn một tài khoản (hiện đang ở trạng thái chưa phê duyệt) trên giao diện `AccountAdminManageFrm` và nhấn nút Phê duyệt / Edit.
 2. `AccountAdminManageFrm` bắt sự kiện thông qua hàm `actionPerformed(e)`.
 3. Giao diện gọi hàm `getAccountById(id)` của `AccountAdminDAO` để lấy dữ liệu chi tiết của tài khoản đó.

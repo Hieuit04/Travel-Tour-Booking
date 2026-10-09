@@ -38,6 +38,10 @@ module.exports.detail = async (req, res) => {
       avatar: tourDetail.avatar,
       slug: tourDetail.slug
     });
+    // Lọc các chuỗi ảnh rỗng và đưa avatar lên đầu tiên để slider luôn có ảnh
+    const validImages = tourDetail.images.filter(img => img && img.trim() !== "");
+    tourDetail.images = [tourDetail.avatar, ...validImages];
+
     res.render('client/pages/tour-detail', {
       pageTitle: tourDetail.tourName,
       tourDetail: tourDetail,
