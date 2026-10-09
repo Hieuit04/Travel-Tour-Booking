@@ -545,6 +545,23 @@ const eventInputQuantity = () => {
     })
   })
 }
+
+const eventRemove = () => {
+  const listButtonRemove = document.querySelectorAll("[button-remove")
+  listButtonRemove.forEach(button => {
+    button.addEventListener("click", () => {
+      const tourId = button.getAttribute("tourId")
+      const cart = JSON.parse(localStorage.getItem("cart"))
+      const indexItem = cart.findIndex(item => item.tourId === tourId)
+      cart.splice(indexItem, 1)
+      localStorage.setItem("cart", JSON.stringify(cart))
+      drawCart();
+      drawMiniCart();
+      notyf.success("Đã xoá!");
+
+    })
+  })
+}
 const drawCart = () => {
   const cartItems = localStorage.getItem('cart');
   fetch("/cart/detail", {
@@ -570,7 +587,7 @@ const drawCart = () => {
           subTotal += parseInt(detail.newPriceBaby) * parseInt(item.quantityBaby);
           return `
           <div class="inner-tour-item">
-            <div class="inner-actions"><span class="inner-remove"><i class="fa-solid fa-xmark"></i></span>
+            <div class="inner-actions"><span class="inner-remove" button-remove tourId="${item.tourId}"><i class="fa-solid fa-xmark"></i></span>
               <input class="inner-check" type="checkbox"/>
             </div>
             <div class="inner-product"><a class="inner-image" href="/tour/detail/${detail.slug}"><img alt="${detail.tourName}" src="${detail.avatar}" onerror="this.src='https://placehold.co/140x100?text=No+Image'"/></a>
@@ -651,6 +668,7 @@ const drawCart = () => {
         const elementTotal = pageCart.querySelector("[total]");
         elementTotal.innerHTML = total.toLocaleString("vi-VN");
         eventInputQuantity();
+        eventRemove();
       }
     })
 }
