@@ -514,10 +514,38 @@ if (boxTourDetail) {
 //  end box tour detail
 
 
-
 // Trang giỏ hàng
-const pageCart = document.querySelector("[page-cart]")
-if (pageCart) {
+const eventInputQuantity = () => {
+  const listInputQuantity = document.querySelectorAll("[inputQuantity]");
+  listInputQuantity.forEach(input => {
+    input.addEventListener("change", () => {
+      const name = input.name
+      let value = parseInt(input.value) || 0
+      const min = parseInt(input.min) || 0
+      const max = parseInt(input.max)
+
+      if (value < min) {
+        value = min;
+        input.value = min
+        notyf.error(`Số lượng tối thiểu là ${min}`)
+      }
+      if (value > max) {
+        value = max;
+        input.value = max
+        notyf.error(`Số lượng tối đa là ${max}`)
+      }
+      const tourId = input.getAttribute("tourId")
+      const cart = JSON.parse(localStorage.getItem('cart'));
+      const existItem = cart.find(item => item.tourId === tourId);
+      if (existItem) {
+        existItem[name] = value;
+        localStorage.setItem('cart', JSON.stringify(cart));
+        drawCart();
+      }
+    })
+  })
+}
+const drawCart = () => {
   const cartItems = localStorage.getItem('cart');
   fetch("/cart/detail", {
     method: 'POST',
@@ -564,47 +592,48 @@ if (pageCart) {
                   <div style="position:relative; display:flex; flex-direction:column; align-items:center;">
                     <input
                       value="${item.quantityAdult}" 
-                      name=""
+                      name="quantityAdult"
+                      tourId="${item.tourId}" 
                       type="number"
                       min = "0"
                       max = "${detail.stockAdult}"
+                      inputQuantity
                     />
-                    ${
-                      detail.stockAdult < item.quantityAdult? `<span class="inner-error" style="position:absolute; top: 100%; white-space: nowrap;"> Còn lại ${detail.stockAdult}</span>`:""
-                    }
+                    ${detail.stockAdult < item.quantityAdult ? `<span class="inner-error" style="position:absolute; top: 100%; white-space: nowrap;"> Còn lại ${detail.stockAdult}</span>` : ""}
                   </div>
-                  <span>1 x<span class="text-main">${detail.newPriceAdult.toLocaleString("vi-VN")}</span></span>
+                  <span>${item.quantityAdult} x<span class="text-main">${detail.newPriceAdult.toLocaleString("vi-VN")}</span></span>
                 </div>
                 <div class="inner-item">
                   <label for="">Trẻ em:</label>
                   <div style="position:relative; display:flex; flex-direction:column; align-items:center;">
                     <input
                       value="${item.quantityChildren}" 
-                      name="" type="number"
+                      name="quantityChildren" 
+                      tourId="${item.tourId}"
+                      type="number"
                       min = "0"
                       max = "${detail.stockChildren}" 
+                      inputQuantity
                     />
-                    ${
-                      detail.stockChildren < item.quantityChildren? `<span class="inner-error" style="position:absolute; top: 100%; white-space: nowrap;"> Còn lại ${detail.stockChildren}</span>`:""
-                    }
+                    ${detail.stockChildren < item.quantityChildren ? `<span class="inner-error" style="position:absolute; top: 100%; white-space: nowrap;"> Còn lại ${detail.stockChildren}</span>` : ""}
                   </div>
-                  <span>0 x<span class="text-main">${detail.newPriceChildren.toLocaleString("vi-VN")}</span></span>
+                  <span>${item.quantityChildren} x<span class="text-main">${detail.newPriceChildren.toLocaleString("vi-VN")}</span></span>
                 </div>
                 <div class="inner-item">
                   <label for="">Em bé:</label>
                   <div style="position:relative; display:flex; flex-direction:column; align-items:center;">
                     <input
                       value="${item.quantityBaby}" 
-                      name=""
+                      name="quantityBaby"
+                      tourId="${item.tourId}"
                       type="number"
                       min = "0"
                       max = "${detail.stockBaby}"
+                      inputQuantity
                     />
-                    ${
-                      detail.stockBaby < item.quantityBaby? `<span class="inner-error" style="position:absolute; top: 100%; white-space: nowrap;"> Còn lại ${detail.stockBaby}</span>` : ""
-                    }
+                    ${detail.stockBaby < item.quantityBaby ? `<span class="inner-error" style="position:absolute; top: 100%; white-space: nowrap;"> Còn lại ${detail.stockBaby}</span>` : ""}
                   </div>
-                  <span>0 x<span class="text-main">${detail.newPriceBaby.toLocaleString("vi-VN")}</span></span>
+                  <span>${item.quantityBaby} x<span class="text-main">${detail.newPriceBaby.toLocaleString("vi-VN")}</span></span>
                 </div>
               </div>
             </div>
@@ -621,7 +650,13 @@ if (pageCart) {
         elementDiscount.innerHTML = discount.toLocaleString("vi-VN");
         const elementTotal = pageCart.querySelector("[total]");
         elementTotal.innerHTML = total.toLocaleString("vi-VN");
+        eventInputQuantity();
       }
     })
+}
+
+const pageCart = document.querySelector("[page-cart]")
+if (pageCart) {
+  drawCart();
 }
 // end Trang giỏ hàng
