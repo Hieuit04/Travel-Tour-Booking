@@ -1,5 +1,12 @@
 
 
+// Khởi tạo giỏ hàng
+const initialCart = localStorage.getItem('cart');
+if (!initialCart) {
+  localStorage.setItem('cart', JSON.stringify([]));
+}
+// end Khởi tạo giỏ hàng
+
 // Khởi tạo AOS\
 AOS.init();
 // Hết khởi tạo AOS
@@ -432,7 +439,7 @@ if (formSearch) {
 const drawMiniCart = () => {
   const miniCart = document.querySelector("[miniCart]");
   if (miniCart) {
-    const cart = JSON.parse(localStorage.getItem('cart'));
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
     miniCart.innerHTML = cart.length > 0 ? cart.length : "0";
   }
 }
@@ -506,12 +513,7 @@ if (boxTourDetail) {
 }
 //  end box tour detail
 
-// Khởi tạo giỏ hàng
-const cart = localStorage.getItem('cart');
-if (!cart) {
-  localStorage.setItem('cart', JSON.stringify([]));
-}
-// end Khởi tạo giỏ hàng
+
 
 // Trang giỏ hàng
 const pageCart = document.querySelector("[page-cart]")
