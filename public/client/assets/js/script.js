@@ -502,6 +502,7 @@ if (boxTourDetail) {
         quantityAdult: quantityAdult,
         quantityChildren: quantityChildren,
         quantityBaby: quantityBaby,
+        checked: true
       };
       cart.unshift(cartItem)
       notyf.success("Đã thêm vào giỏ hàng");
@@ -562,6 +563,22 @@ const eventRemove = () => {
     })
   })
 }
+
+const eventCheck = () => {
+  const listInputCheck = document.querySelectorAll("[inputCheck]")
+  listInputCheck.forEach(input => {
+    input.addEventListener("change", () => {
+      const tourId = input.getAttribute("tourId")
+      const cart = JSON.parse(localStorage.getItem("cart"))
+      const existItem = cart.find(item => item.tourId === tourId);
+      if (existItem) {
+        existItem.checked = input.checked;
+        localStorage.setItem("cart", JSON.stringify(cart));
+        drawCart();
+      }
+    })
+  })
+}
 const drawCart = () => {
   const cartItems = localStorage.getItem('cart');
   fetch("/cart/detail", {
@@ -582,13 +599,15 @@ const drawCart = () => {
         let subTotal = 0;
         const htmlArray = data.cartDetail.map(item => {
           const { detail } = item;
-          subTotal += parseInt(detail.newPriceAdult) * parseInt(item.quantityAdult);
-          subTotal += parseInt(detail.newPriceChildren) * parseInt(item.quantityChildren);
-          subTotal += parseInt(detail.newPriceBaby) * parseInt(item.quantityBaby);
+          if(item.checked){
+            subTotal += parseInt(detail.newPriceAdult) * parseInt(item.quantityAdult);
+            subTotal += parseInt(detail.newPriceChildren) * parseInt(item.quantityChildren);
+            subTotal += parseInt(detail.newPriceBaby) * parseInt(item.quantityBaby);
+          }
           return `
           <div class="inner-tour-item">
             <div class="inner-actions"><span class="inner-remove" button-remove tourId="${item.tourId}"><i class="fa-solid fa-xmark"></i></span>
-              <input class="inner-check" type="checkbox"/>
+              <input class="inner-check" inputCheck tourId="${item.tourId}" type="checkbox" ${item.checked ? "checked" : ""}/>
             </div>
             <div class="inner-product"><a class="inner-image" href="/tour/detail/${detail.slug}"><img alt="${detail.tourName}" src="${detail.avatar}" onerror="this.src='https://placehold.co/140x100?text=No+Image'"/></a>
               <div class="inner-content">
@@ -669,6 +688,7 @@ const drawCart = () => {
         elementTotal.innerHTML = total.toLocaleString("vi-VN");
         eventInputQuantity();
         eventRemove();
+        eventCheck();
       }
     })
 }
