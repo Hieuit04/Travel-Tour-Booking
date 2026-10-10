@@ -340,10 +340,44 @@ if (orderForm) {
       },
     ])
     .onSuccess((event) => {
-      console.log(event.target.fullname.value)
-      console.log(event.target.phone.value)
-      console.log(event.target.note.value)
-      console.log(event.target.paymentMethod.value)
+      const fullName =  event.target.fullname.value
+      const phone = event.target.phone.value
+      const note = event.target.note.value
+      const paymentMethod = event.target.paymentMethod.value
+
+      let cart = JSON.parse(localStorage.getItem("cart"))
+      cart = cart.filter(item => item.checked)
+      if (cart.length == 0) {
+        notyf.error("Vui lòng chọn ít nhất 1 tour!");
+        return;
+      }
+      const dataFinal = {
+        fullName: fullName,
+        phone: phone,
+        note: note,
+        paymentMethod: paymentMethod,
+        items: cart,
+      }
+      fetch('/order/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataFinal),
+        })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.code === 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code === 'success') {
+            let cart = JSON.parse(localStorage.getItem("cart"));
+            cart = cart.filter(item => item.checked == false)
+            localStorage.setItem("cart", JSON.stringify(cart));
+            notyf.success(data.message);
+            window.location.href = `/order/success?orderCode=${data.orderCode}&phone=${phone}`;
+          }
+        })
     })
 
   // Bank info section12
