@@ -29,7 +29,6 @@ module.exports.websiteInfo = async (req, res) => {
 };
 
 module.exports.websiteInfoPatch = async (req, res) => {
-  console.log(req.files);
   req.body.logo = req.files.logo ? req.files.logo[0].path : "";
   req.body.favicon = req.files.favicon ? req.files.favicon[0].path : "";
   await SettingWebsiteInfo.findOneAndUpdate({}, req.body, { upsert: true });

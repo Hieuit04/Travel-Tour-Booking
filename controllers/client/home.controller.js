@@ -93,15 +93,48 @@ module.exports.home = async (req, res) => {
       position: "desc"
     })
     .limit(8);
-  for (const item of tourListSection2) {
+  for (const item of tourListSection4) {
     formatTourItem(item)
   }
   // end section4
+
+  // section6
+  const categoryIdSection6 = res.locals.settingWebsiteInfo.categoryIdSection6;
+  let categorySection6 = null;
+  if (categoryIdSection6) {
+    categorySection6 = await Category.findOne({
+      _id: categoryIdSection6,
+      deleted: false,
+      status: "active",
+    });
+  }
+  let tourListSection6 = [];
+  if (categoryIdSection6) {
+    tourListSection6 = await Tour
+      .find({
+        deleted: false,
+        status: "active",
+        category: {
+          $in: categoryFilter(categoryList, categoryIdSection6)
+        }
+      })
+      .sort({
+        position: "desc"
+      })
+      .limit(8);
+    for (const item of tourListSection6) {
+      formatTourItem(item)
+    }
+  }
+  // end section6
+
   res.render('client/pages/home.pug', {
     pageTitle: 'Trang chủ',
     tourListSection2: tourListSection2,
     tourListSection4: tourListSection4,
     categorySection4: categorySection4,
+    tourListSection6: tourListSection6,
+    categorySection6: categorySection6,
     promotion: promotion,
     isUpcoming: isUpcoming,
   });

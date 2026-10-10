@@ -255,65 +255,21 @@ block main
       h2.box-title(
         data-aos-duration="1000" 
         data-aos="fade-up"
-        ) Tour Nước Ngoài
+        ) #{categorySection6 ? categorySection6.categoryName : 'Tour Nước Ngoài'}
       .inner-wrap(
         data-aos-delay="300" 
         data-aos-duration="1000" 
         data-aos="fade-up"
         )
-        .product-item
-          a.inner-image(href="#")
-            img(
-              alt="" 
-              src="/client/assets/images/demo/product-1.jpg"
-              )
-          .inner-content
-            .inner-discount
-              i.fa-solid.fa-bolt
-              | Giảm -30%
-            h3.inner-title
-              a(href="#") Tour 2026 Phú Quốc – Thiên Đường Đảo Ngọc (3N2D) Lorem ipsum dolor sit amet consectetur
-            .inner-prices
-              .inner-price-old
-                del 13.650.000
-                span đ
-              .inner-price-new
-                | 10.650.000
-                span đ
-            .inner-desc
-              div
-                | Mã Tour:
-                b 123456789
-              div
-                | Ngày Khởi Hành:
-                b 22/07/2024
-              div
-                | Thời Gian:
-                b 10 Ngày 9 Đêm
-            .inner-footer
-              .inner-rating
-                .inner-stars
-                  i.fa-solid.fa-star
-                  i.fa-solid.fa-star
-                  i.fa-solid.fa-star
-                  i.fa-solid.fa-star
-                  i.fa-regular.fa-star
-                .inner-number (5)
-              .inner-stock
-                .inner-label Số chỗ còn:
-                .inner-number 10
-        .product-item Item
-        .product-item Item
-        .product-item Item
-        .product-item Item
-        .product-item Item
-        .product-item Item
-        .product-item Item
+        if tourListSection6 && tourListSection6.length > 0
+          each item in tourListSection6
+            +product-item(item)
       .inner-button(
         data-aos-duration="1000" 
         data-aos="fade-up"
         )
-        a.button-outline(href="#") Xem tất cả
+        if categorySection6
+          a.button-outline(href=`/category/${categorySection6.slug}`) Xem tất cả
   // End Section 6
   // Section 7
   .section-5(

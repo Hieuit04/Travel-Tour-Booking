@@ -597,6 +597,7 @@ if (settingWebsiteInfoForm) {
       const email = event.target.email.value;
       const address = event.target.address.value;
       const categoryIdSection4 = event.target.categoryIdSection4.value;
+      const categoryIdSection6 = event.target.categoryIdSection6.value;
       const logo = filePond.logo?.getFile()?.file || null;
       const favicon = filePond.favicon?.getFile()?.file || null;
       
@@ -606,6 +607,7 @@ if (settingWebsiteInfoForm) {
       formData.append('email', email);
       formData.append('address', address);
       formData.append('categoryIdSection4', categoryIdSection4);
+      formData.append('categoryIdSection6', categoryIdSection6);
       if (logo) {
         formData.append('logo', logo, logo.name || 'logo.png');
       }

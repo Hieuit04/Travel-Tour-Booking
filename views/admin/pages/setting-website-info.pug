@@ -21,12 +21,18 @@ block main
           label(for="address") Địa chỉ
           input(type="text" name="address" id="address" value = settingWebsiteInfo.address)
         .inner-group
-          label(for="categoryIdSection4") Danh mục của Section 4
+          label(for="categoryIdSection4") Danh mục của Section 4 (Tour trong nước)
           select(name="categoryIdSection4" id="categoryIdSection4")
             option(value="") -- Chọn danh mục --
             //- 2. Gọi mixin truyền vào categoryTree từ backend
             if categoryTree
               +select-tree(categoryTree,1,settingWebsiteInfo.categoryIdSection4)
+        .inner-group
+          label(for="categoryIdSection6") Danh mục của Section 6 (Tour nước ngoài)
+          select(name="categoryIdSection6" id="categoryIdSection6")
+            option(value="") -- Chọn danh mục --
+            if categoryTree
+              +select-tree(categoryTree,1,settingWebsiteInfo.categoryIdSection6)
         .inner-group
           label(for="logo") Logo
           input(type="file" name="logo" id="logo" accept="image/*" filepondImage image-default = settingWebsiteInfo.logo).inner-upload-image
