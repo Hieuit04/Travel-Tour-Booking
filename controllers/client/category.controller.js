@@ -19,6 +19,26 @@ module.exports.list = async (req, res) => {
     }).lean();
     const breadcrumb = buildBreadcrumb(categoryDetail, categoryList);
 
+    // Phan trang
+    const pagination = {
+      currentPage: 1,
+      limitItems: 9
+    };
+    if (req.query.page) {
+      pagination.currentPage = parseInt(req.query.page);
+    }
+    pagination.skip = (pagination.currentPage - 1) * pagination.limitItems;
+
+    const countTours = await Tour.countDocuments({
+      deleted: false,
+      status: "active",
+      category: {
+        $in: categoryFilter(categoryList, categoryDetail._id)
+      }
+    });
+    pagination.totalItems = countTours;
+    pagination.totalPage = Math.ceil(countTours / pagination.limitItems);
+
     // Danh sách tour theo danh mục
     const tourList = await Tour
       .find({
@@ -31,7 +51,8 @@ module.exports.list = async (req, res) => {
       .sort({
         position: "desc"
       })
-      .limit(8);
+      .skip(pagination.skip)
+      .limit(pagination.limitItems);
     for (const item of tourList) {
       formatTourItem(item)
     }
@@ -45,6 +66,7 @@ module.exports.list = async (req, res) => {
       categoryDetail: categoryDetail,
       tourList: tourList,
       cityList: cityList,
+      pagination: pagination,
     });
   } catch (error) {
     console.error(error);

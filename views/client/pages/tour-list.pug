@@ -94,7 +94,7 @@ block main
                 i.fa-solid.fa-eye
             .inner-total
               | Tất cả:
-              b #{tourList.length} tour
+              b #{pagination.totalItems} tour
             button.inner-button-filter
               | Bộ Lọc
               img(
@@ -104,13 +104,31 @@ block main
           .inner-wrap-3
             each item in tourList 
               +product-item(item)
-          .box-pagination
-            button
-              i.fa-solid.fa-angles-left
-            button.active 1
-            button 2
-            button 3
-            button 4
-            button
-              i.fa-solid.fa-angles-right
+          if pagination && pagination.totalPage > 0
+            .box-pagination
+              button(button-pagination=pagination.currentPage - 1 disabled=(pagination.currentPage == 1 ? true : false))
+                i.fa-solid.fa-angles-left
+              
+              - 
+                var pages = [];
+                if (pagination.totalPage <= 5) {
+                  for (var i = 1; i <= pagination.totalPage; i++) pages.push(i);
+                } else {
+                  if (pagination.currentPage <= 3) {
+                    pages = [1, 2, 3, 4, '...', pagination.totalPage];
+                  } else if (pagination.currentPage >= pagination.totalPage - 2) {
+                    pages = [1, '...', pagination.totalPage - 3, pagination.totalPage - 2, pagination.totalPage - 1, pagination.totalPage];
+                  } else {
+                    pages = [1, '...', pagination.currentPage - 1, pagination.currentPage, pagination.currentPage + 1, '...', pagination.totalPage];
+                  }
+                }
+              
+              each page in pages
+                if page == '...'
+                  button(disabled=true) ...
+                else
+                  button(class=(pagination.currentPage == page ? "active" : "") button-pagination=page) #{page}
+              
+              button(button-pagination=pagination.currentPage + 1 disabled=(pagination.currentPage == pagination.totalPage ? true : false))
+                i.fa-solid.fa-angles-right
   // End Section 9
