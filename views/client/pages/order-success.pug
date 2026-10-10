@@ -12,7 +12,8 @@ block main
         if order
           p Mã đơn hàng: <b>#{order.code}</b>
           p Tên khách hàng: <b>#{order.fullName}</b>
-          p Số điện thoại: <b>#{order.phone}</b>
+          - var successPhone = order.phone.toString().startsWith("0") ? order.phone : "0" + order.phone
+          p Số điện thoại: <b>#{successPhone}</b>
           if order.note
             p Ghi chú: <b>#{order.note}</b>
           

@@ -116,12 +116,24 @@ module.exports.permissionList = [
   {
     label: "Xoá thông tin liên hệ",
     value: "contact-delete",
+  },
+  {
+    label: "Xem đơn hàng",
+    value: "order-view",
+  },
+  {
+    label: "Sửa đơn hàng",
+    value: "order-edit",
+  },
+  {
+    label: "Xoá đơn hàng",
+    value: "order-delete",
   }
 ];
 
 module.exports.paymentMethodList = [
   {
-    label: "Thanh toán tiền mặt khi đi tour",
+    label: "Thanh toán tiền mặt",
     value: "money",
   },
   {
@@ -155,16 +167,8 @@ module.exports.orderStatusList = [
     value: "initial",
   },
   {
-    label: "Đang xử lý",
-    value: "processing",
-  },
-  {
     label: "Đã hoàn thành",
     value: "done",
-  },
-  {
-    label: "Thành công",
-    value: "success",
   },
   {
     label: "Hủy",

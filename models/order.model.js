@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const schema = new mongoose.Schema({
   code: String,
   fullName: String,
-  phone: Number,
+  phone: String,
   note: String,
   items: Array,
   subTotal: Number,

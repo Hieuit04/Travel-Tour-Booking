@@ -374,7 +374,8 @@ if (orderForm) {
             let cart = JSON.parse(localStorage.getItem("cart"));
             cart = cart.filter(item => item.checked == false)
             localStorage.setItem("cart", JSON.stringify(cart));
-            notyf.success(data.message);
+            
+            drawNotyf('success', data.message);
             window.location.href = `/order/success?orderCode=${data.orderCode}&phone=${phone}`;
           }
         })

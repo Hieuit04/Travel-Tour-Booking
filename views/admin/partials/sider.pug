@@ -17,9 +17,10 @@ nav.sider
         i.fa-solid.fa-percent
         span Quản lý khuyến mãi
 
-    a.inner-item(href=`/${pathAdmin}/order/list`)
-      img(src="/admin/assets/images/icon-sider-4.svg")
-      span Quản lý đơn hàng
+    if(pers.includes("order-view"))
+      a.inner-item(href=`/${pathAdmin}/order/list`)
+        img(src="/admin/assets/images/icon-sider-4.svg")
+        span Quản lý đơn hàng
     a.inner-item(href=`/${pathAdmin}/user/list`)
       img(src="/admin/assets/images/icon-sider-5.svg")
       span Quản lý người dùng

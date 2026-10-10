@@ -500,7 +500,7 @@ const orderEditForm = document.querySelector('.section-8 #order-edit-form');
 if (orderEditForm) {
   const validator = new JustValidate('#order-edit-form');
   validator
-    .addField('#customerName', [
+    .addField('#fullName', [
       {
         rule: 'required',
         errorMessage: 'Vui lòng nhập tên khách hàng!',
@@ -511,29 +511,50 @@ if (orderEditForm) {
         rule: 'required',
         errorMessage: 'Vui lòng nhập số điện thoại!',
       },
-      {
-        rule: 'customRegexp',
-        value: /^(0|\+?84)[35789]\d{8}$/,
-        errorMessage: 'Số điện thoại chưa đúng định dạng Việt Nam!',
-      },
     ])
-
     .onSuccess((event) => {
-      const customerName = event.target.customerName.value;
-      const phone = event.target.phone.value;
-      const notes = event.target.notes.value;
-      const paymentMethod = event.target.paymentMethod.value;
-      const paymentStatus = event.target.paymentStatus.value;
-      const orderDate = event.target.orderDate.value;
-      const status = event.target.status.value;
-      console.log(customerName);
-      console.log(phone);
-      console.log(notes);
-      console.log(paymentMethod);
-      console.log(paymentStatus);
-      console.log(orderDate);
-      console.log(status);
-    });
+      const btnSubmit = event.target.querySelector('button[type="submit"]');
+      btnSubmit.disabled = true;
+      btnSubmit.innerText = "Đang xử lý..."
+
+      const api = orderEditForm.getAttribute('data-api');
+      const fullName = event.target.elements.fullName.value;
+      const phone = event.target.elements.phone.value;
+      const note = event.target.elements.note.value;
+      const paymentMethod = event.target.elements.paymentMethod.value;
+      const paymentStatus = event.target.elements.paymentStatus.value;
+      const status = event.target.elements.status.value;
+
+      const dataFinal = {
+        fullName,
+        phone,
+        note,
+        paymentMethod,
+        paymentStatus,
+        status
+      }
+
+      fetch(api, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataFinal)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.code == "success") {
+          notyf.success(data.message);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          notyf.error(data.message);
+          btnSubmit.disabled = false;
+          btnSubmit.innerText = "Cập nhật"
+        }
+      })
+    })
 }
 // End validate order edit form
 
@@ -1284,5 +1305,4 @@ if (selectPagination) {
   }
 }
 // end pagination
-
 
