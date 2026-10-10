@@ -1,0 +1,76 @@
+extends ../layouts/default.pug
+include ../mixins/product-item.pug
+
+block main
+  .container
+    .section-11(style="padding-top: 20px;")
+      .inner-wrap
+        h4.mb-4(style="color: green;") Cảm ơn quý khách đã đặt tour! Chúng tôi sẽ liên hệ lại với quý khách trong thời gian sớm nhất.
+        .inner-head
+          .inner-title Thông tin đơn hàng
+        
+        if order
+          p Mã đơn hàng: <b>#{order.code}</b>
+          p Tên khách hàng: <b>#{order.fullName}</b>
+          p Số điện thoại: <b>#{order.phone}</b>
+          if order.note
+            p Ghi chú: <b>#{order.note}</b>
+          
+          - var paymentMethodItem = paymentMethodList.find(item => item.value === order.paymentMethod)
+          p Phương thức thanh toán: <b>#{paymentMethodItem ? paymentMethodItem.label : order.paymentMethod}</b>
+          
+          - var paymentStatusItem = paymentStatusList.find(item => item.value === order.paymentStatus)
+          p Trạng thái thanh toán: <b>#{paymentStatusItem ? paymentStatusItem.label : order.paymentStatus}</b>
+          
+          - var orderStatusItem = orderStatusList.find(item => item.value === order.status)
+          p Trạng thái đơn hàng: <b>#{orderStatusItem ? orderStatusItem.label : order.status}</b>
+          
+          p Ngày đặt: <b>#{moment(order.createdAt).format("HH:mm - DD/MM/YYYY")}</b>
+
+    if order && order.items && order.items.length > 0
+      .section-11(style="padding-top: 20px;")
+        .inner-wrap
+          .inner-head
+            .inner-title Danh sách tour
+          .inner-tour-list
+            each item in order.items
+              .inner-tour-item
+                .inner-product
+                  a.inner-image(href=`/tour/detail/${item.slug}`)
+                    img(alt=item.tourName src=item.avatar onerror="this.src='https://placehold.co/140x100?text=No+Image'")
+                  .inner-content
+                    h3.inner-title
+                      a(href=`/tour/detail/${item.slug}`) #{item.tourName}
+                    .inner-desc
+                      div Ngày Khởi Hành: <b>#{moment(item.departureDate).format("DD/MM/YYYY")}</b>
+                      if item.cityName
+                        div Khởi Hành Tại: <b>#{item.cityName}</b>
+                .inner-quantity
+                  .inner-label Số Lượng Hành Khách
+                  .inner-list
+                    .inner-item
+                      label(for="") Người lớn:
+                      div(style="position:relative; display:flex; flex-direction:column; align-items:center;")
+                        input(value=item.quantityAdult readonly type="number" disabled)
+                      span #{item.quantityAdult} x<span class="text-main">#{item.newPriceAdult.toLocaleString("vi-VN")}</span>
+                    .inner-item
+                      label(for="") Trẻ em:
+                      div(style="position:relative; display:flex; flex-direction:column; align-items:center;")
+                        input(value=item.quantityChildren readonly type="number" disabled)
+                      span #{item.quantityChildren} x<span class="text-main">#{item.newPriceChildren.toLocaleString("vi-VN")}</span>
+                    .inner-item
+                      label(for="") Em bé:
+                      div(style="position:relative; display:flex; flex-direction:column; align-items:center;")
+                        input(value=item.quantityBaby readonly type="number" disabled)
+                      span #{item.quantityBaby} x<span class="text-main">#{item.newPriceBaby.toLocaleString("vi-VN")}</span>
+          .inner-price-list
+            .inner-item
+              .inner-label Tổng tiền:     
+              .inner-price #{order.subTotal.toLocaleString("vi-VN")}đ
+            .inner-item
+              .inner-label Giảm:
+              .inner-price #{order.discount > 0 ? "-" + order.discount.toLocaleString("vi-VN") : "0"}đ
+            .inner-item
+              .inner-label Thanh toán:
+              .inner-price-hl #{order.total.toLocaleString("vi-VN")}đ
+

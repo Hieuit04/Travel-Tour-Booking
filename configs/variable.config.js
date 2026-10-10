@@ -118,3 +118,56 @@ module.exports.permissionList = [
     value: "contact-delete",
   }
 ];
+
+module.exports.paymentMethodList = [
+  {
+    label: "Thanh toán tiền mặt khi đi tour",
+    value: "money",
+  },
+  {
+    label: "Zalo Pay",
+    value: "zalopay",
+  },
+  {
+    label: "VN Pay",
+    value: "vnpay",
+  },
+  {
+    label: "Chuyển khoản ngân hàng",
+    value: "bank",
+  }
+];
+
+module.exports.paymentStatusList = [
+  {
+    label: "Chưa thanh toán",
+    value: "unpaid",
+  },
+  {
+    label: "Đã thanh toán",
+    value: "paid",
+  }
+];
+
+module.exports.orderStatusList = [
+  {
+    label: "Khởi tạo",
+    value: "initial",
+  },
+  {
+    label: "Đang xử lý",
+    value: "processing",
+  },
+  {
+    label: "Đã hoàn thành",
+    value: "done",
+  },
+  {
+    label: "Thành công",
+    value: "success",
+  },
+  {
+    label: "Hủy",
+    value: "cancel",
+  }
+];
