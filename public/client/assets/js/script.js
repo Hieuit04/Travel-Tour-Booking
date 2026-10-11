@@ -371,12 +371,26 @@ if (orderForm) {
             notyf.error(data.message);
           }
           if (data.code === 'success') {
+            // Cập nhật lại gior hàng
             let cart = JSON.parse(localStorage.getItem("cart"));
             cart = cart.filter(item => item.checked == false)
             localStorage.setItem("cart", JSON.stringify(cart));
             
-            drawNotyf('success', data.message);
-            window.location.href = `/order/success?orderCode=${data.orderCode}&phone=${phone}`;
+            switch (paymentMethod) {
+              case "money":
+              case "bank":
+                drawNotyf('success', data.message);
+                window.location.href = `/order/success?orderCode=${data.orderCode}&phone=${phone}`;
+                break;
+              case "zalopay":
+                window.location.href = `/order/payment-zalopay?orderCode=${data.orderCode}&phone=${phone}`;
+                break;
+              default:
+                notyf.error("Vui lòng chọn phương thức thanh toán!");
+                window.location.href = `/`;
+                break;
+            }
+            
           }
         })
     })
@@ -734,7 +748,7 @@ if (pageCart) {
 }
 // end Trang giỏ hàng
 
-// Ph�n trang
+// Ph�n trang
 const buttonsPagination = document.querySelectorAll('[button-pagination]');
 if(buttonsPagination.length > 0) {
   let url = new URL(window.location.href);
@@ -746,4 +760,4 @@ if(buttonsPagination.length > 0) {
     });
   });
 }
-// End Ph�n trang
+// End Ph�n trang
