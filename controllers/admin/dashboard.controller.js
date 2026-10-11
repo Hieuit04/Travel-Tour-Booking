@@ -25,3 +25,78 @@ module.exports.dashboard = async (req, res) => {
     overView: overView,
   });
 }
+
+
+module.exports.revenueChartPost = async (req, res) => {
+  try {
+    const {
+      currentMonth,
+      currentYear,
+      previousMonth,
+      previousYear,
+      arrayDay
+    } = req.body;
+
+    // Truy vấn tất cả đơn hàng trong tháng hiện tại 
+    const currentMonthOrders = await Order.find({
+      deleted: false,
+      paymentStatus: 'paid',
+      status: "done",
+      createdAt: {
+        $gte: new Date(currentYear, currentMonth - 1, 1),
+        $lt: new Date(currentYear, currentMonth, 1),
+      }
+    });
+    // Truy vấn tất cả đơn hàng trong tháng trước đó 
+    const previousMonthOrders = await Order.find({
+      deleted: false,
+      paymentStatus: 'paid',
+      status: "done",
+      createdAt: {
+        $gte: new Date(previousYear, previousMonth - 1, 1),
+        $lt: new Date(previousYear, previousMonth, 1),
+      }
+    });
+
+    // Tạo mảng doanh thu từng ngày của từng tháng
+    const dataCurrentMonth = [];
+    const dataPreviousMonth = [];
+
+    // Tính tổng doanh thu từng ngày của tháng hiện tại
+    for (let i = 0; i < arrayDay.length; i++) {
+      const day = arrayDay[i];
+      const totalPriceDay = currentMonthOrders.filter(order => {
+        const orderDate = new Date(order.createdAt);
+        return orderDate.getDate() === day;
+      }).reduce((total, order) => {
+        return total + order.total;
+      }, 0);
+      dataCurrentMonth.push(totalPriceDay);
+    };
+
+    // Tính tổng doanh thu từng ngày của tháng trước đó
+    for (let i = 0; i < arrayDay.length; i++) {
+      const day = arrayDay[i];
+      const totalPriceDay = previousMonthOrders.filter(order => {
+        const orderDate = new Date(order.createdAt);
+        return orderDate.getDate() === day;
+      }).reduce((total, order) => {
+        return total + order.total;
+      }, 0);
+      dataPreviousMonth.push(totalPriceDay);
+    };
+
+    return res.json({
+      code: "success",
+      message: "Lấy biểu đồ doanh thu thành công!",
+      dataCurrentMonth: dataCurrentMonth,
+      dataPreviousMonth: dataPreviousMonth,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.json({
+      code: "error",
+      message: "Không lấy được biểu đồ doanh thu!"
+    });
+  }
+}

@@ -131,51 +131,105 @@ if (listFilepondImage.length > 0) {
 }
 // End File Pond
 
-// Revenue chart 
+// Revenue chart
+const drawRevenueChart = (currentDate) => {
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear();
+  const previousDate = new Date(currentYear, currentMonth - 2, 1); // Lấy ngày 1 tháng trước
+  const previousMonth = previousDate.getMonth() + 1;
+  const previousYear = previousDate.getFullYear();
+  // Tổng số ngày trong tháng 
+  const totalDaysCurrent = new Date(currentYear, currentMonth, 0).getDate();
+  const totalDaysPrevious = new Date(previousYear, previousMonth, 0).getDate();
+  const totalDays = totalDaysCurrent > totalDaysPrevious ? totalDaysCurrent : totalDaysPrevious;
+
+  const arrayDay = [];
+  for (let i = 1; i <= totalDays; i++) {
+    arrayDay.push(i);
+  }
+
+  const dataFinal = {
+    currentMonth: currentMonth,
+    currentYear: currentYear,
+    previousMonth: previousMonth,
+    previousYear: previousYear,
+    arrayDay: arrayDay,
+  }
+  fetch(`/${pathAdmin}/dashboard/revenue-chart`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(dataFinal),
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 'error') {
+        notyf.error(data.message);
+      }
+      if (data.code === 'success') {
+        const currentChart = Chart.getChart(revenueChart)
+        if (currentChart) {
+          currentChart.destroy();
+        }
+        // Tạo mảng dữ liệu cho biểu đồ
+        new Chart(revenueChart, {
+          type: 'line',
+          data: {
+            labels: arrayDay,
+            datasets: [
+              {
+                label: `Tháng ${currentMonth}/${currentYear}`,
+                data: data.dataCurrentMonth,
+                borderColor: '#007bff',
+                borderWidth: 1.5,
+              },
+              {
+                label: `Tháng ${previousMonth}/${previousYear}`,
+                data: data.dataPreviousMonth,
+                borderColor: '#ff002b',
+                borderWidth: 1.5,
+              }
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Ngày',
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Doanh thu',
+                }
+              }
+            }
+          },
+        });
+      }
+    })
+}
+
 const revenueChart = document.querySelector('#revenue-chart');
 if (revenueChart) {
-  new Chart(revenueChart, {
-    type: 'line',
-    data: {
-      labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
-      datasets: [
-        {
-          label: 'Tháng này',
-          data: [20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000, 65000, 70000, 75000, 80000, 85000, 90000, 489000, 95000, 100000, 105000, 110000, 115000, 120000, 125000, 130000, 135000, 140000, 145000, 150000, 0, 0, 0],
-          borderColor: '#007bff',
-          borderWidth: 1.5,
-        },
-        {
-          label: 'Tháng trước',
-          data: [10000, 35000, 80000, 95000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 80000, 85000, 85000, 85000, 85000, 85000, 85000, 85000, 85000, 120000, 85000, 85000, 85000, 140000, 145000, 140000, 140000, 140000, 140000],
-          borderColor: '#ff002b',
-          borderWidth: 1.5,
-        }
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom'
-        }
-      },
-      scales: {
-        x: {
-          title: {
-            display: true,
-            text: 'Ngày',
-          }
-        },
-        y: {
-          title: {
-            display: true,
-            text: 'Doanh thu',
-          }
-        }
-      }
-    },
+  const currentDate = new Date();
+  drawRevenueChart(currentDate);
+  // Bắt sự kiện lọc theo tháng 
+  const filterMonth = document.querySelector('[filter-month]');
+  filterMonth.addEventListener('change', () => {
+    const value = filterMonth.value;
+    const currentDate = new Date(value);
+    drawRevenueChart(currentDate);
   });
 }
 // End Revenue chart
@@ -355,7 +409,7 @@ if (tourCreateForm) {
         formData.append('avatar', avatar, avatar.name || 'image.png');
       }
       if (filePond.images?.getFiles()) {
-        for (const item of filePond.images.getFiles()) { 
+        for (const item of filePond.images.getFiles()) {
           formData.append('images', item.file);
         }
       }
@@ -457,7 +511,7 @@ if (tourEditForm) {
         formData.append('avatar', avatar, avatar.name || 'image.png');
       }
       if (filePond.images?.getFiles()) {
-        for (const item of filePond.images.getFiles()) { 
+        for (const item of filePond.images.getFiles()) {
           formData.append('images', item.file);
         }
       }
@@ -541,19 +595,19 @@ if (orderEditForm) {
         },
         body: JSON.stringify(dataFinal)
       })
-      .then(res => res.json())
-      .then(data => {
-        if(data.code == "success") {
-          notyf.success(data.message);
-          setTimeout(() => {
-            window.location.reload();
-          }, 1500);
-        } else {
-          notyf.error(data.message);
-          btnSubmit.disabled = false;
-          btnSubmit.innerText = "Cập nhật"
-        }
-      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code == "success") {
+            notyf.success(data.message);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+          } else {
+            notyf.error(data.message);
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật"
+          }
+        })
     })
 }
 // End validate order edit form
@@ -600,7 +654,7 @@ if (settingWebsiteInfoForm) {
       const categoryIdSection6 = event.target.categoryIdSection6.value;
       const logo = filePond.logo?.getFile()?.file || null;
       const favicon = filePond.favicon?.getFile()?.file || null;
-      
+
       const formData = new FormData();
       formData.append('nameWebsite', nameWebsite);
       formData.append('phone', phone);
@@ -709,7 +763,7 @@ if (settingAccountAdminCreateForm) {
       const status = event.target.status.value;
       const passWord = event.target.passWord.value;
       const avatar = filePond.avatar?.getFile()?.file || null;
-      
+
       const formData = new FormData();
       formData.append('fullName', fullName);
       formData.append('email', email);
@@ -726,15 +780,15 @@ if (settingAccountAdminCreateForm) {
         body: formData,
       })
         .then(res => res.json())
-      .then(data => {
-        if (data.code === 'error') {
-          notyf.error(data.message);
-        }
-        if (data.code === 'success') {
-          drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
-          window.location.reload();
-        }
-      })
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code === 'success') {
+            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
+            window.location.reload();
+          }
+        })
     });
 }
 // End validate setting account admin create form
@@ -786,7 +840,7 @@ if (settingAccountAdminEditForm) {
       const positionCompany = event.target.positionCompany.value;
       const status = event.target.status.value;
       const avatar = filePond.avatar?.getFile()?.file || null;
-      
+
       const formData = new FormData();
       formData.append('fullName', fullName);
       formData.append('email', email);
@@ -802,14 +856,14 @@ if (settingAccountAdminEditForm) {
         body: formData,
       })
         .then(res => res.json())
-      .then(data => {
-        if (data.code === 'error') {
-          notyf.error(data.message);
-        }
-        if (data.code === 'success') {
-          notyf.success(data.message);
-        }
-      })
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code === 'success') {
+            notyf.success(data.message);
+          }
+        })
     });
 }
 // End validate setting account admin edit form
@@ -861,14 +915,14 @@ if (settingAccountAdminChangePasswordForm) {
         body: JSON.stringify(dataFinal),
       })
         .then(res => res.json())
-      .then(data => {
-        if (data.code === 'error') {
-          notyf.error(data.message);
-        }
-        if (data.code === 'success') {
-          notyf.success(data.message);
-        }
-      })
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code === 'success') {
+            notyf.success(data.message);
+          }
+        })
     });
 }
 // End validate setting account admin change password form
@@ -1004,7 +1058,7 @@ if (profileEditForm) {
       const email = event.target.email.value;
       const phone = event.target.phone.value;
       const avatar = filePond.avatar?.getFile()?.file || null;
-      const formData= new FormData();
+      const formData = new FormData();
       formData.append('fullName', fullName);
       formData.append('email', email);
       formData.append('phone', phone);
