@@ -8,18 +8,18 @@ block main
       .inner-item
         img(src="/admin/assets/images/section-1-icon-1.svg")
         .inner-content
-          .inner-text Người dùng
-          .inner-number 1.200
+          .inner-text Quản trị viên
+          .inner-number #{overView.totalAdmin.toLocaleString("vi-VN")}
       .inner-item
         img(src="/admin/assets/images/section-1-icon-2.svg")
         .inner-content
           .inner-text Đơn hàng
-          .inner-number 3.600
+          .inner-number #{overView.totalOrder.toLocaleString("vi-VN")}
       .inner-item
         img(src="/admin/assets/images/section-1-icon-3.svg")
         .inner-content
           .inner-text Doanh thu
-          .inner-number 300.000.000đ
+          .inner-number #{overView.totalRevenue.toLocaleString("vi-VN")}
     //- End Section 1
 
     //- Section 2
