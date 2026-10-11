@@ -45,41 +45,59 @@ block main
               th Trạng thái
               th.text-right Ngày đặt
           tbody
-            tr
-              td
-                .text-main OD000001
-              td
-                div Họ tên: Lê Văn A
-                div SĐT: 0123456789
-                div Ghi chú: Test...
-              td
-                .tour-list
-                  .inner-item
-                    img(src="/admin/assets/images/demo-tour-1.png")
-                    .inner-content
-                      .inner-title Tour Hạ Long
-                      .inner-desc
-                        div Người lớn: 3 x 1.500.000đ
-                        div Trẻ em: 2 x 1.300.000đ
-                        div Em bé: 2 x 1.000.000đ
-                  .inner-item
-                    img(src="/admin/assets/images/demo-tour-1.png")
-                    .inner-content
-                      .inner-title Tour Hạ Long
-                      .inner-desc
-                        div Người lớn: 3 x 1.500.000đ
-                        div Trẻ em: 2 x 1.300.000đ
-                        div Em bé: 2 x 1.000.000đ
-              td
-                div Tổng tiền: 10.000.000đ
-                div Giảm: 400.000đ
-                div Mã giảm: TOURMUAHE2024
-                div Thanh toán: 9.600.000đ
-                div PTTT: Ví Momo
-                div TTTT: Đã thanh toán
-              td
-                .tag.tag-orange Khởi tạo
-                //- .tag.tag-green Đã duyệt
-                //- .tag.tag-red Đã hủy
-              td.text-right 16:20 - 01/01/2024
+            if newOrders && newOrders.length > 0
+              each item in newOrders
+                tr
+                  td
+                    .text-main #{item.code}
+                  td
+                    div Họ tên: #{item.fullName}
+                    - var listPhone = item.phone ? (item.phone.toString().startsWith("0") ? item.phone : "0" + item.phone) : ""
+                    div SĐT: #{listPhone}
+                    if item.note
+                      div Ghi chú: #{item.note}
+                  td
+                    .tour-list
+                      if item.items && item.items.length > 0
+                        each tour in item.items
+                          .inner-item
+                            img(src=tour.avatar onerror="this.src='https://placehold.co/140x100?text=No+Image'")
+                            .inner-content
+                              .inner-title #{tour.tourName}
+                              .inner-desc
+                                if tour.quantityAdult > 0
+                                  div Người lớn: #{tour.quantityAdult} x #{tour.newPriceAdult.toLocaleString("vi-VN")}đ
+                                if tour.quantityChildren > 0
+                                  div Trẻ em: #{tour.quantityChildren} x #{tour.newPriceChildren.toLocaleString("vi-VN")}đ
+                                if tour.quantityBaby > 0
+                                  div Em bé: #{tour.quantityBaby} x #{tour.newPriceBaby.toLocaleString("vi-VN")}đ
+                  td
+                    div Tổng tiền: #{(item.subTotal || 0).toLocaleString("vi-VN")}đ
+                    if item.discount > 0
+                      div Giảm: #{item.discount.toLocaleString("vi-VN")}đ
+                    if item.couponCode || item.coupon
+                      div Mã giảm: #{item.couponCode || item.coupon}
+                    div Thanh toán: #{(item.total || 0).toLocaleString("vi-VN")}đ
+                    
+                    - var paymentMethodItem = paymentMethodList ? paymentMethodList.find(pm => pm.value === item.paymentMethod) : null
+                    div PTTT: #{paymentMethodItem ? paymentMethodItem.label : item.paymentMethod}
+                    
+                    - var paymentStatusItem = paymentStatusList ? paymentStatusList.find(ps => ps.value === item.paymentStatus) : null
+                    div TTTT: 
+                      if item.paymentStatus === 'paid'
+                        b(style="color: green;") #{paymentStatusItem ? paymentStatusItem.label : item.paymentStatus}
+                      else
+                        b(style="color: red;") #{paymentStatusItem ? paymentStatusItem.label : item.paymentStatus}
+                  td
+                    - var orderStatusItem = orderStatusList ? orderStatusList.find(os => os.value === item.status) : null
+                    if item.status === "success" || item.status === "done"
+                      .tag.tag-green #{orderStatusItem ? orderStatusItem.label : item.status}
+                    else if item.status === "cancel"
+                      .tag.tag-red #{orderStatusItem ? orderStatusItem.label : item.status}
+                    else
+                      .tag.tag-orange #{orderStatusItem ? orderStatusItem.label : item.status}
+                  td.text-right #{moment(item.createdAt).format('HH:mm - DD/MM/YYYY')}
+            else
+              tr
+                td(colspan="6" class="text-center") Không có đơn hàng mới nào!
     //- End Section 3

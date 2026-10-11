@@ -1,5 +1,7 @@
 const AccountAdmin = require('../../models/accounts-admin.model');
 const Order = require('../../models/order.model');
+const moment = require('moment');
+const variableConfig = require('../../configs/variable.config');
 
 module.exports.dashboard = async (req, res) => {
   const overView = {
@@ -14,15 +16,26 @@ module.exports.dashboard = async (req, res) => {
     deleted: false,
     paymentStatus: 'paid',
     status: "done",
-  })
+  });
 
   overView.totalRevenue = orderList.reduce((total, order) => {
     return total + order.total;
   }, 0);
 
+  // Lấy 5 đơn hàng mới nhất
+  const newOrders = await Order
+    .find({ deleted: false })
+    .sort({ createdAt: "desc" })
+    .limit(5);
+
   res.render('admin/pages/dashboard', {
     pageTitle: 'Trang tổng quan',
     overView: overView,
+    newOrders: newOrders,
+    moment: moment,
+    orderStatusList: variableConfig.orderStatusList,
+    paymentStatusList: variableConfig.paymentStatusList,
+    paymentMethodList: variableConfig.paymentMethodList,
   });
 }
 
