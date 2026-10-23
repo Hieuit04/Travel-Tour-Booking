@@ -150,6 +150,21 @@ input, textarea, select, button {
   opacity: 1;
 }
 
+.form-account .inner-social-item img {
+  width: 20px;
+  height: 20px;
+  max-width: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.form-account .inner-social-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
 .form-account .inner-button {
   width: 100%;
   height: 56px;

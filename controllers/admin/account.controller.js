@@ -48,7 +48,7 @@ module.exports.loginPost = async (req, res) => {
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: rememberPassword ? "7y" : "1d"
+      expiresIn: rememberPassword ? "7d" : "1d"
     }
   );
 
@@ -279,6 +279,7 @@ module.exports.resetPasswordPost = async (req, res) => {
     const token = req.cookies.token;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { id, email } = decoded;
+    console.log("id: ", id);
     const existAccount = await AccountAdmin.findOne({ _id: id, email: email, status: "active" });
     if (!existAccount) {
       res.clearCookie("token");

@@ -1,0 +1,62 @@
+extends ../layouts/account.pug
+include ../mixins/checkbox.pug
+
+block main
+  .form-account
+    h1.inner-title Đăng nhập
+    p.inner-desc Vui lòng nhập email và mật khẩu để tiếp tục
+    form.inner-form(id="login-form")
+      .inner-group 
+        label.inner-label(for="email") Email *
+        input(
+          type="email" 
+          id="email" 
+          name="email" 
+          autocomplete="username"
+          placeholder="Ví dụ: abc@gmail.com" 
+          class="inner-control"
+        )
+      .inner-group 
+        label.inner-label(for="password" ) Mật khẩu *
+        input(
+          type="password" 
+          id="password" 
+          name="password" 
+          autocomplete="current-password"
+          class="inner-control"
+        )
+      .inner-meta
+        .inner-check
+          +checkbox-30("rememberPassword", "rememberPassword")
+          label(for="rememberPassword") Nhớ mật khẩu
+        a(href=`/account/forgot-password`) Quên mật khẩu?
+      button.inner-button(type="submit") Đăng nhập
+      //- Đăng nhập bằng Google
+    .inner-social
+      .inner-social-title
+        span Hoặc
+      //- Google Identity Services
+      div(
+        id="g_id_onload"
+        data-client_id=googleClientId
+        data-callback="handleGoogleCredential"
+        data-auto_prompt="false"
+      )
+      div.g_id_signin(
+        data-type="standard"
+        data-size="large"
+        data-theme="outline"
+        data-text="signin_with"
+        data-shape="rectangular"
+        data-logo_alignment="left"
+        data-width="350"
+      )
+    .inner-more
+      span Bạn chưa có tài khoản?
+      a(href="/account/register") Tạo tài khoản
+
+  script(
+    src="https://accounts.google.com/gsi/client"
+    async
+    defer
+  )

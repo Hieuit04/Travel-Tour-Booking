@@ -42,4 +42,23 @@ header.header
           src="/client/assets/images/icon-cart-arrow.svg"
           )
         div(miniCart) 0
+      if account
+        .user-account
+          .inner-login.user-logged
+            img.inner-icon-login(
+              alt=account.fullName
+              src=account.avatar || "/client/assets/images/icon-account.svg"
+            )
+            span.user-fullname= account.fullName
+          .user-dropdown
+            a(href="/profile") Thông tin cá nhân
+            a(href="/order") Đơn hàng đã đặt
+            a(href="/account/logout") Đăng xuất
+      else
+        a.inner-login(href="/account/login")
+          img.inner-icon-login(
+            alt="Login"
+            src="/client/assets/images/icon-account.svg"
+    )
+
 // End Header

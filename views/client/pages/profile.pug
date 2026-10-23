@@ -1,0 +1,94 @@
+extends ../layouts/default.pug
+
+block main
+  // Section Profile
+  .section-profile
+    .container
+      .inner-wrap
+        // Avatar
+        .inner-avatar-card
+          .inner-avatar-box
+            .inner-avatar-circle
+              img#profileAvatarImg(
+                src= profileUser.avatar ? profileUser.avatar : "/client/assets/images/icon-account.svg"
+                alt= profileUser.fullName
+                onerror="this.src='/client/assets/images/icon-account.svg'"
+              )
+            input#avatarInput(type="file" name="avatar" accept="image/png, image/jpeg, image/jpg, image/webp" style="display: none;")
+          h2.inner-user-name#displayFullName= profileUser.fullName 
+          label.btn-change-photo(for="avatarInput" title="Nhấn để tải lên ảnh mới")
+            i.fa-solid.fa-camera
+            span Đổi ảnh
+
+        // Thông tin cá nhân
+        .inner-info-card
+          .inner-card-head
+            h1.inner-title Thông tin cá nhân
+            button.btn-edit-action#btnStartEdit(type="button" title="Chỉnh sửa thông tin cá nhân")
+              i.fa-solid.fa-pen-to-square
+              span Chỉnh sửa
+
+          form#profileEditForm(action="/profile/edit" method="POST" enctype="multipart/form-data")
+            .inner-fields-grid
+              //Họ và tên
+              .inner-field-item
+                label.inner-label(for="inputFullName")
+                  i.fa-regular.fa-user
+                  span Họ và tên
+                  span.inner-required *
+                .inner-val-box#valFullName= (profileUser && profileUser.fullName) ? profileUser.fullName : "Chưa cập nhật"
+                .inner-input-wrap
+                  input.inner-control#inputFullName(
+                    type="text"
+                    name="fullName"
+                    value=(profileUser && profileUser.fullName) ? profileUser.fullName : ""
+                    placeholder="Nhập họ và tên..."
+                    autocomplete="name"
+                  )
+                  .inner-field-error#errFullName 
+
+                // Số điện thoại
+              .inner-field-item
+                label.inner-label(for="inputPhone")
+                  i.fa-solid.fa-phone
+                  span Số điện thoại
+                  span.inner-required *
+                .inner-val-box#valPhone= (profileUser && profileUser.phone) ? profileUser.phone : "Chưa cập nhật"
+
+                .inner-input-wrap
+                  input.inner-control#inputPhone(
+                    type="tel"
+                    name="phone"
+                    value=(profileUser && profileUser.phone) ? profileUser.phone : ""
+                    placeholder="..."
+                    autocomplete="tel"
+                  )
+                  .inner-field-error#errPhone
+
+                // Email
+              .inner-field-item.inner-field-span-2
+                label.inner-label(for="inputEmail")
+                  i.fa-regular.fa-envelope
+                  span Email *
+                  span.inner-required *
+                .inner-val-box#valEmail= (profileUser && profileUser.email) ? profileUser.email : "Chưa cập nhật"
+                .inner-input-wrap
+                  input.inner-control#inputEmail(
+                    type="email"
+                    name="email"
+                    value=(profileUser && profileUser.email) ? profileUser.email : ""
+                    placeholder="Ví dụ: email@gmail.com"
+                    autocomplete="email"
+                  )
+                  .inner-field-error#errEmail
+
+            // Hủy & Lưu thay đổi
+            .inner-edit-actions#profileEditActions
+              button.btn-cancel#btnCancelEdit(type="button")
+                i.fa-solid.fa-xmark
+                span Hủy
+              button.btn-save#btnSaveEdit(type="submit")
+                i.fa-solid.fa-check
+                span Lưu thay đổi
+
+  script(src="/client/assets/js/profile.js")
