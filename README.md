@@ -238,6 +238,22 @@ DOMAIN_WEBSITE="https://project-5-bw06.onrender.com"
 
 ---
 
+## 📝 AI Blog Automation
+
+`blog_automation/generate_blog.py` uses an LLM (Anthropic API) to write an informative travel guide (history, best time to visit, day-by-day itinerary, food, cost tables, tips, FAQ) for each active tour that has no post yet. It inserts the tour's own images and saves the post to the `blogs` collection, which is shown at `/blog`.
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r blog_automation/requirements.txt
+# add ANTHROPIC_API_KEY to .env
+.venv/bin/python blog_automation/generate_blog.py               # up to 5 tours without a post
+.venv/bin/python blog_automation/generate_blog.py --slug <tour-slug> --dry-run   # preview, no save
+.venv/bin/python blog_automation/test_generate_blog.py          # helper tests
+```
+
+Run it on a schedule (e.g. cron) to keep the blog filled automatically.
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:

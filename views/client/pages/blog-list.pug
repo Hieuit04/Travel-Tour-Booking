@@ -1,0 +1,17 @@
+extends ../layouts/default.pug
+
+block main
+  .section-blog
+    .container
+      h1.inner-title-main Tin Tức Du Lịch
+      .blog-list
+        each item in blogList
+          a.blog-item(href=`/blog/${item.slug}`)
+            if item.avatar
+              img(src=item.avatar alt=item.title)
+            .inner-content
+              h2.inner-title #{item.title}
+              .inner-date #{item.createdAtFormat}
+              p.inner-excerpt #{item.excerpt}
+        else
+          p Chưa có bài viết nào.
