@@ -9,12 +9,17 @@ const schema = new mongoose.Schema({
   avatar: String,
   content: String,
   tourId: String,
-  status: String,
+  status: String, // pending (chờ duyệt) | active (đã đăng)
   createdBy: String,
+  updatedBy: String,
+  publishedAt: Date,
+  publishedBy: String,
   deleted: {
     type: Boolean,
     default: false
-  }
+  },
+  deletedBy: String,
+  deletedAt: Date
 }, {
   timestamps: true
 });

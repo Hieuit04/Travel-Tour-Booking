@@ -16,6 +16,10 @@ nav.sider
       a.inner-item(href=`/${pathAdmin}/promotion/list`)
         i.fa-solid.fa-percent
         span Quản lý khuyến mãi
+    if(pers.includes("blog-view"))
+      a.inner-item(href=`/${pathAdmin}/blog/list`)
+        i.fa-regular.fa-newspaper
+        span Quản lý bài viết
 
     if(pers.includes("order-view"))
       a.inner-item(href=`/${pathAdmin}/order/list`)

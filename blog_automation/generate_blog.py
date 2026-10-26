@@ -147,16 +147,17 @@ def main():
                     "tags": post.tags,
                     "avatar": images[0] if images else "",
                     "content": markdown.markdown(body_md, extensions=["tables"]),
-                    "status": "active",
+                    "status": "pending",  # chờ nhân viên duyệt trước khi đăng
                     "deleted": False,
                     "createdBy": "ai",
                     "updatedAt": now,
                 },
                 "$setOnInsert": {"createdAt": now},
+                "$unset": {"publishedAt": "", "publishedBy": ""},
             },
             upsert=True,
         )
-        print(f"  đã lưu: /blog/{slug}")
+        print(f"  đã lưu (chờ duyệt): {slug}")
 
 
 if __name__ == "__main__":

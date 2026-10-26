@@ -346,6 +346,54 @@ if (categoryEditForm) {
 }
 // End validate category edit form
 
+// Validate blog edit form
+const blogEditForm = document.querySelector('.section-8 #blog-edit-form');
+if (blogEditForm) {
+  const validator = new JustValidate('#blog-edit-form');
+  validator
+    .addField('#title', [
+      {
+        rule: 'required',
+        errorMessage: 'Tiêu đề và nội dung không được để trống!',
+      },
+    ])
+
+    .onSuccess((event) => {
+      const id = event.target.elements['id'].value;
+      const action = event.submitter ? event.submitter.value : 'draft';
+      const content = tinymce.get('content').getContent();
+      if (!tinymce.get('content').getContent({ format: 'text' }).trim()) {
+        notyf.error('Tiêu đề và nội dung không được để trống!');
+        return;
+      }
+      const dataFinal = {
+        title: event.target.title.value,
+        excerpt: event.target.excerpt.value,
+        avatar: event.target.avatar.value,
+        content: content,
+        action: action,
+      };
+      fetch(`/${pathAdmin}/blog/edit/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataFinal),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code === 'success') {
+            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
+            window.location.href = `/${pathAdmin}/blog/list`;
+          }
+        })
+    });
+}
+// End validate blog edit form
+
 
 // Validate tour create form
 const tourCreateForm = document.querySelector('.section-8 #tour-create-form');

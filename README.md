@@ -230,6 +230,7 @@ DOMAIN_WEBSITE="https://project-5-bw06.onrender.com"
 | GET/POST/PATCH/DELETE | `/category` | Manage categories (CRUD) |
 | GET/PATCH | `/order` | Manage orders |
 | GET/POST/PATCH/DELETE | `/promotion` | Manage promotions & coupons |
+| GET/PATCH | `/blog` | Review, edit, publish & delete AI blog posts |
 | GET/POST/PATCH/DELETE | `/account` | Manage admin accounts |
 | GET/POST/PATCH/DELETE | `/role` | Manage roles & permissions |
 | GET/POST | `/setting` | Website general settings |
@@ -240,7 +241,7 @@ DOMAIN_WEBSITE="https://project-5-bw06.onrender.com"
 
 ## 📝 AI Blog Automation
 
-`blog_automation/generate_blog.py` uses an LLM (Anthropic API) to write an informative travel guide (history, best time to visit, day-by-day itinerary, food, cost tables, tips, FAQ) for each active tour that has no post yet. It inserts the tour's own images and saves the post to the `blogs` collection, which is shown at `/blog`.
+`blog_automation/generate_blog.py` uses an LLM (Anthropic API) to write an informative travel guide (history, best time to visit, day-by-day itinerary, food, cost tables, tips, FAQ) for each active tour that has no post yet. It inserts the tour's own images and saves the post to the `blogs` collection with status `pending`. A manager reviews it in the admin page **Quản lý bài viết** (`/admin/blog/list`): edit, save as draft, approve & publish, or delete. Only published posts (`active`) are shown at `/blog`. Permissions: `blog-view`, `blog-edit`, `blog-publish`, `blog-delete`.
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r blog_automation/requirements.txt
