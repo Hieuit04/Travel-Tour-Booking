@@ -27,19 +27,25 @@ block main
           label(for="excerpt") Tóm tắt
           textarea(name="excerpt" id="excerpt") #{blogDetail.excerpt}
         .inner-group.inner-two-col
-          label(for="avatar") Ảnh đại diện (URL)
-          input(type="text" name="avatar" id="avatar" value=blogDetail.avatar)
-          if blogDetail.avatar
-            img(src=blogDetail.avatar style="max-width: 300px; margin-top: 10px; border-radius: 8px;")
+          label(for="avatar") Ảnh đại diện
+          input(type="file" name="avatar" id="avatar" accept="image/*" filepondImage image-default=blogDetail.avatar).inner-upload-image
         .inner-group.inner-two-col
           label(for="content") Nội dung
           textarea(name="content" id="content" textarea-mce) #{blogDetail.content}
         if(pers.includes("blog-edit"))
           .inner-group.inner-two-col.text-center
-            button.btn-create(type="submit" value="draft") Lưu nháp
-            if(pers.includes("blog-publish"))
-              |  
-              button.btn-create(type="submit" value="publish") Duyệt và đăng
+            if blogDetail.status == "active"
+              if(pers.includes("blog-publish"))
+                button.btn-create(type="submit" value="update") Cập nhật
+                |  
+              button.btn-create(type="submit" value="draft") Gỡ bài (về chờ duyệt)
+            else
+              button.btn-create(type="submit" value="draft") Lưu nháp
+              if(pers.includes("blog-publish"))
+                |  
+                button.btn-create(type="submit" value="publish") Duyệt và đăng
+      .inner-link
+        a(href=`/${pathAdmin}/blog/preview/${blogDetail.id}` target="_blank") Xem trước trên trang Tin tức (bản đã lưu)
       if(pers.includes("blog-delete"))
         .inner-link
           a(

@@ -85,20 +85,45 @@ module.exports.edit = async (req, res) => {
   }
 };
 
+// [GET] /admin/blog/preview/:id
+module.exports.preview = async (req, res) => {
+  try {
+    const blogDetail = await Blog.findOne({
+      _id: req.params.id,
+      deleted: false
+    }).lean();
+    if (!blogDetail) {
+      res.redirect(`/${variableConfig.pathAdmin}/blog/list`);
+      return;
+    }
+    blogDetail.createdAtFormat = moment(blogDetail.publishedAt || blogDetail.createdAt).format('DD/MM/YYYY');
+    const tour = await Tour.findOne({ _id: blogDetail.tourId }).lean();
+    res.render('client/pages/blog-detail', {
+      pageTitle: `[Xem trước] ${blogDetail.title}`,
+      blogDetail: blogDetail,
+      tour: tour
+    });
+  } catch (error) {
+    res.redirect(`/${variableConfig.pathAdmin}/blog/list`);
+  }
+};
+
 // [PATCH] /admin/blog/edit/:id
-// action = "draft": lưu nháp, bài về trạng thái chờ duyệt
+// action = "draft": lưu nháp, bài ở (hoặc chuyển về) trạng thái chờ duyệt
 // action = "publish": duyệt và đăng lên trang Tin tức
+// action = "update": sửa bài đã đăng, giữ nguyên trạng thái đã đăng
 module.exports.editPatch = async (req, res) => {
   try {
-    const { title, excerpt, content, avatar, action } = req.body;
-    if (!["draft", "publish"].includes(action)) {
+    const { title, excerpt, content, action } = req.body;
+    if (!["draft", "publish", "update"].includes(action)) {
       res.json({
         code: "error",
         message: "Hành động không hợp lệ!"
       });
       return;
     }
-    if (action == "publish" && !checkPermission(res, "blog-publish")) return;
+    // Đăng bài hoặc sửa bài đang hiển thị đều thay đổi nội dung công khai
+    if (action != "draft" && !checkPermission(res, "blog-publish")) return;
 
     const plainContent = (content || "").replace(/<[^>]*>|&nbsp;/g, "").trim();
     if (!title || !title.trim() || !plainContent) {
@@ -120,19 +145,35 @@ module.exports.editPatch = async (req, res) => {
       });
       return;
     }
+    if (action == "update" && blogDetail.status != "active") {
+      res.json({
+        code: "error",
+        message: "Bài viết chưa được đăng!"
+      });
+      return;
+    }
 
     const dataUpdate = {
       title: title.trim(),
       excerpt: excerpt || "",
       content: content,
-      avatar: avatar || "",
       updatedBy: res.locals.account.id
     };
+    if (req.file) {
+      dataUpdate.avatar = req.file.path;
+    }
+    let message = "Đã lưu nháp bài viết!";
     if (action == "publish") {
       dataUpdate.status = "active";
       dataUpdate.publishedAt = new Date();
       dataUpdate.publishedBy = res.locals.account.id;
+      message = "Đăng bài thành công!";
+    } else if (action == "update") {
+      message = "Cập nhật bài viết thành công!";
     } else {
+      if (blogDetail.status == "active") {
+        message = "Đã gỡ bài, chuyển về chờ duyệt!";
+      }
       dataUpdate.status = "pending";
     }
 
@@ -140,7 +181,7 @@ module.exports.editPatch = async (req, res) => {
 
     res.json({
       code: "success",
-      message: action == "publish" ? "Đăng bài thành công!" : "Đã lưu nháp bài viết!"
+      message: message
     });
   } catch (error) {
     res.json({

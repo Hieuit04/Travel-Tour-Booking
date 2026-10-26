@@ -68,7 +68,9 @@ block main
                 td #{item.publishedAtFormat}
                 td
                   .inner-action
-                    a(href=`/${pathAdmin}/blog/edit/${item.id}`)
+                    a(href=`/${pathAdmin}/blog/preview/${item.id}` target="_blank" title="Xem trước")
+                      i.fa-regular.fa-eye
+                    a(href=`/${pathAdmin}/blog/edit/${item.id}` title="Sửa")
                       i.fa-regular.fa-pen-to-square
                     if(pers.includes("blog-delete"))
                       a(

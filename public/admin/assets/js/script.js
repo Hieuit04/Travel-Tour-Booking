@@ -366,19 +366,18 @@ if (blogEditForm) {
         notyf.error('Tiêu đề và nội dung không được để trống!');
         return;
       }
-      const dataFinal = {
-        title: event.target.title.value,
-        excerpt: event.target.excerpt.value,
-        avatar: event.target.avatar.value,
-        content: content,
-        action: action,
-      };
+      const avatar = filePond.avatar?.getFile()?.file || null;
+      const formData = new FormData();
+      formData.append('title', event.target.title.value);
+      formData.append('excerpt', event.target.excerpt.value);
+      formData.append('content', content);
+      formData.append('action', action);
+      if (avatar) {
+        formData.append('avatar', avatar, avatar.name);
+      }
       fetch(`/${pathAdmin}/blog/edit/${id}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataFinal),
+        body: formData,
       })
         .then(res => res.json())
         .then(data => {
