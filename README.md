@@ -255,6 +255,19 @@ Run it on a schedule (e.g. cron) to keep the blog filled automatically.
 
 ---
 
+## 💰 Competitor Price Scraper
+
+`price_scraper/scrape_prices.py` collects tour prices from Vietravel, PYS Travel, Vietnam Booking, BenThanh Tourist, TUGO, Hanoitourist (requests + BeautifulSoup) and Saigontourist (Selenium, headless Chrome downloaded automatically). Each tour is upserted into the `competitor_prices` collection by `source + url` with name, destination, departure city, duration (days/nights), departure date, price, original price, seats left and `scraped_at`. It waits 2.5 s between requests; run it once a day.
+
+```bash
+.venv/bin/pip install -r price_scraper/requirements.txt
+.venv/bin/python price_scraper/scrape_prices.py                 # all sources, saves to MongoDB
+.venv/bin/python price_scraper/scrape_prices.py --sources pys,tugo --max-pages 2 --dry-run   # writes competitor_prices.json
+.venv/bin/python price_scraper/test_scrape_prices.py            # helper tests
+```
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:
