@@ -266,6 +266,8 @@ Run it on a schedule (e.g. cron) to keep the blog filled automatically.
 .venv/bin/python price_scraper/test_scrape_prices.py            # helper tests
 ```
 
+**Price suggestion:** on the admin tour create/edit pages, a panel under "Giá mới" matches competitor tours to the selected locations and the "Thời gian" field (e.g. `3 ngày 2 đêm`, `3N2Đ`). It shows a suggested adult price (median, rounded to 10.000đ), the common range (25th–75th percentile), and the list of matching competitor tours. "Dùng làm giá mới" copies the suggestion into the new adult price. Same-duration tours are used first, then ±1 day, then any duration. Only prices scraped in the last 30 days count (`GET /admin/tour/price-suggest`, logic in `helpers/priceSuggest.helper.js`, test: `node helpers/priceSuggest.test.js`).
+
 ---
 
 ## 🤝 Contributing

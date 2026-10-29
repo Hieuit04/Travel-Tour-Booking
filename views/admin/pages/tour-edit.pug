@@ -1,6 +1,7 @@
 extends ../layouts/default.pug
 include ../mixins/checkbox.pug
 include ../mixins/select-tree.pug
+include ../mixins/price-suggest.pug
 
 block main
   h1.box-title Edit tour
@@ -56,6 +57,7 @@ block main
           .inner-input-item
             label(for="newPriceBaby") Em bé
             input(type="number" name="newPriceBaby" id="newPriceBaby" value=tourDetail.newPriceBaby)
+      +price-suggest()
       .inner-group
         label(for="") Còn lại
         .inner-input-list

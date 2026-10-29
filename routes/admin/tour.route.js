@@ -10,6 +10,7 @@ const { checkPermission } = require('../../middlewares/admin/permission.middlewa
 router.get('/list', tourController.list);
 router.get('/create', tourController.create);
 router.get('/trash', tourController.trash);
+router.get('/price-suggest', tourController.priceSuggest);
 
 router.post(
   '/create',

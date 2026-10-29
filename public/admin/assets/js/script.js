@@ -1409,3 +1409,75 @@ if (selectPagination) {
 }
 // end pagination
 
+
+// Price suggest (tour create/edit)
+const priceSuggest = document.querySelector('[price-suggest]');
+if (priceSuggest) {
+  const form = priceSuggest.closest('form');
+  const empty = priceSuggest.querySelector('.inner-suggest-empty');
+  const result = priceSuggest.querySelector('.inner-suggest-result');
+  const tbody = priceSuggest.querySelector('tbody');
+  const money = (n) => n.toLocaleString('vi-VN') + 'đ';
+  let suggested = null;
+  let timer = null;
+
+  const showEmpty = (text) => {
+    empty.textContent = text;
+    empty.hidden = false;
+    result.hidden = true;
+    suggested = null;
+  };
+
+  const load = () => {
+    const locations = [...form.querySelectorAll('input[name="locations"]:checked')].map(i => i.value);
+    const time = form.time.value.trim();
+    if (!locations.length) {
+      showEmpty('Chọn địa điểm và nhập thời gian (vd: 3 ngày 2 đêm) để xem gợi ý.');
+      return;
+    }
+    const params = new URLSearchParams({ locations: locations.join(','), time });
+    fetch(`/${pathAdmin}/tour/price-suggest?${params}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.code === 'error') return showEmpty(data.message);
+        if (!data.stats) return showEmpty('Chưa có tour đối thủ nào cùng điểm đến.');
+
+        suggested = data.suggestedPrice;
+        const s = data.stats;
+        priceSuggest.querySelector('.inner-suggest-price').textContent = ' ' + money(suggested);
+        priceSuggest.querySelector('.inner-suggest-range').textContent =
+          `Khoảng phổ biến: ${money(s.p25)} – ${money(s.p75)} · thấp nhất ${money(s.min)} · cao nhất ${money(s.max)}`;
+        priceSuggest.querySelector('.inner-suggest-basis').textContent =
+          `Tính từ ${s.count} tour ${data.basisText}${data.duration.days ? '' : ' (chưa nhập thời gian)'}.`;
+
+        tbody.replaceChildren(...data.tours.map(t => {
+          const tr = document.createElement('tr');
+          if (t.sameDuration) tr.classList.add('is-same');
+          const name = document.createElement(/^https?:\/\//.test(t.url) ? 'a' : 'span');
+          name.textContent = t.tour_name;  // dữ liệu thu thập từ web ngoài: chỉ gán text, không gán HTML
+          if (name.tagName === 'A') { name.href = t.url; name.target = '_blank'; name.rel = 'noopener'; }
+          const cells = [
+            t.source,
+            name,
+            t.duration_days ? `${t.duration_days}N${t.duration_nights ?? ''}${t.duration_nights != null ? 'Đ' : ''}` : '—',
+            [t.departure_city, t.departure_date].filter(Boolean).join(' · ') || '—',
+            money(t.price_adult) + (t.original_price ? ` (gốc ${money(t.original_price)})` : ''),
+          ];
+          cells.forEach(c => { const td = document.createElement('td'); td.append(c); tr.append(td); });
+          return tr;
+        }));
+        empty.hidden = true;
+        result.hidden = false;
+      })
+      .catch(() => showEmpty('Không lấy được gợi ý giá!'));
+  };
+
+  const schedule = () => { clearTimeout(timer); timer = setTimeout(load, 400); };
+  form.addEventListener('change', (e) => { if (e.target.name === 'locations') schedule(); });
+  form.time.addEventListener('input', schedule);
+  priceSuggest.querySelector('.inner-suggest-apply').addEventListener('click', () => {
+    if (suggested) form.newPriceAdult.value = suggested;
+  });
+  load();
+}
+// End price suggest

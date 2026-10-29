@@ -1745,3 +1745,51 @@ input, textarea, select, button {
   background: #a8a8a8; 
 }
 /* End Order Tour List */
+
+/* Price suggest (tour create/edit) */
+.section-8 .inner-price-suggest {
+  border: 1px dashed var(--color-main);
+  border-radius: 8px;
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--color-text);
+}
+.section-8 .inner-suggest-empty, .section-8 .inner-suggest-basis {
+  color: #606060;
+}
+.section-8 .inner-suggest-summary {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.section-8 .inner-suggest-price {
+  font-size: 20px;
+  color: var(--color-main);
+  margin: 0 12px 0 4px;
+}
+.section-8 .inner-suggest-apply {
+  border: none;
+  background-color: var(--color-main);
+  color: white;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+.section-8 .inner-suggest-table {
+  width: 100%;
+  border-collapse: collapse;
+  display: block;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.section-8 .inner-suggest-table th, .section-8 .inner-suggest-table td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid #EEE;
+}
+.section-8 .inner-suggest-table tr.is-same td {
+  background-color: #F0F5FF;
+}
+.section-8 .inner-suggest-table a {
+  color: var(--color-main);
+}
