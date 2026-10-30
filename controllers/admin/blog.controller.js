@@ -72,7 +72,8 @@ module.exports.edit = async (req, res) => {
       res.redirect(`/${variableConfig.pathAdmin}/blog/list`);
       return;
     }
-    const tour = await Tour.findOne({ _id: blogDetail.tourId }).select('tourName slug');
+    // bài không gắn tour có tourId rỗng, findOne({_id: ""}) sẽ lỗi CastError
+    const tour = blogDetail.tourId ? await Tour.findOne({ _id: blogDetail.tourId }).select('tourName slug') : null;
     blogDetail.createdAtFormat = moment(blogDetail.createdAt).format('HH:mm - DD/MM/YYYY');
     blogDetail.publishedAtFormat = blogDetail.publishedAt ? moment(blogDetail.publishedAt).format('HH:mm - DD/MM/YYYY') : "";
     res.render('admin/pages/blog-edit', {
@@ -97,7 +98,7 @@ module.exports.preview = async (req, res) => {
       return;
     }
     blogDetail.createdAtFormat = moment(blogDetail.publishedAt || blogDetail.createdAt).format('DD/MM/YYYY');
-    const tour = await Tour.findOne({ _id: blogDetail.tourId }).lean();
+    const tour = blogDetail.tourId ? await Tour.findOne({ _id: blogDetail.tourId }).lean() : null;
     res.render('client/pages/blog-detail', {
       pageTitle: `[Xem trước] ${blogDetail.title}`,
       blogDetail: blogDetail,
