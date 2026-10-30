@@ -1,0 +1,13 @@
+extends ../layouts/default.pug
+
+block main
+  .section-blog
+    .container
+      article.blog-detail
+        h1.inner-title #{blogDetail.title}
+        .inner-date #{blogDetail.createdAtFormat}
+        if blogDetail.avatar
+          img.inner-avatar(src=blogDetail.avatar alt=blogDetail.title)
+        .inner-content !{blogDetail.content}
+        if tour
+          a.button-outline(href=`/tour/detail/${tour.slug}`) Xem tour: #{tour.tourName}

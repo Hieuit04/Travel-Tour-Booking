@@ -230,11 +230,43 @@ DOMAIN_WEBSITE="https://project-5-bw06.onrender.com"
 | GET/POST/PATCH/DELETE | `/category` | Manage categories (CRUD) |
 | GET/PATCH | `/order` | Manage orders |
 | GET/POST/PATCH/DELETE | `/promotion` | Manage promotions & coupons |
+| GET/PATCH | `/blog` | Review, edit, publish & delete AI blog posts |
 | GET/POST/PATCH/DELETE | `/account` | Manage admin accounts |
 | GET/POST/PATCH/DELETE | `/role` | Manage roles & permissions |
 | GET/POST | `/setting` | Website general settings |
 | GET | `/contact` | View contact messages |
 | GET/POST | `/profile` | Admin profile & settings |
+
+---
+
+## 📝 AI Blog Automation
+
+`blog_automation/generate_blog.py` uses an LLM (Anthropic API) to write an informative travel guide (history, best time to visit, day-by-day itinerary, food, cost tables, tips, FAQ) for each active tour that has no post yet. It inserts the tour's own images and saves the post to the `blogs` collection with status `pending`. A manager reviews it in the admin page **Quản lý bài viết** (`/admin/blog/list`): edit, save as draft, approve & publish, or delete. Only published posts (`active`) are shown at `/blog`. Permissions: `blog-view`, `blog-edit`, `blog-publish`, `blog-delete`.
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r blog_automation/requirements.txt
+# add ANTHROPIC_API_KEY to .env
+.venv/bin/python blog_automation/generate_blog.py               # up to 5 tours without a post
+.venv/bin/python blog_automation/generate_blog.py --slug <tour-slug> --dry-run   # preview, no save
+.venv/bin/python blog_automation/test_generate_blog.py          # helper tests
+```
+
+Run it on a schedule (e.g. cron) to keep the blog filled automatically.
+
+---
+
+## 💰 Competitor Price Scraper
+
+`price_scraper/scrape_prices.py` collects tour prices from Vietravel, PYS Travel, Vietnam Booking, BenThanh Tourist, TUGO, Hanoitourist (requests + BeautifulSoup) and Saigontourist (Selenium, headless Chrome downloaded automatically). Each tour is upserted into the `competitor_prices` collection by `source + url` with name, destination, departure city, duration (days/nights), departure date, price, original price, seats left and `scraped_at`. It waits 2.5 s between requests; run it once a day.
+
+```bash
+.venv/bin/pip install -r price_scraper/requirements.txt
+.venv/bin/python price_scraper/scrape_prices.py                 # all sources, saves to MongoDB
+.venv/bin/python price_scraper/scrape_prices.py --sources pys,tugo --max-pages 2 --dry-run   # writes competitor_prices.json
+.venv/bin/python price_scraper/test_scrape_prices.py            # helper tests
+```
+
+**Price suggestion:** on the admin tour create/edit pages, a panel under "Giá mới" matches competitor tours to the selected locations and the "Thời gian" field (e.g. `3 ngày 2 đêm`, `3N2Đ`). It shows a suggested adult price (median, rounded to 10.000đ), the common range (25th–75th percentile), and the list of matching competitor tours. "Dùng làm giá mới" copies the suggestion into the new adult price. Same-duration tours are used first, then ±1 day, then any duration. Only prices scraped in the last 30 days count (`GET /admin/tour/price-suggest`, logic in `helpers/priceSuggest.helper.js`, test: `node helpers/priceSuggest.test.js`).
 
 ---
 

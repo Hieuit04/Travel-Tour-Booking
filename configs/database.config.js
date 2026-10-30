@@ -6,6 +6,12 @@ const { permissionList } = require('./variable.config');
 
 const seedAdmin = async () => {
   try {
+    // Super Admin tạo từ trước sẽ thiếu quyền mới thêm (vd. blog-*), nên bổ sung mỗi lần khởi động
+    await Role.updateOne(
+      { roleName: 'Super Admin' },
+      { $addToSet: { rolePermissions: { $each: permissionList.map(item => item.value) } } }
+    );
+
     const adminCount = await AccountAdmin.countDocuments();
     if (adminCount === 0) {
       // 1. Lấy toàn bộ danh sách quyền từ variable.config

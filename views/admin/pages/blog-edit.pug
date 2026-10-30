@@ -1,0 +1,58 @@
+extends ../layouts/default.pug
+
+block main
+  if(pers.includes("blog-view"))
+    h1.box-title Chi tiết bài viết
+
+    //- Section 8
+    .section-8
+      form(id="blog-edit-form")
+        input(type="hidden" name="id" value=blogDetail.id)
+        .inner-group
+          label Tour
+          if tour
+            a(href=`/tour/detail/${tour.slug}` target="_blank") #{tour.tourName}
+          else
+            span (Tour không tồn tại)
+        .inner-group
+          label Trạng thái
+          if blogDetail.status == "active"
+            .tag.tag-green Đã đăng lúc #{blogDetail.publishedAtFormat}
+          else
+            .tag.tag-orange Chờ duyệt (tạo lúc #{blogDetail.createdAtFormat})
+        .inner-group.inner-two-col
+          label(for="title") Tiêu đề
+          input(type="text" name="title" id="title" value=blogDetail.title)
+        .inner-group.inner-two-col
+          label(for="excerpt") Tóm tắt
+          textarea(name="excerpt" id="excerpt") #{blogDetail.excerpt}
+        .inner-group.inner-two-col
+          label(for="avatar") Ảnh đại diện
+          input(type="file" name="avatar" id="avatar" accept="image/*" filepondImage image-default=blogDetail.avatar).inner-upload-image
+        .inner-group.inner-two-col
+          label(for="content") Nội dung
+          textarea(name="content" id="content" textarea-mce) #{blogDetail.content}
+        if(pers.includes("blog-edit"))
+          .inner-group.inner-two-col.text-center
+            if blogDetail.status == "active"
+              if(pers.includes("blog-publish"))
+                button.btn-create(type="submit" value="update") Cập nhật
+                |  
+              button.btn-create(type="submit" value="draft") Gỡ bài (về chờ duyệt)
+            else
+              button.btn-create(type="submit" value="draft") Lưu nháp
+              if(pers.includes("blog-publish"))
+                |  
+                button.btn-create(type="submit" value="publish") Duyệt và đăng
+      .inner-link
+        a(href=`/${pathAdmin}/blog/preview/${blogDetail.id}` target="_blank") Xem trước trên trang Tin tức (bản đã lưu)
+      if(pers.includes("blog-delete"))
+        .inner-link
+          a(
+            href="javascript:;"
+            button-delete
+            data-api=`/${pathAdmin}/blog/delete/${blogDetail.id}`
+          ) Xóa bài
+      .inner-link
+        a(href=`/${pathAdmin}/blog/list`) Quay lại danh sách
+    //- End Section 8

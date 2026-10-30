@@ -1,7 +1,10 @@
+const mongoose = require('mongoose');
 const Category = require('../../models/category.model');
 const City = require('../../models/city.model');
 const Tour = require('../../models/tour.model');
 const AccountAdmin = require('../../models/accounts-admin.model');
+const CompetitorPrice = require('../../models/competitor-price.model');
+const priceSuggest = require('../../helpers/priceSuggest.helper');
 const moment = require('moment');
 const buildCategoryTree = require('../../helpers/categoryTree.helper');
 const categoryFilter = require('../../helpers/categoryFilter.helper');
@@ -520,5 +523,25 @@ module.exports.restorePatch = async (req, res) => {
       code: "error",
       message: "Dữ liệu không hợp lệ!"
     })
+  }
+}
+
+// Gợi ý giá từ giá tour đối thủ: ?locations=id1,id2&time=3 ngày 2 đêm
+module.exports.priceSuggest = async (req, res) => {
+  try {
+    if (!res.locals.pers.includes("tour-create") && !res.locals.pers.includes("tour-edit")) {
+      res.json({ code: "error", message: "Không có quyền truy cập!" });
+      return;
+    }
+    const ids = String(req.query.locations || "").split(",").filter(id => mongoose.isValidObjectId(id));
+    const cities = await City.find({ _id: { $in: ids } });
+    const since = moment().subtract(30, "days").toDate();  // bỏ giá cũ hơn 30 ngày
+    const rows = cities.length
+      ? await CompetitorPrice.find({ scraped_at: { $gte: since }, price_adult: { $gt: 0 } }).lean()
+      : [];
+    res.json({ code: "success", ...priceSuggest(rows, cities.map(c => c.name), String(req.query.time || "")) });
+  } catch (error) {
+    console.log(error);
+    res.json({ code: "error", message: "Không lấy được gợi ý giá!" });
   }
 }
