@@ -81,16 +81,9 @@ block main
                     
                     - var paymentMethodItem = paymentMethodList ? paymentMethodList.find(pm => pm.value === item.paymentMethod) : null
                     div PTTT: #{paymentMethodItem ? paymentMethodItem.label : item.paymentMethod}
-                    
-                    - var paymentStatusItem = paymentStatusList ? paymentStatusList.find(ps => ps.value === item.paymentStatus) : null
-                    div TTTT: 
-                      if item.paymentStatus === 'paid'
-                        b(style="color: green;") #{paymentStatusItem ? paymentStatusItem.label : item.paymentStatus}
-                      else
-                        b(style="color: red;") #{paymentStatusItem ? paymentStatusItem.label : item.paymentStatus}
                   td
                     - var orderStatusItem = orderStatusList ? orderStatusList.find(os => os.value === item.status) : null
-                    if item.status === "success" || item.status === "done"
+                    if item.status === "done"
                       .tag.tag-green #{orderStatusItem ? orderStatusItem.label : item.status}
                     else if item.status === "cancel"
                       .tag.tag-red #{orderStatusItem ? orderStatusItem.label : item.status}

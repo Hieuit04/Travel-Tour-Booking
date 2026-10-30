@@ -20,8 +20,8 @@ block main
           - var paymentMethodItem = paymentMethodList.find(item => item.value === order.paymentMethod)
           p Phương thức thanh toán: <b>#{paymentMethodItem ? paymentMethodItem.label : order.paymentMethod}</b>
           
-          - var paymentStatusItem = paymentStatusList.find(item => item.value === order.paymentStatus)
-          p Trạng thái thanh toán: <b>#{paymentStatusItem ? paymentStatusItem.label : order.paymentStatus}</b>
+          if order.paidAt
+            p Thời điểm thanh toán: <b>#{moment(order.paidAt).format("HH:mm - DD/MM/YYYY")}</b>
           
           - var orderStatusItem = orderStatusList.find(item => item.value === order.status)
           p Trạng thái đơn hàng: <b>#{orderStatusItem ? orderStatusItem.label : order.status}</b>

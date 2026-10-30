@@ -14,7 +14,6 @@ module.exports.dashboard = async (req, res) => {
   overView.totalOrder = await Order.countDocuments({ deleted: false });
   const orderList = await Order.find({
     deleted: false,
-    paymentStatus: 'paid',
     status: "done",
   });
 
@@ -34,7 +33,6 @@ module.exports.dashboard = async (req, res) => {
     newOrders: newOrders,
     moment: moment,
     orderStatusList: variableConfig.orderStatusList,
-    paymentStatusList: variableConfig.paymentStatusList,
     paymentMethodList: variableConfig.paymentMethodList,
   });
 }
@@ -53,7 +51,6 @@ module.exports.revenueChartPost = async (req, res) => {
     // Truy vấn tất cả đơn hàng trong tháng hiện tại 
     const currentMonthOrders = await Order.find({
       deleted: false,
-      paymentStatus: 'paid',
       status: "done",
       createdAt: {
         $gte: new Date(currentYear, currentMonth - 1, 1),
@@ -63,7 +60,6 @@ module.exports.revenueChartPost = async (req, res) => {
     // Truy vấn tất cả đơn hàng trong tháng trước đó 
     const previousMonthOrders = await Order.find({
       deleted: false,
-      paymentStatus: 'paid',
       status: "done",
       createdAt: {
         $gte: new Date(previousYear, previousMonth - 1, 1),

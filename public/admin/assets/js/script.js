@@ -623,7 +623,6 @@ if (orderEditForm) {
       const phone = event.target.elements.phone.value;
       const note = event.target.elements.note.value;
       const paymentMethod = event.target.elements.paymentMethod.value;
-      const paymentStatus = event.target.elements.paymentStatus.value;
       const status = event.target.elements.status.value;
 
       const dataFinal = {
@@ -631,7 +630,6 @@ if (orderEditForm) {
         phone,
         note,
         paymentMethod,
-        paymentStatus,
         status
       }
 

@@ -23,10 +23,8 @@ block main
             each item in paymentMethodList
               option(value=item.value selected=(orderDetail.paymentMethod === item.value)) #{item.label}
         .inner-group
-          label(for="paymentStatus") Trạng thái thanh toán
-          select(name="paymentStatus" id="paymentStatus")
-            each item in paymentStatusList
-              option(value=item.value selected=(orderDetail.paymentStatus === item.value)) #{item.label}
+          label(for="paidAt") Thời điểm thanh toán
+          input(type="text" id="paidAt" value=(orderDetail.paidAt ? moment(orderDetail.paidAt).format('HH:mm - DD/MM/YYYY') : "Chưa thanh toán") readonly disabled)
         .inner-group
           label(for="orderDate") Ngày đặt
           input(type="text" id="orderDate" value=moment(orderDetail.createdAt).format('HH:mm - DD/MM/YYYY') readonly disabled)
