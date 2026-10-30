@@ -12,8 +12,10 @@ block main
           label Tour
           if tour
             a(href=`/tour/detail/${tour.slug}` target="_blank") #{tour.tourName}
-          else
+          else if blogDetail.tourId
             span (Tour không tồn tại)
+          else
+            span (Không gắn tour)
         .inner-group
           label Trạng thái
           if blogDetail.status == "active"
