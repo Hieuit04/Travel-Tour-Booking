@@ -76,10 +76,12 @@ module.exports.edit = async (req, res) => {
     const tour = blogDetail.tourId ? await Tour.findOne({ _id: blogDetail.tourId }).select('tourName slug') : null;
     blogDetail.createdAtFormat = moment(blogDetail.createdAt).format('HH:mm - DD/MM/YYYY');
     blogDetail.publishedAtFormat = blogDetail.publishedAt ? moment(blogDetail.publishedAt).format('HH:mm - DD/MM/YYYY') : "";
+    const tourList = await Tour.find({ deleted: false }).select('tourName').sort({ tourName: 1 });
     res.render('admin/pages/blog-edit', {
       pageTitle: 'Chi tiết bài viết',
       blogDetail: blogDetail,
-      tour: tour
+      tour: tour,
+      tourList: tourList
     });
   } catch (error) {
     res.redirect(`/${variableConfig.pathAdmin}/blog/list`);
@@ -115,7 +117,7 @@ module.exports.preview = async (req, res) => {
 // action = "update": sửa bài đã đăng, giữ nguyên trạng thái đã đăng
 module.exports.editPatch = async (req, res) => {
   try {
-    const { title, excerpt, content, action } = req.body;
+    const { title, excerpt, content, action, tourId } = req.body;
     if (!["draft", "publish", "update"].includes(action)) {
       res.json({
         code: "error",
@@ -154,7 +156,16 @@ module.exports.editPatch = async (req, res) => {
       return;
     }
 
+    if (tourId && !(await Tour.exists({ _id: tourId, deleted: false }))) {
+      res.json({
+        code: "error",
+        message: "Tour không tồn tại!"
+      });
+      return;
+    }
+
     const dataUpdate = {
+      tourId: tourId || "",
       title: title.trim(),
       excerpt: excerpt || "",
       content: content,

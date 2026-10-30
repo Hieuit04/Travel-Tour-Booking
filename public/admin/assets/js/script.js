@@ -369,6 +369,7 @@ if (blogEditForm) {
       const formData = new FormData();
       formData.append('title', event.target.title.value);
       formData.append('excerpt', event.target.excerpt.value);
+      formData.append('tourId', event.target.tourId.value);
       formData.append('content', content);
       formData.append('action', action);
       if (avatar) {

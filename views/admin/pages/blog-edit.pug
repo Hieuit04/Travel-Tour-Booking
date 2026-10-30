@@ -9,13 +9,15 @@ block main
       form(id="blog-edit-form")
         input(type="hidden" name="id" value=blogDetail.id)
         .inner-group
-          label Tour
+          label(for="tourId") Tour
+          select(name="tourId" id="tourId")
+            option(value="") -- Không gắn tour --
+            if blogDetail.tourId && !tour
+              option(value="" selected) (Tour không tồn tại)
+            each item in tourList
+              option(value=item.id selected=(item.id == blogDetail.tourId)) #{item.tourName}
           if tour
-            a(href=`/tour/detail/${tour.slug}` target="_blank") #{tour.tourName}
-          else if blogDetail.tourId
-            span (Tour không tồn tại)
-          else
-            span (Không gắn tour)
+            a(href=`/tour/detail/${tour.slug}` target="_blank") Xem tour
         .inner-group
           label Trạng thái
           if blogDetail.status == "active"

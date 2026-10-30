@@ -1,4 +1,4 @@
-"""Nhập bài viết soạn sẵn (JSON) vào collection blogs ở trạng thái chờ duyệt.
+"""Nhập bài viết soạn sẵn (JSON, mỗi bài có tourSlug) vào collection blogs ở trạng thái chờ duyệt.
 
 python blog_automation/import_posts.py blog_automation/posts/2026-10-30.json
 """
@@ -22,6 +22,11 @@ def main():
     db = MongoClient(os.environ["DATABASE"]).get_default_database()
     now = datetime.now(timezone.utc)
     for p in posts:
+        # mỗi bài phải gắn một tour (trường tourSlug)
+        tour = db.tours.find_one({"slug": p.get("tourSlug"), "deleted": False}) if p.get("tourSlug") else None
+        if not tour:
+            print(f"bỏ qua (thiếu/sai tourSlug): {p['title']}")
+            continue
         slug = slugify(p["title"])
         body = p["content_markdown"]
         if p.get("avatarCredit"):
@@ -34,11 +39,12 @@ def main():
                     "excerpt": p["excerpt"],
                     "tags": p["tags"],
                     "avatar": p.get("avatar", ""),
+                    "tourId": str(tour["_id"]),
                     "content": markdown.markdown(body, extensions=["tables"]),
                     "updatedAt": now,
                 },
                 # chạy lại không làm mất trạng thái đã duyệt
-                "$setOnInsert": {"status": "pending", "deleted": False, "createdBy": "ai", "tourId": "", "createdAt": now},
+                "$setOnInsert": {"status": "pending", "deleted": False, "createdBy": "ai", "createdAt": now},
             },
             upsert=True,
         )
