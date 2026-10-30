@@ -259,7 +259,6 @@ if (categoryCreateForm) {
       const avatar = filePond.avatar?.getFile()?.file || null;
 
       const description = tinymce.get('description').getContent();
-
       const formData = new FormData();
       formData.append('categoryName', categoryName);
       formData.append('parent', parent);
@@ -1139,7 +1138,7 @@ if (changePasswordForm) {
       const finalData = {
         passWord: passWord,
       }
-      fetch(`/admin/account/reset-password`, {
+      fetch(`/${pathAdmin}/account/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

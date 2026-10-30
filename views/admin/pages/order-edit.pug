@@ -9,14 +9,14 @@ block main
       form(id="order-edit-form" data-api=`/${pathAdmin}/order/edit/${orderDetail.id}`)
         .inner-group
           label(for="fullName") Tên khách hàng
-          input(type="text" name="fullName" id="fullName" value=orderDetail.fullName)
+          input(type="text" name="fullName" id="fullName" value=orderDetail.fullName readonly)
         .inner-group
           label(for="phone") Số điện thoại
           - var displayPhone = orderDetail.phone.toString().startsWith("0") ? orderDetail.phone : "0" + orderDetail.phone
-          input(type="text" name="phone" id="phone" value=displayPhone)
+          input(type="text" name="phone" id="phone" value=displayPhone readonly)
         .inner-group.inner-two-col
           label(for="note") Ghi chú
-          textarea(name="note" id="note") #{orderDetail.note}
+          textarea(name="note" id="note" readonly) #{orderDetail.note}
         .inner-group
           label(for="paymentMethod") Phương thức thanh toán
           select(name="paymentMethod" id="paymentMethod")

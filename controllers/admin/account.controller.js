@@ -32,7 +32,7 @@ module.exports.loginPost = async (req, res) => {
       message: "Mật khẩu không chính xác",
     });
     return;
-  }
+  }   
 
   if (existAccount.status !== "active") {
     return res.json({
