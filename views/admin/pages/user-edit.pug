@@ -1,0 +1,43 @@
+extends ../layouts/default.pug
+
+block main
+  if(pers.includes("user-edit"))
+    h1.box-title Khách hàng: #{userDetail.fullName}
+
+    //- Section 8
+    .section-8
+      form(id="user-edit-form" data-api=`/${pathAdmin}/user/edit/${userDetail.id}`)
+        .inner-group
+          label(for="fullName") Họ và tên *
+          input(type="text" name="fullName" id="fullName" value=userDetail.fullName)
+        .inner-group
+          label(for="email") Email
+          input(type="email" name="email" id="email" value=userDetail.email readonly disabled)
+        .inner-group
+          label(for="phone") Số điện thoại
+          input(type="text" name="phone" id="phone" value=(userDetail.phone || "") placeholder="Chưa cập nhật SĐT")
+        .inner-group
+          label(for="authType") Phương thức đăng ký
+          input(type="text" id="authType" value=(userDetail.authType === "google" ? "Đăng nhập Google" : "Đăng ký thường") readonly disabled)
+        .inner-group
+          label(for="createdAt") Ngày đăng ký
+          input(type="text" id="createdAt" value=moment(userDetail.createdAt).format('HH:mm - DD/MM/YYYY') readonly disabled)
+        .inner-group
+          label(for="status") Trạng thái tài khoản
+          select(name="status" id="status")
+            each item in userStatusList
+              option(value=item.value selected=(userDetail.status === item.value)) #{item.label}
+        .inner-group.inner-two-col
+          label Ảnh đại diện
+          div(style="display: flex; align-items: center; gap: 15px; margin-top: 5px;")
+            if userDetail.avatar
+              img(src=userDetail.avatar style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #e0e0e0;" onerror="this.src='https://placehold.co/60x60?text=U'")
+            else
+              img(src="https://placehold.co/60x60?text=U" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #e0e0e0;")
+            span(style="color: #888; font-size: 13px;") Ảnh đại diện tài khoản khách hàng
+        .inner-group.inner-two-col.text-center
+          button.btn-create(type="submit") Cập nhật
+      .inner-link
+        a(href=`/${pathAdmin}/user/list`) Quay lại danh sách
+    //- End Section 8
+

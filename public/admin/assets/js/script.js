@@ -657,6 +657,63 @@ if (orderEditForm) {
 }
 // End validate order edit form
 
+// Validate user edit form
+const userEditForm = document.querySelector('.section-8 #user-edit-form');
+if (userEditForm) {
+  const validator = new JustValidate('#user-edit-form');
+  validator
+    .addField('#fullName', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập họ và tên khách hàng!',
+      },
+    ])
+    .onSuccess((event) => {
+      const btnSubmit = event.target.querySelector('button[type="submit"]');
+      btnSubmit.disabled = true;
+      btnSubmit.innerText = "Đang xử lý...";
+
+      const api = userEditForm.getAttribute('data-api');
+      const fullName = event.target.elements.fullName.value;
+      const phone = event.target.elements.phone ? event.target.elements.phone.value : "";
+      const status = event.target.elements.status.value;
+
+      const dataFinal = {
+        fullName,
+        phone,
+        status,
+      };
+
+      fetch(api, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataFinal),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code == "success") {
+            notyf.success(data.message);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+          } else {
+            notyf.error(data.message);
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
+        })
+        .catch(err => {
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+          btnSubmit.disabled = false;
+          btnSubmit.innerText = "Cập nhật";
+        });
+    });
+}
+// End validate user edit form
+
+
 
 // Validate setting website info form
 const settingWebsiteInfoForm = document.querySelector('.section-8 #setting-website-info-form');

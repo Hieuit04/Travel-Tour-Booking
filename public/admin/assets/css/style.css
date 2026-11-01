@@ -201,6 +201,11 @@ input, textarea, select, button {
   margin-left: 10px;
 }
 
+.form-account .google-signin .S9gUrf-YoZ4jf div{
+  display: flex;
+  
+}
+
 @media (max-width: 768px) {
   .form-account {
     width: 80%;

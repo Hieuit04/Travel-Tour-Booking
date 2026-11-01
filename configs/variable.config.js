@@ -144,6 +144,18 @@ module.exports.permissionList = [
   {
     label: "Xoá bài viết",
     value: "blog-delete",
+  },
+  {
+    label: "Xem tài khoản khách hàng",
+    value: "user-view",
+  },
+  {
+    label: "Sửa tài khoản khách hàng",
+    value: "user-edit",
+  },
+  {
+    label: "Xoá tài khoản khách hàng",
+    value: "user-delete",
   }
 ];
 
@@ -155,6 +167,17 @@ module.exports.blogStatusList = [
   {
     label: "Đã đăng",
     value: "active",
+  }
+];
+
+module.exports.userStatusList = [
+  {
+    label: "Hoạt động",
+    value: "active",
+  },
+  {
+    label: "Tạm dừng",
+    value: "inactive",
   }
 ];
 

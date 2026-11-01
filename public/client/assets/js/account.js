@@ -54,178 +54,179 @@ if (loginForm) {
 
 // Validate register form
 const registerForm = document.querySelector('.form-account #register-form')
-if(registerForm) {
-    const validator = new JustValidate('#register-form');
-    validator
-        .addField("#fullName", [
-            {
-                rule: "required",
-                message: "Vui lòng nhập họ tên"
-            },
-            {
-                rule: "minLength",
-                value: 5,
-                errorMessage: "Tên tối thiểu 5 ký tự!",                
-            },
-            {
-                rule: "maxLength",
-                value: 50,
-                errorMessage: "Họ và tên không được quá 50 ký tự!",
-            }
-        ])
-        .addField("#email", [
-            {
-                rule: "required",
-                message: "Vui lòng nhập email",
-            },
-            {
-                rule: "email",
-                message: "Email không hợp lệ",
-            }
-        ])
-        .addField("#password", [
-            {
-                rule: "required",
-                message: "Vui lòng nhập mật khẩu",
-            },
-            {
-                rule: "strongPassword",
-                errorMessage: (value) =>{
-                    let html = ``;
-                    if(value.length < 8) {
-                        html += `Mật khẩu phải có ít nhất 8 ký tự <br>`;
-                    }
-                    if (!/[0-9]/.test(value)) {
-                        html += `<div>Mật khẩu phải chứa ít nhất 1 chữ số!</div>`
-                    }
-                    if (!/[a-z]/.test(value)) {
-                        html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết thường!</div>`
-                    }
-                    if (!/[A-Z]/.test(value)) {
-                        html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết hoa!</div>`
-                    }
-                    if (!/[^A-Za-z0-9]/.test(value)) {
-                        html += `<div>Mật khẩu phải chứa ký tự đặc biệt!</div>`
-                    }
-                    return html
-                }
-            }
-        ])
-        .addField('#agree', [
-            {
-                rule: "required",
-                message: "Vui lòng đồng ý với điều khoản"
-            }
-        ])
-        .onSuccess((event) => {
-            const fullName = event.target.fullName.value;
-            const email = event.target.email.value;
-            const password = event.target.password.value;
-            const dataFinal = {
-                fullName: fullName,
-                passWord: password,
-            }
-            fetch(`/account/register`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(dataFinal),
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.code == 'error') {
-                        notyf.error(data.message);
-                    }
-                    if(data.code == 'success') {
-                        console.log(data);
-                        drawNotyf(data.code, data.message);
-                        window.location.href = `/account/otp-verification?email=${email}`;
-                    }
+if (registerForm) {
+  const validator = new JustValidate('#register-form');
+  validator
+    .addField("#fullName", [
+      {
+        rule: "required",
+        message: "Vui lòng nhập họ tên"
+      },
+      {
+        rule: "minLength",
+        value: 5,
+        errorMessage: "Tên tối thiểu 5 ký tự!",
+      },
+      {
+        rule: "maxLength",
+        value: 50,
+        errorMessage: "Họ và tên không được quá 50 ký tự!",
+      }
+    ])
+    .addField("#email", [
+      {
+        rule: "required",
+        message: "Vui lòng nhập email",
+      },
+      {
+        rule: "email",
+        message: "Email không hợp lệ",
+      }
+    ])
+    .addField("#password", [
+      {
+        rule: "required",
+        message: "Vui lòng nhập mật khẩu",
+      },
+      {
+        rule: "strongPassword",
+        errorMessage: (value) => {
+          let html = ``;
+          if (value.length < 8) {
+            html += `Mật khẩu phải có ít nhất 8 ký tự <br>`;
+          }
+          if (!/[0-9]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ số!</div>`
+          }
+          if (!/[a-z]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết thường!</div>`
+          }
+          if (!/[A-Z]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết hoa!</div>`
+          }
+          if (!/[^A-Za-z0-9]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ký tự đặc biệt!</div>`
+          }
+          return html
+        }
+      }
+    ])
+    .addField('#agree', [
+      {
+        rule: "required",
+        message: "Vui lòng đồng ý với điều khoản"
+      }
+    ])
+    .onSuccess((event) => {
+      const fullName = event.target.fullName.value;
+      const email = event.target.email.value;
+      const password = event.target.password.value;
+      const dataFinal = {
+        fullName: fullName,
+        email: email,
+        passWord: password,
+      }
+      fetch(`/account/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataFinal),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code == 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code == 'success') {
+            console.log(data);
+            drawNotyf(data.code, data.message);
+            window.location.href = `/account/otp-verification?email=${email}`;
+          }
 
-                })
         })
+    })
 }
 // End Validate register form
 
 // Validate forgot password form
 const forgotPasswordForm = document.querySelector('.form-account #forgot-password-form');
-if(forgotPasswordForm){
-    const validator = new JustValidate('#forgot-password-form');
-    validator
-        .addField('#email', [
-            {
-                rule: "required",
-                message: "Vui lòng nhập email",
-            },
-            {
-                rule: "email",
-                message: "Email không hợp lệ",
-            }
-        ])
-        .onSuccess((event) => {
-            const email = event.target.email.value;
-            const dataFinal = {
-                email: email,
-            }
-            fetch(`/account/forgot-password`, {
-                method: "POST",
-                headers:{
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(dataFinal),
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.code == 'error') {
-                        notyf.error(data.message);
-                    }
-                    if(data.code == 'success') {
-                        drawNotyf(data.code, data.message);
-                        window.location.href = `/account/otp-verification?email=${email}`;
-                    }
-                })
+if (forgotPasswordForm) {
+  const validator = new JustValidate('#forgot-password-form');
+  validator
+    .addField('#email', [
+      {
+        rule: "required",
+        message: "Vui lòng nhập email",
+      },
+      {
+        rule: "email",
+        message: "Email không hợp lệ",
+      }
+    ])
+    .onSuccess((event) => {
+      const email = event.target.email.value;
+      const dataFinal = {
+        email: email,
+      }
+      fetch(`/account/forgot-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataFinal),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code == 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code == 'success') {
+            drawNotyf(data.code, data.message);
+            window.location.href = `/account/otp-verification?email=${email}`;
+          }
         })
+    })
 }
 //Validate forgot password form
 
 // Validate OTP form
 const otpVerificationForm = document.querySelector('.form-account #otp-verification-form');
-if(otpVerificationForm){
-    const validator = new JustValidate('#otp-verification-form');
-    validator
-        .addField('#otp', [
-            {
-                rule: "required",
-                message: "Vui lòng nhập mã OTP",
-            }
-        ])
-        .onSuccess((event) => {
-            const otp = event.target.otp.value;
-            const email = event.target.email.value;
-            const dataFinal = {
-                email: email,
-                otp: otp,
-            }
-            fetch(`/account/otp-verification`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(dataFinal),
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.code == 'error') {
-                        notyf.error(data.message);
-                    }
-                    if(data.code == 'success') {
-                        drawNotyf(data.code, data.message);
-                        if(data.purpose == 'register') window.location.href = `/account/login`;
-                        if(data.purpose == 'forgot-password') window.location.href = `/account/reset-password`;
-                    }
-                })
-        });
+if (otpVerificationForm) {
+  const validator = new JustValidate('#otp-verification-form');
+  validator
+    .addField('#otp', [
+      {
+        rule: "required",
+        message: "Vui lòng nhập mã OTP",
+      }
+    ])
+    .onSuccess((event) => {
+      const otp = event.target.otp.value;
+      const email = event.target.email.value;
+      const dataFinal = {
+        email: email,
+        otp: otp,
+      }
+      fetch(`/account/otp-verification`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataFinal),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code == 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code == 'success') {
+            drawNotyf(data.code, data.message);
+            if (data.purpose == 'register') window.location.href = `/account/login`;
+            if (data.purpose == 'forgot-password') window.location.href = `/account/reset-password`;
+          }
+        })
+    });
 }
 // End Validate OTP form
 
@@ -308,154 +309,154 @@ if (resetPasswordForm) {
 
 // Validate login with google
 async function handleGoogleCredential(response) {
-    try {
-        const googleIdToken = response.credential;
-        if (!googleIdToken) {
-            notyf.error("Không nhận được thông tin xác thực từ Google!");
-            return;
-        }
-        const result = await fetch("/account/auth/google", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                credential: googleIdToken
-            })
-        });
-
-        const data = await result.json();
-        if (data.code === "error") {
-            notyf.error(data.message);
-            return;
-        }
-        if (data.code === "complete-register") {
-            window.location.href = "/account/complete-register";
-            return;
-        }
-        if (data.code === "success") {
-            drawNotyf(
-                data.code,
-                data.message
-            );
-            window.location.href = "/";
-        }
-    } catch (error) {
-        console.error("Google Login Error:", error);
-        notyf.error(
-            "Đã xảy ra lỗi khi đăng nhập bằng Google!"
-        );
+  try {
+    const googleIdToken = response.credential;
+    if (!googleIdToken) {
+      notyf.error("Không nhận được thông tin xác thực từ Google!");
+      return;
     }
+    const result = await fetch("/account/auth/google", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        credential: googleIdToken
+      })
+    });
+
+    const data = await result.json();
+    if (data.code === "error") {
+      notyf.error(data.message);
+      return;
+    }
+    if (data.code === "complete-register") {
+      window.location.href = "/account/complete-register";
+      return;
+    }
+    if (data.code === "success") {
+      drawNotyf(
+        data.code,
+        data.message
+      );
+      window.location.href = "/";
+    }
+  } catch (error) {
+    console.error("Google Login Error:", error);
+    notyf.error(
+      "Đã xảy ra lỗi khi đăng nhập bằng Google!"
+    );
+  }
 }
 // End validate login with google
 
 // Render nút đăng nhập Google
 const googleSigninOverlay = document.querySelector('.google-signin-overlay') || document.querySelector('.google-signin');
 if (googleSigninOverlay) {
-    const initGoogleButton = () => {
-        google.accounts.id.initialize({
-            client_id: googleSigninOverlay.getAttribute('data-client-id'),
-            callback: handleGoogleCredential,
-            auto_select: false,
-        });
-        google.accounts.id.renderButton(googleSigninOverlay, {
-            type: "standard",
-            theme: "outline",
-            size: "large",
-            width: 400,
-        });
-    };
-    if (window.google && google.accounts && google.accounts.id) {
-        initGoogleButton();
-    } else {
-        window.onGoogleLibraryLoad = initGoogleButton;
-    }
+  const initGoogleButton = () => {
+    google.accounts.id.initialize({
+      client_id: googleSigninOverlay.getAttribute('data-client-id'),
+      callback: handleGoogleCredential,
+      auto_select: false,
+    });
+    google.accounts.id.renderButton(googleSigninOverlay, {
+      type: "standard",
+      theme: "outline",
+      size: "large",
+      width: 400,
+    });
+  };
+  if (window.google && google.accounts && google.accounts.id) {
+    initGoogleButton();
+  } else {
+    window.onGoogleLibraryLoad = initGoogleButton;
+  }
 }
 // End render nút đăng nhập Google
 
 // Validate completeRegister form
 const completeRegisterForm = document.querySelector('.form-account #complete-register-form')
-if(completeRegisterForm) {
-    const validator = new JustValidate('#complete-register-form');
-    validator
-        .addField("#fullName", [
-            {
-                rule: "required",
-                message: "Vui lòng nhập họ tên"
-            },
-            {
-                rule: "minLength",
-                value: 5,
-                errorMessage: "Tên tối thiểu 5 ký tự!",                
-            },
-            {
-                rule: "maxLength",
-                value: 50,
-                errorMessage: "Họ và tên không được quá 50 ký tự!",
-            }
-        ])
-        .addField("#password", [
-            {
-                rule: "required",
-                message: "Vui lòng nhập mật khẩu",
-            },
-            {
-                rule: "strongPassword",
-                errorMessage: (value) =>{
-                    let html = ``;
-                    if(value.length < 8) {
-                        html += `Mật khẩu phải có ít nhất 8 ký tự <br>`;
-                    }
-                    if (!/[0-9]/.test(value)) {
-                        html += `<div>Mật khẩu phải chứa ít nhất 1 chữ số!</div>`
-                    }
-                    if (!/[a-z]/.test(value)) {
-                        html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết thường!</div>`
-                    }
-                    if (!/[A-Z]/.test(value)) {
-                        html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết hoa!</div>`
-                    }
-                    if (!/[^A-Za-z0-9]/.test(value)) {
-                        html += `<div>Mật khẩu phải chứa ký tự đặc biệt!</div>`
-                    }
-                    return html
-                }
-            }
-        ])
-        .addField('#agree', [
-            {
-                rule: "required",
-                message: "Vui lòng đồng ý với điều khoản"
-            }
-        ])
-        .onSuccess((event) => {
-            const fullName = event.target.fullName.value;
-            const email = event.target.email.value;
-            const password = event.target.password.value;
-            const dataFinal = {
-                fullName: fullName,
-                email: email,
-                passWord: password,
-            }
-            fetch(`/account/complete-register`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(dataFinal),
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.code == 'error') {
-                        notyf.error(data.message);
-                    }
-                    if(data.code == 'success') {
-                        console.log(data);
-                        drawNotyf(data.code, data.message);
-                        window.location.href = `/account/otp-verification?email=${email}`;
-                    }
+if (completeRegisterForm) {
+  const validator = new JustValidate('#complete-register-form');
+  validator
+    .addField("#fullName", [
+      {
+        rule: "required",
+        message: "Vui lòng nhập họ tên"
+      },
+      {
+        rule: "minLength",
+        value: 5,
+        errorMessage: "Tên tối thiểu 5 ký tự!",
+      },
+      {
+        rule: "maxLength",
+        value: 50,
+        errorMessage: "Họ và tên không được quá 50 ký tự!",
+      }
+    ])
+    .addField("#password", [
+      {
+        rule: "required",
+        message: "Vui lòng nhập mật khẩu",
+      },
+      {
+        rule: "strongPassword",
+        errorMessage: (value) => {
+          let html = ``;
+          if (value.length < 8) {
+            html += `Mật khẩu phải có ít nhất 8 ký tự <br>`;
+          }
+          if (!/[0-9]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ số!</div>`
+          }
+          if (!/[a-z]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết thường!</div>`
+          }
+          if (!/[A-Z]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ít nhất 1 chữ viết hoa!</div>`
+          }
+          if (!/[^A-Za-z0-9]/.test(value)) {
+            html += `<div>Mật khẩu phải chứa ký tự đặc biệt!</div>`
+          }
+          return html
+        }
+      }
+    ])
+    .addField('#agree', [
+      {
+        rule: "required",
+        message: "Vui lòng đồng ý với điều khoản"
+      }
+    ])
+    .onSuccess((event) => {
+      const fullName = event.target.fullName.value;
+      const email = event.target.email.value;
+      const password = event.target.password.value;
+      const dataFinal = {
+        fullName: fullName,
+        email: email,
+        passWord: password,
+      }
+      fetch(`/account/complete-register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataFinal),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code == 'error') {
+            notyf.error(data.message);
+          }
+          if (data.code == 'success') {
+            console.log(data);
+            drawNotyf(data.code, data.message);
+            window.location.href = `/account/otp-verification?email=${email}`;
+          }
 
-                })
         })
+    })
 }
 // End Validate register form
