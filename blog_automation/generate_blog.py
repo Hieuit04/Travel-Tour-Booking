@@ -4,12 +4,17 @@ Chạy:  python blog_automation/generate_blog.py            # viết cho mọi t
        python blog_automation/generate_blog.py --slug ten-tour --dry-run
 """
 import argparse
+import hashlib
 import html
+import json
 import os
 import re
+import time
 import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 
 import anthropic
 import markdown
@@ -21,6 +26,7 @@ from pymongo import MongoClient
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 MODEL = os.getenv("BLOG_MODEL", "claude-opus-5")
+MIN_IMAGES = 4  # ảnh bìa + 3 ảnh trong bài
 
 SYSTEM = """Bạn là biên tập viên du lịch giàu kinh nghiệm, viết blog tiếng Việt cho một website đặt tour.
 Mục tiêu: bài viết mang tính THÔNG TIN, hữu ích cho người đọc lên kế hoạch chuyến đi, không phải bài quảng cáo.
@@ -59,12 +65,62 @@ def tour_images(tour: dict) -> list[str]:
     return [img for img in [tour.get("avatar"), *(tour.get("images") or [])] if img and img.strip()]
 
 
-def fill_images(md: str, images: list[str]) -> str:
-    """Thay IMAGE_n bằng URL ảnh thật; xoá ảnh có chỉ số không hợp lệ."""
+def fill_images(md: str, images: list[str], credits: list[str] | None = None) -> str:
+    """Thay IMAGE_n bằng URL ảnh thật (kèm chú thích nguồn nếu có); xoá ảnh có chỉ số không hợp lệ."""
+    credits = credits or []
     def repl(m: re.Match) -> str:
         i = int(m.group(2)) - 1
-        return f"![{m.group(1)}]({images[i]})" if 0 <= i < len(images) else ""
+        if not 0 <= i < len(images):
+            return ""
+        credit = credits[i] if i < len(credits) else ""
+        return f"![{m.group(1)}]({images[i]})" + (f"\n\n*Ảnh: {credit}*\n" if credit else "")
     return re.sub(r"!\[([^\]]*)\]\(IMAGE_(\d+)\)", repl, md)
+
+
+def pick_commons(pages, n: int) -> list[tuple[str, str]]:
+    """Lọc ảnh ngang, đủ lớn, giấy phép CC/public domain cho phép thương mại và chỉnh sửa → [(url, chú thích nguồn)]."""
+    picked = []
+    for p in sorted(pages, key=lambda p: p.get("index", 0)):
+        ii = (p.get("imageinfo") or [{}])[0]
+        meta = ii.get("extmetadata", {})
+        lic = meta.get("LicenseShortName", {}).get("value", "")
+        if (ii.get("width", 0) < 1200 or ii["width"] < ii.get("height", 0)
+                or not re.search(r"CC|Public domain", lic, re.I) or "NC" in lic or "ND" in lic):
+            continue
+        author = strip_html(meta.get("Artist", {}).get("value", ""))
+        if not author or "[" in author:
+            author = "Wikimedia Commons"
+        picked.append((ii["thumburl"], f"{author}, [{lic}]({ii['descriptionurl']})"))
+        if len(picked) == n:
+            break
+    return picked
+
+
+def commons_images(query: str, n: int) -> list[tuple[str, str]]:
+    """Tìm ảnh điểm đến trên Wikimedia Commons (ảnh giấy phép mở, phải ghi nguồn)."""
+    params = {"action": "query", "format": "json", "generator": "search", "gsrsearch": f"{query} filetype:bitmap",
+              "gsrnamespace": 6, "gsrlimit": 30, "prop": "imageinfo", "iiprop": "url|extmetadata|size", "iiurlwidth": 1280}
+    try:
+        req = Request("https://commons.wikimedia.org/w/api.php?" + urlencode(params),
+                      headers={"User-Agent": "travel-website-blog/1.0"})
+        pages = json.load(urlopen(req, timeout=30)).get("query", {}).get("pages", {}).values()
+    except (OSError, ValueError):
+        return []
+    return pick_commons(pages, n)
+
+
+def upload_cloudinary(url: str) -> str:
+    """Tải ảnh lên Cloudinary (giống ảnh admin upload); lỗi hoặc thiếu cấu hình thì giữ URL gốc."""
+    name, key, secret = (os.getenv(k) for k in ("CLOUDINARY_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"))
+    if not (name and key and secret):
+        return url
+    ts = str(int(time.time()))
+    signature = hashlib.sha1(f"folder=blog&timestamp={ts}{secret}".encode()).hexdigest()
+    data = urlencode({"file": url, "folder": "blog", "timestamp": ts, "api_key": key, "signature": signature}).encode()
+    try:
+        return json.load(urlopen(f"https://api.cloudinary.com/v1_1/{name}/image/upload", data, timeout=60))["secure_url"]
+    except (OSError, ValueError, KeyError):
+        return url
 
 
 def tour_brief(tour: dict, cities: list[str], images: list[str]) -> str:
@@ -119,8 +175,17 @@ def main():
 
     for tour in db.tours.find(query).limit(args.limit):
         city_ids = [ObjectId(c) for c in tour.get("location") or [] if ObjectId.is_valid(c)]
-        cities = [c["name"] for c in db.cities.find({"_id": {"$in": city_ids}})]
+        names = {c["_id"]: c["name"] for c in db.cities.find({"_id": {"$in": city_ids}})}
+        cities = [names[c] for c in city_ids if c in names]
         images = tour_images(tour)
+        credits = [""] * len(images)
+        # tour ít ảnh thì bổ sung ảnh điểm đến từ Internet, ưu tiên thành phố cuối (điểm đến)
+        for city in reversed(cities):
+            if len(images) >= MIN_IMAGES:
+                break
+            for url, credit in commons_images(city, MIN_IMAGES - len(images)):
+                images.append(url if args.dry_run else upload_cloudinary(url))
+                credits.append(credit)
         print(f"→ {tour['tourName']}")
         try:
             post = write_post(client, tour_brief(tour, cities, images))
@@ -128,7 +193,9 @@ def main():
             print(f"  lỗi, bỏ qua: {e}")
             continue
 
-        body_md = fill_images(post.content_markdown, images)
+        body_md = fill_images(post.content_markdown, images, credits)
+        if credits and credits[0]:
+            body_md += f"\n\n*Ảnh bìa: {credits[0]}*"
         if args.dry_run:
             print(f"# {post.title}\n\n{body_md}\n")
             continue

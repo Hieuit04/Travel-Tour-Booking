@@ -29,7 +29,7 @@ if (loginForm) {
         passWord: password,
         rememberPassword: rememberPassword,
       }
-      fetch(`/admin/account/login`, {
+      fetch(`/${pathAdmin}/account/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -129,7 +129,7 @@ if (registerForm) {
         email: email,
         passWord: password,
       }
-      fetch(`/admin/account/register`, {
+      fetch(`/${pathAdmin}/account/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -174,7 +174,7 @@ if (forgotPasswordForm) {
       const dataFinal = {
         email: email,
       }
-      fetch(`/admin/account/forgot-password`, {
+      fetch(`/${pathAdmin}/account/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -216,7 +216,7 @@ if (otpPasswordForm) {
         email: email,
         otp: otp,
       }
-      fetch(`/admin/account/otp-password`, {
+      fetch(`/${pathAdmin}/account/otp-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -293,7 +293,7 @@ if (resetPasswordForm) {
       const finalData = {
         passWord: passWord,
       }
-      fetch(`/admin/account/reset-password`, {
+      fetch(`/${pathAdmin}/account/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

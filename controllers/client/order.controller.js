@@ -45,7 +45,6 @@ module.exports.createPost = async (req, res) => {
     }
     req.body.discount = 0;
     req.body.total = req.body.subTotal - req.body.discount;
-    req.body.paymentStatus = "unpaid";
     req.body.status = "initial";
     req.body.accountId = res.locals.account ? res.locals.account.id : "";
     const order = new Order(req.body);
@@ -87,7 +86,6 @@ module.exports.success = async (req, res) => {
       order: order,
       moment: moment,
       paymentMethodList: variableConfig.paymentMethodList,
-      paymentStatusList: variableConfig.paymentStatusList,
       orderStatusList: variableConfig.orderStatusList
     });
   } catch (error) {
@@ -180,9 +178,11 @@ module.exports.paymentZalopayResultPost = async (req, res) => {
       const order = await Order.updateOne({
         code: orderCode,
         phone: phone,
-        deleted: false
+        deleted: false,
+        status: "initial", // không ghi đè đơn đã xác nhận/hủy
       }, {
-        paymentStatus: "paid", // cập nhật trạng thái thanh toán
+        status: "paid",
+        paidAt: new Date(),
       });
 
       result.return_code = 1;
@@ -311,9 +311,11 @@ module.exports.paymentVnpayResult = async (req, res) => {
       await Order.updateOne({
         code: orderCode,
         phone: phone,
-        deleted: false
+        deleted: false,
+        status: "initial", // không ghi đè đơn đã xác nhận/hủy
       }, {
-        paymentStatus: "paid", // cập nhật trạng thái thanh toán
+        status: "paid",
+        paidAt: new Date(),
       });
 
       res.redirect(`${process.env.DOMAIN_WEBSITE}/order/success?orderCode=${orderCode}&phone=${phone}`);

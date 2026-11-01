@@ -26,11 +26,11 @@ module.exports.detail = async (req, res) => {
       return;
     }
     blogDetail.createdAtFormat = moment(blogDetail.createdAt).format('DD/MM/YYYY');
-    const tour = await Tour.findOne({
+    const tour = blogDetail.tourId ? await Tour.findOne({
       _id: blogDetail.tourId,
       status: "active",
       deleted: false
-    }).lean();
+    }).lean() : null;
     res.render('client/pages/blog-detail', {
       pageTitle: blogDetail.title,
       blogDetail: blogDetail,

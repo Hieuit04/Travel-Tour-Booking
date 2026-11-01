@@ -24,11 +24,6 @@ block main
             option(value="") Phương thức thanh toán
             each item in paymentMethodList
               option(value=item.value) #{item.label}
-        .inner-item
-          select(filter name="paymentStatus")
-            option(value="") Trạng thái thanh toán
-            each item in paymentStatusList
-              option(value=item.value) #{item.label}
         .inner-item.inner-reset(button-reset-filter)
           <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
     //- End Section 4
@@ -98,16 +93,9 @@ block main
                 
                 - var paymentMethodItem = paymentMethodList.find(pm => pm.value === item.paymentMethod)
                 div PTTT: #{paymentMethodItem ? paymentMethodItem.label : item.paymentMethod}
-                
-                - var paymentStatusItem = paymentStatusList.find(ps => ps.value === item.paymentStatus)
-                div TTTT: 
-                  if item.paymentStatus === 'paid'
-                    b(style="color: green;") #{paymentStatusItem ? paymentStatusItem.label : item.paymentStatus}
-                  else
-                    b(style="color: red;") #{paymentStatusItem ? paymentStatusItem.label : item.paymentStatus}
               td
                 - var orderStatusItem = orderStatusList.find(os => os.value === item.status)
-                if item.status === "success" || item.status === "done"
+                if item.status === "done"
                   .tag.tag-green #{orderStatusItem ? orderStatusItem.label : item.status}
                 else if item.status === "cancel"
                   .tag.tag-red #{orderStatusItem ? orderStatusItem.label : item.status}

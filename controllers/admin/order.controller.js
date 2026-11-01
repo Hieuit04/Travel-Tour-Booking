@@ -14,11 +14,6 @@ module.exports.list = async (req, res) => {
     find.status = req.query.status;
   }
 
-  // Lọc theo trạng thái thanh toán
-  if (req.query.paymentStatus) {
-    find.paymentStatus = req.query.paymentStatus;
-  }
-
   // Lọc theo phương thức thanh toán
   if (req.query.paymentMethod) {
     find.paymentMethod = req.query.paymentMethod;
@@ -74,7 +69,6 @@ module.exports.list = async (req, res) => {
     pagination: pagination,
     moment: moment,
     orderStatusList: variableConfig.orderStatusList,
-    paymentStatusList: variableConfig.paymentStatusList,
     paymentMethodList: variableConfig.paymentMethodList,
   });
 };
@@ -93,7 +87,6 @@ module.exports.edit = async (req, res) => {
       orderDetail: orderDetail,
       moment: moment,
       orderStatusList: variableConfig.orderStatusList,
-      paymentStatusList: variableConfig.paymentStatusList,
       paymentMethodList: variableConfig.paymentMethodList,
     });
   } catch (error) {
@@ -114,6 +107,9 @@ module.exports.editPatch = async (req, res) => {
       ...req.body,
       updatedBy: adminId
     });
+    if (req.body.status === "paid") {
+      await Order.updateOne({ _id: id, paidAt: null }, { paidAt: new Date() });
+    }
 
     res.json({
       code: "success",
@@ -173,6 +169,9 @@ module.exports.changeMultiPatch = async (req, res) => {
           updatedBy: adminId
         }
       );
+      if (option === "paid") {
+        await Order.updateMany({ _id: { $in: listId }, paidAt: null }, { paidAt: new Date() });
+      }
       res.json({
         code: "success",
         message: "Cập nhật trạng thái thành công"

@@ -259,7 +259,6 @@ if (categoryCreateForm) {
       const avatar = filePond.avatar?.getFile()?.file || null;
 
       const description = tinymce.get('description').getContent();
-
       const formData = new FormData();
       formData.append('categoryName', categoryName);
       formData.append('parent', parent);
@@ -370,6 +369,7 @@ if (blogEditForm) {
       const formData = new FormData();
       formData.append('title', event.target.title.value);
       formData.append('excerpt', event.target.excerpt.value);
+      formData.append('tourId', event.target.tourId.value);
       formData.append('content', content);
       formData.append('action', action);
       if (avatar) {
@@ -623,7 +623,6 @@ if (orderEditForm) {
       const phone = event.target.elements.phone.value;
       const note = event.target.elements.note.value;
       const paymentMethod = event.target.elements.paymentMethod.value;
-      const paymentStatus = event.target.elements.paymentStatus.value;
       const status = event.target.elements.status.value;
 
       const dataFinal = {
@@ -631,7 +630,6 @@ if (orderEditForm) {
         phone,
         note,
         paymentMethod,
-        paymentStatus,
         status
       }
 
@@ -1186,7 +1184,7 @@ if (changePasswordForm) {
       const finalData = {
         passWord: passWord,
       }
-      fetch(`/admin/account/reset-password`, {
+      fetch(`/${pathAdmin}/account/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

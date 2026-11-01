@@ -177,24 +177,21 @@ module.exports.paymentMethodList = [
   }
 ];
 
-module.exports.paymentStatusList = [
-  {
-    label: "Chưa thanh toán",
-    value: "unpaid",
-  },
-  {
-    label: "Đã thanh toán",
-    value: "paid",
-  }
-];
-
 module.exports.orderStatusList = [
   {
     label: "Khởi tạo",
     value: "initial",
   },
   {
-    label: "Đã hoàn thành",
+    label: "Đã thanh toán",
+    value: "paid",
+  },
+  {
+    label: "Xác nhận",
+    value: "confirmed",
+  },
+  {
+    label: "Hoàn thành",
     value: "done",
   },
   {

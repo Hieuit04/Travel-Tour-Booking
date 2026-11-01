@@ -9,24 +9,22 @@ block main
       form(id="order-edit-form" data-api=`/${pathAdmin}/order/edit/${orderDetail.id}`)
         .inner-group
           label(for="fullName") Tên khách hàng
-          input(type="text" name="fullName" id="fullName" value=orderDetail.fullName)
+          input(type="text" name="fullName" id="fullName" value=orderDetail.fullName readonly)
         .inner-group
           label(for="phone") Số điện thoại
           - var displayPhone = orderDetail.phone.toString().startsWith("0") ? orderDetail.phone : "0" + orderDetail.phone
-          input(type="text" name="phone" id="phone" value=displayPhone)
+          input(type="text" name="phone" id="phone" value=displayPhone readonly)
         .inner-group.inner-two-col
           label(for="note") Ghi chú
-          textarea(name="note" id="note") #{orderDetail.note}
+          textarea(name="note" id="note" readonly) #{orderDetail.note}
         .inner-group
           label(for="paymentMethod") Phương thức thanh toán
           select(name="paymentMethod" id="paymentMethod")
             each item in paymentMethodList
               option(value=item.value selected=(orderDetail.paymentMethod === item.value)) #{item.label}
         .inner-group
-          label(for="paymentStatus") Trạng thái thanh toán
-          select(name="paymentStatus" id="paymentStatus")
-            each item in paymentStatusList
-              option(value=item.value selected=(orderDetail.paymentStatus === item.value)) #{item.label}
+          label(for="paidAt") Thời điểm thanh toán
+          input(type="text" id="paidAt" value=(orderDetail.paidAt ? moment(orderDetail.paidAt).format('HH:mm - DD/MM/YYYY') : "Chưa thanh toán") readonly disabled)
         .inner-group
           label(for="orderDate") Ngày đặt
           input(type="text" id="orderDate" value=moment(orderDetail.createdAt).format('HH:mm - DD/MM/YYYY') readonly disabled)
