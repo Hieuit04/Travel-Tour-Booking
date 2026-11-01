@@ -1,6 +1,6 @@
-const Tour = require('../../models/tour.model');
+const Tour = require('../../models/tour.model.js');
 const moment = require('moment');
-const City = require('../../models/city.model');
+const City = require('../../models/city.model.js');
 
 module.exports.cart = (req, res) => {
   res.render('client/pages/cart', {
