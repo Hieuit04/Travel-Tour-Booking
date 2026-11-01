@@ -1,95 +1,120 @@
 extends ../layouts/default.pug
 
 block main
-  .container
-    .section-my-orders
-      h1.inner-title Đơn hàng của tôi
+  .container(style="padding: 40px 15px 60px;")
+    h1.box-title Đơn hàng của tôi
 
-      //- Tab lọc trạng thái
-      .inner-tabs
-        a.inner-tab(
-          href="/my-orders"
-          class=(currentStatus === "" ? "active" : "")
-        ) Tất cả
-        each statusItem in orderStatusList
-          a.inner-tab(
-            href=`/my-orders?status=${statusItem.value}`
-            class=(currentStatus === statusItem.value ? "active" : "")
-          ) #{statusItem.label}
+    //- Thanh công cụ Bộ lọc & Tìm kiếm (cùng 1 hàng, khoảng cách gọn gàng)
+    .section-filter-wrap
+      .section-4(style="padding-bottom: 0px")
+        .inner-wrap
+          .inner-item
+            <i class="fa-solid fa-filter"></i> Bộ lọc
+          .inner-item
+            select(filter name="status")
+              option(value="") Trạng thái
+              each item in orderStatusList
+                option(value=item.value) #{item.label}
+          .inner-item
+            input(filter name="startDate" type="date")
+            span -
+            input(filter name="endDate" type="date")
+          .inner-item
+            select(filter name="paymentMethod")
+              option(value="") Phương thức thanh toán
+              each item in paymentMethodList
+                option(value=item.value) #{item.label}
+          .inner-item.inner-reset(button-reset-filter)
+            <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
 
+      .section-5(style="padding-bottom: 15px")
+        form.inner-search
+          button(type="submit") <i class="fa-solid fa-magnifying-glass"></i>
+          input(type="text" placeholder="Tìm kiếm theo mã đơn..." input-search)
+    //- End Section Filter & Search
+
+    //- Section 6: Bảng danh sách đơn hàng
+    .section-6
+      table
+        thead
+          tr
+            th Mã
+            th Thông tin khách
+            th Danh sách tour
+            th Thanh toán
+            th(style="white-space: nowrap; text-align: center;") Trạng thái
+            th(style="white-space: nowrap;") Ngày đặt
+            th(style="text-align: center; white-space: nowrap;") Hành động
+        tbody
+          if orderList.length > 0
+            each item in orderList
+              tr
+                td(style="white-space: nowrap;")
+                  a.text-main(href=`/my-orders/${item.code}` style="font-weight: 700; color: var(--color-main, #582be8);") #{item.code}
+                td
+                  div Họ tên: #{item.fullName}
+                  - var listPhone = item.phone.toString().startsWith("0") ? item.phone : "0" + item.phone
+                  div SĐT: #{listPhone}
+                  if item.note
+                    div Ghi chú: #{item.note}
+                td
+                  .tour-list
+                    each tour in item.items
+                      .inner-item
+                        img(src=tour.avatar onerror="this.src='https://placehold.co/140x100?text=No+Image'")
+                        .inner-content
+                          .inner-title #{tour.tourName}
+                          .inner-desc
+                            if tour.quantityAdult > 0
+                              div Người lớn: #{tour.quantityAdult} x #{tour.newPriceAdult.toLocaleString("vi-VN")}đ
+                            if tour.quantityChildren > 0
+                              div Trẻ em: #{tour.quantityChildren} x #{tour.newPriceChildren.toLocaleString("vi-VN")}đ
+                            if tour.quantityBaby > 0
+                              div Em bé: #{tour.quantityBaby} x #{tour.newPriceBaby.toLocaleString("vi-VN")}đ
+                            if tour.departureDate
+                              div Khởi hành: #{moment(tour.departureDate).format('DD/MM/YYYY')}
+                td
+                  div Tổng tiền: #{item.subTotal.toLocaleString("vi-VN")}đ
+                  div Giảm: #{item.discount.toLocaleString("vi-VN")}đ
+                  div Thanh toán: <span class="text-red" style="font-weight: 700; color: #EF3826;">#{item.total.toLocaleString("vi-VN")}đ</span>
+                  
+                  - var paymentMethodItem = paymentMethodList.find(pm => pm.value === item.paymentMethod)
+                  div PTTT: #{paymentMethodItem ? paymentMethodItem.label : item.paymentMethod}
+                  
+                  if item.paymentStatus
+                    - var paymentStatusItem = paymentStatusList.find(ps => ps.value === item.paymentStatus)
+                    div TTTT: 
+                      if item.paymentStatus === 'paid'
+                        b(style="color: green;") #{paymentStatusItem ? paymentStatusItem.label : item.paymentStatus}
+                      else
+                        b(style="color: red;") #{paymentStatusItem ? paymentStatusItem.label : item.paymentStatus}
+                td(style="white-space: nowrap; text-align: center;")
+                  - var orderStatusItem = orderStatusList.find(os => os.value === item.status)
+                  if item.status === "success" || item.status === "done" || item.status === "paid"
+                    .tag.tag-green #{orderStatusItem ? orderStatusItem.label : item.status}
+                  else if item.status === "cancel"
+                    .tag.tag-red #{orderStatusItem ? orderStatusItem.label : item.status}
+                  else
+                    .tag.tag-orange #{orderStatusItem ? orderStatusItem.label : item.status}
+                td(style="white-space: nowrap;") #{moment(item.createdAt).format('HH:mm - DD/MM/YYYY')}
+                td(style="text-align: center; white-space: nowrap;")
+                  .inner-action
+                    a(href=`/my-orders/${item.code}` title="Xem chi tiết đơn hàng")
+                      <i class="fa-regular fa-eye"></i>
+          else
+            tr
+              td(colspan="7" style="text-align: center; padding: 40px; color: #888;")
+                i.fa-solid.fa-box-open(style="font-size: 36px; margin-bottom: 10px; display: block; color: #ccc;")
+                | Bạn chưa có đơn hàng nào!
+    //- End Section 6
+
+    //- Section 7: Phân trang
+    .section-7
       if orderList.length > 0
-        .inner-list
-          each order in orderList
-            - var orderStatusItem = orderStatusList.find(s => s.value === order.status)
-            - var paymentMethodItem = paymentMethodList.find(p => p.value === order.paymentMethod)
-            - var paymentStatusItem = paymentStatusList.find(p => p.value === order.paymentStatus)
-            - var orderPhone = order.phone.toString().startsWith("0") ? order.phone : "0" + order.phone
-
-            .inner-card
-              .inner-card-head
-                .inner-code
-                  | Mã đơn: 
-                  b #{order.code}
-                .inner-date
-                  i.fa-regular.fa-calendar
-                  |  Ngày đặt: #{moment(order.createdAt).format("HH:mm - DD/MM/YYYY")}
-
-              .inner-tours
-                each tour, tourIndex in order.items
-                  .inner-tour
-                    a.inner-image(href=`/tour/detail/${tour.slug}`)
-                      img(
-                        src=tour.avatar
-                        alt=tour.tourName
-                        onerror="this.src='https://placehold.co/140x100?text=No+Image'"
-                      )
-                      if tourIndex === 0
-                        span.inner-badge.inner-status(
-                          class=(order.status === "done" ? "badge-green" : (order.status === "cancel" ? "badge-red" : "badge-orange"))
-                        ) #{orderStatusItem ? orderStatusItem.label : order.status}
-                    .inner-info
-                      a.inner-name(href=`/tour/detail/${tour.slug}`) #{tour.tourName}
-                      if tour.departureDate
-                        .inner-meta
-                          i.fa-regular.fa-calendar-days
-                          |  Khởi hành: #{moment(tour.departureDate).format("DD/MM/YYYY")}
-                      if tour.cityName
-                        .inner-meta
-                          i.fa-solid.fa-location-dot
-                          |  Điểm xuất phát: #{tour.cityName}
-                      .inner-meta
-                        i.fa-solid.fa-users
-                        |  
-                        - var guests = []
-                        - if (tour.quantityAdult > 0) guests.push(tour.quantityAdult + " người lớn")
-                        - if (tour.quantityChildren > 0) guests.push(tour.quantityChildren + " trẻ em")
-                        - if (tour.quantityBaby > 0) guests.push(tour.quantityBaby + " em bé")
-                        | #{guests.join(", ")}
-
-              .inner-card-foot
-                .inner-summary
-                  div
-                    | Tổng tiền: 
-                    span.inner-total #{order.total.toLocaleString("vi-VN")}đ
-                a.inner-detail(href=`/my-orders/${order.code}`) Xem chi tiết
-
-        //- Phân trang
-        if pagination.totalPages > 1
-          - var queryStatus = currentStatus ? `&status=${currentStatus}` : ""
-          .inner-pagination
-            if pagination.page > 1
-              a.inner-page(href=`/my-orders?page=${pagination.page - 1}${queryStatus}`)
-                i.fa-solid.fa-angle-left
-            - for (let i = 1; i <= pagination.totalPages; i++)
-              a.inner-page(
-                href=`/my-orders?page=${i}${queryStatus}`
-                class=(i === pagination.page ? "active" : "")
-              ) #{i}
-            if pagination.page < pagination.totalPages
-              a.inner-page(href=`/my-orders?page=${pagination.page + 1}${queryStatus}`)
-                i.fa-solid.fa-angle-right
+        .inner-text Hiển thị #{pagination.skip + 1} - #{pagination.skip + orderList.length} của #{pagination.totalRecord} đơn hàng
+        select(pagination)
+          - for(let i = 1; i <= pagination.totalPages; i++)
+            option(value=i selected=(i === pagination.page)) Trang #{i}
       else
-        .inner-empty
-          i.fa-solid.fa-suitcase-rolling
-          p Bạn chưa đặt tour nào
-          a.inner-button(href="/") Khám phá các tour
+        .inner-text Không tìm thấy đơn hàng nào!
+    //- End Section 7

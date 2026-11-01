@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
   code: String,
+  accountId: String,
   acccountId: String,
   fullName: String,
   phone: String,
@@ -11,6 +12,7 @@ const schema = new mongoose.Schema({
   discount: Number,
   total: Number,
   paymentMethod: String,
+  paymentStatus: String,
   status: String,
   paidAt: Date,
   updatedBy: String,

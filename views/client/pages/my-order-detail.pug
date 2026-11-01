@@ -1,136 +1,78 @@
 extends ../layouts/default.pug
 
 block main
-  - var orderStatusItem = orderStatusList.find(s => s.value === order.status)
-  - var paymentMethodItem = paymentMethodList.find(p => p.value === order.paymentMethod)
-  - var paymentStatusItem = paymentStatusList.find(p => p.value === order.paymentStatus)
-  - var orderPhone = order.phone.toString().startsWith("0") ? order.phone : "0" + order.phone
-  - var canPay = order.status === "initial" && order.paymentStatus === "unpaid"
-  - var canCancel = order.status === "initial" && order.paymentStatus !== "paid"
+  .container(style="padding: 40px 15px 60px; max-width: 950px;")
+    h1.box-title(style="text-align: center; margin-bottom: 24px;") Đơn hàng: #{orderDetail.code}
 
-  .container
-    .section-my-order-detail
-      a.inner-back(href="/my-orders")
-        i.fa-solid.fa-arrow-left
-        |  Quay lại danh sách
-      h1.inner-title Chi tiết đơn hàng
+    //- Section 8: Giao diện chi tiết đơn hàng
+    .section-8
+      form
+        .inner-group
+          label(for="fullName" style="display: block; width: 100%; margin-bottom: 10px;") Tên khách hàng
+          input(type="text" name="fullName" id="fullName" value=orderDetail.fullName readonly disabled)
+        .inner-group
+          label(for="phone" style="display: block; width: 100%; margin-bottom: 10px;") Số điện thoại
+          - var displayPhone = orderDetail.phone.toString().startsWith("0") ? orderDetail.phone : "0" + orderDetail.phone
+          input(type="text" name="phone" id="phone" value=displayPhone readonly disabled)
+        .inner-group.inner-two-col(style="grid-column: 1 / -1; display: flex; flex-direction: column; width: 100%;")
+          label(for="note" style="display: block; width: 100%; margin-bottom: 10px;") Ghi chú
+          textarea(name="note" id="note" readonly disabled style="width: 100%;") #{orderDetail.note || "Không có ghi chú"}
+        .inner-group
+          label(for="paymentMethod" style="display: block; width: 100%; margin-bottom: 10px;") Phương thức thanh toán
+          select(name="paymentMethod" id="paymentMethod" disabled)
+            each item in paymentMethodList
+              option(value=item.value selected=(orderDetail.paymentMethod === item.value)) #{item.label}
+        .inner-group
+          label(for="paidAt" style="display: block; width: 100%; margin-bottom: 10px;") Thời điểm thanh toán
+          input(type="text" id="paidAt" value=(orderDetail.paidAt ? moment(orderDetail.paidAt).format('HH:mm - DD/MM/YYYY') : "Chưa thanh toán") readonly disabled)
+        .inner-group
+          label(for="orderDate" style="display: block; width: 100%; margin-bottom: 10px;") Ngày đặt
+          input(type="text" id="orderDate" value=moment(orderDetail.createdAt).format('HH:mm - DD/MM/YYYY') readonly disabled)
+        .inner-group
+          label(for="status" style="display: block; width: 100%; margin-bottom: 10px;") Trạng thái
+          select(name="status" id="status" disabled)
+            each item in orderStatusList
+              option(value=item.value selected=(orderDetail.status === item.value)) #{item.label}
+        .inner-group.inner-two-col(style="grid-column: 1 / -1; display: flex; flex-direction: column; width: 100%;")
+          label(style="display: block; width: 100%; margin-bottom: 10px;") Danh sách tour
+          .tour-list.inner-large(style="width: 100%;")
+            each item in orderDetail.items
+              .inner-item
+                img(src=item.avatar onerror="this.src='https://placehold.co/140x100?text=No+Image'")
+                .inner-content
+                  .inner-title #{item.tourName}
+                  .inner-desc
+                    if item.quantityAdult > 0
+                      div Người lớn: #{item.quantityAdult} x #{item.newPriceAdult.toLocaleString("vi-VN")}đ
+                    if item.quantityChildren > 0
+                      div Trẻ em: #{item.quantityChildren} x #{item.newPriceChildren.toLocaleString("vi-VN")}đ
+                    if item.quantityBaby > 0
+                      div Em bé: #{item.quantityBaby} x #{item.newPriceBaby.toLocaleString("vi-VN")}đ
+                    if item.departureDate
+                      div Ngày khởi hành: #{moment(item.departureDate).format('DD/MM/YYYY')}
+                    if item.cityName
+                      div Khởi hành tại: #{item.cityName}
+        .inner-group
+          label(style="display: block; width: 100%; margin-bottom: 10px;") Thanh toán
+          .inner-text
+            div Tổng tiền: #{orderDetail.subTotal.toLocaleString("vi-VN")}đ
+            div Giảm: #{orderDetail.discount.toLocaleString("vi-VN")}đ
+            div Thanh toán: <span class="text-red" style="color: #EF3826; font-size: 18px; font-weight: 700;">#{orderDetail.total.toLocaleString("vi-VN")}đ</span>
+        
+        //- Nút Quay lại danh sách: Nằm chính giữa khung
+        .inner-group.inner-btn-wrap(style="grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; width: 100%; margin-top: 15px;")
+          a.btn-create(
+            href="/my-orders" 
+            style="display: inline-flex; justify-content: center; align-items: center; text-decoration: none; min-width: 260px; height: 50px; font-size: 16px; font-weight: 700; border-radius: 10px; background-color: var(--color-main, #582be8); color: white; transition: opacity 0.2s;"
+          ) Quay lại danh sách
 
-      //- Thông tin đơn hàng
-      .inner-box
-        .inner-box-head Thông tin đơn hàng
-        .inner-grid
-          .inner-row
-            span.inner-label Mã đơn:
-            b.inner-code #{order.code}
-          .inner-row
-            span.inner-label Trạng thái đơn:
-            span #{orderStatusItem ? orderStatusItem.label : order.status}
-          .inner-row
-            span.inner-label Ngày đặt:
-            span #{moment(order.createdAt).format("HH:mm - DD/MM/YYYY")}
-          .inner-row
-            span.inner-label Trạng thái thanh toán:
-            span #{paymentStatusItem ? paymentStatusItem.label : order.paymentStatus}
-          .inner-row
-            span.inner-label Phương thức thanh toán:
-            span #{paymentMethodItem ? paymentMethodItem.label : order.paymentMethod}
-
-      //- Thông tin người đặt
-      .inner-box
-        .inner-box-head Thông tin người đặt
-        .inner-grid
-          .inner-row
-            span.inner-label Họ và tên:
-            span #{order.fullName}
-          .inner-row
-            span.inner-label Số điện thoại:
-            span #{orderPhone}
-          if order.note
-            .inner-row.inner-row-full
-              span.inner-label Ghi chú:
-              span #{order.note}
-
-      //- Danh sách tour
-      .inner-box
-        .inner-box-head Danh sách tour
-        each tour in order.items
-          .inner-tour
-            a.inner-image(href=`/tour/detail/${tour.slug}`)
-              img(
-                src=tour.avatar
-                alt=tour.tourName
-                onerror="this.src='https://placehold.co/160x110?text=No+Image'"
-              )
-            .inner-info
-              a.inner-name(href=`/tour/detail/${tour.slug}`) #{tour.tourName}
-              if tour.departureDate
-                .inner-meta
-                  i.fa-regular.fa-calendar-days
-                  |  Khởi hành: #{moment(tour.departureDate).format("DD/MM/YYYY")}
-              if tour.cityName
-                .inner-meta
-                  i.fa-solid.fa-location-dot
-                  |  Điểm xuất phát: #{tour.cityName}
-              table.inner-price-table
-                thead
-                  tr
-                    th Loại
-                    th Số lượng
-                    th Đơn giá
-                    th Thành tiền
-                tbody
-                  if tour.quantityAdult > 0
-                    tr
-                      td Người lớn
-                      td #{tour.quantityAdult}
-                      td #{tour.newPriceAdult.toLocaleString("vi-VN")}đ
-                      td #{(tour.quantityAdult * tour.newPriceAdult).toLocaleString("vi-VN")}đ
-                  if tour.quantityChildren > 0
-                    tr
-                      td Trẻ em
-                      td #{tour.quantityChildren}
-                      td #{tour.newPriceChildren.toLocaleString("vi-VN")}đ
-                      td #{(tour.quantityChildren * tour.newPriceChildren).toLocaleString("vi-VN")}đ
-                  if tour.quantityBaby > 0
-                    tr
-                      td Em bé
-                      td #{tour.quantityBaby}
-                      td #{tour.newPriceBaby.toLocaleString("vi-VN")}đ
-                      td #{(tour.quantityBaby * tour.newPriceBaby).toLocaleString("vi-VN")}đ
-
-      //- Tổng kết thanh toán
-      .inner-box
-        .inner-box-head Tổng kết thanh toán
-        .inner-summary
-          .inner-row
-            span Tạm tính
-            span #{order.subTotal.toLocaleString("vi-VN")}đ
-          .inner-row
-            span Giảm giá
-            span -#{order.discount.toLocaleString("vi-VN")}đ
-          .inner-row.inner-row-total
-            span Tổng cộng
-            span.inner-total #{order.total.toLocaleString("vi-VN")}đ
-
-      //- Hành động
-      if canPay || canCancel
-        .inner-actions
-          if canPay
-            a.inner-btn.inner-btn-zalopay(
-              href=`/order/payment-zalopay?orderCode=${order.code}&phone=${order.phone}`
-            )
-              i.fa-solid.fa-credit-card
-              |  Thanh toán lại bằng ZaloPay
-            a.inner-btn.inner-btn-vnpay(
-              href=`/order/payment-vnpay?orderCode=${order.code}&phone=${order.phone}`
-            )
-              i.fa-solid.fa-credit-card
-              |  Thanh toán lại bằng VNPay
-          if canCancel
-            button.inner-btn.inner-btn-cancel(
-              type="button"
-              button-delete
-              data-api=`/my-orders/cancel/${order.code}`
-              data-confirm="Bạn có chắc chắn muốn huỷ đơn hàng này?"
-            )
-              | Huỷ đơn hàng
+      //- Nút ở dưới: Thay bằng nút "Hủy đơn hàng" (chỉ khi trạng thái là khởi tạo)
+      if orderDetail.status === "initial"
+        .inner-link(style="text-align: center; margin-top: 25px; width: 100%;")
+          a(
+            href="javascript:;" 
+            button-cancel-order
+            data-api=`/my-orders/cancel/${orderDetail.code}`
+            style="color: #EF3826; font-weight: 700; font-size: 16px; text-decoration: underline; cursor: pointer;"
+          ) Hủy đơn hàng
+    //- End Section 8

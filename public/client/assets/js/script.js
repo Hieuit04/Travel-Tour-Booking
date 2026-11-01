@@ -799,3 +799,130 @@ if (listBtnDelete.length > 0) {
   });
 }
 // End button delete
+
+
+// ============================================================
+// CLIENT MY-ORDERS HANDLERS (FILTER, SEARCH, PAGINATION, CANCEL)
+// ============================================================
+
+// 1. Filter
+const listOrderFilter = document.querySelectorAll('.section-4 [filter]');
+if (listOrderFilter.length > 0) {
+  let url = new URL(window.location.href);
+  let listName = [];
+  listOrderFilter.forEach((filter) => {
+    listName.push(filter.name);
+    filter.addEventListener('change', () => {
+      const name = filter.name;
+      const value = filter.value;
+      if (value) {
+        url.searchParams.set(name, value);
+      } else {
+        url.searchParams.delete(name);
+      }
+      url.searchParams.delete('page');
+      window.location.href = url.href;
+    });
+    const valueCurrent = url.searchParams.get(filter.name);
+    if (valueCurrent) {
+      filter.value = valueCurrent;
+    }
+  });
+
+  const btnResetFilter = document.querySelector('.section-4 [button-reset-filter]');
+  if (btnResetFilter) {
+    btnResetFilter.addEventListener('click', () => {
+      listName.forEach((name) => {
+        url.searchParams.delete(name);
+      });
+      url.searchParams.delete('page');
+      window.location.href = url.href;
+    });
+  }
+}
+
+// 2. Search
+const orderSearchForm = document.querySelector('.section-5 .inner-search');
+if (orderSearchForm) {
+  let url = new URL(window.location.href);
+  orderSearchForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = orderSearchForm.querySelector('[input-search]');
+    const value = input ? input.value.trim() : '';
+    if (value) {
+      url.searchParams.set('keyword', value);
+    } else {
+      url.searchParams.delete('keyword');
+    }
+    url.searchParams.delete('page');
+    window.location.href = url.href;
+  });
+  const valueCurrent = url.searchParams.get('keyword');
+  if (valueCurrent) {
+    const input = orderSearchForm.querySelector('[input-search]');
+    if (input) input.value = valueCurrent;
+  }
+}
+
+// 3. Pagination select
+const orderPaginationSelect = document.querySelector('.section-7 select[pagination]');
+if (orderPaginationSelect) {
+  let url = new URL(window.location.href);
+  orderPaginationSelect.addEventListener('change', () => {
+    const value = orderPaginationSelect.value;
+    url.searchParams.set('page', value);
+    window.location.href = url.href;
+  });
+  const valueCurrent = url.searchParams.get('page');
+  if (valueCurrent) {
+    orderPaginationSelect.value = valueCurrent;
+  }
+}
+
+// 4. Cancel Order Button (detail page)
+const btnCancelOrder = document.querySelector('[button-cancel-order]');
+if (btnCancelOrder) {
+  btnCancelOrder.addEventListener('click', () => {
+    if (!confirm('Bạn có chắc chắn muốn huỷ đơn hàng này không?')) {
+      return;
+    }
+    const api = btnCancelOrder.getAttribute('data-api');
+    btnCancelOrder.style.pointerEvents = 'none';
+    btnCancelOrder.innerText = 'Đang xử lý huỷ đơn...';
+
+    fetch(api, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.code === 'success') {
+          if (typeof drawNotyf === 'function') {
+            drawNotyf(data.code, data.message);
+          } else if (typeof notyf !== 'undefined') {
+            notyf.success(data.message);
+          }
+          window.location.reload();
+        } else {
+          if (typeof notyf !== 'undefined') {
+            notyf.error(data.message);
+          } else {
+            alert(data.message);
+          }
+          btnCancelOrder.style.pointerEvents = 'auto';
+          btnCancelOrder.innerText = 'Hủy đơn hàng';
+        }
+      })
+      .catch(() => {
+        if (typeof notyf !== 'undefined') {
+          notyf.error('Có lỗi xảy ra, vui lòng thử lại!');
+        } else {
+          alert('Có lỗi xảy ra, vui lòng thử lại!');
+        }
+        btnCancelOrder.style.pointerEvents = 'auto';
+        btnCancelOrder.innerText = 'Hủy đơn hàng';
+      });
+  });
+}
