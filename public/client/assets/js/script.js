@@ -764,3 +764,38 @@ if(buttonsPagination.length > 0) {
   });
 }
 // End Ph�n trang
+
+// Button delete (dùng chung: thêm thuộc tính button-delete, data-api, tuỳ chọn data-confirm và data-method)
+const listBtnDelete = document.querySelectorAll('[button-delete]');
+if (listBtnDelete.length > 0) {
+  listBtnDelete.forEach((button) => {
+    button.addEventListener('click', () => {
+      const message = button.getAttribute('data-confirm') || 'Vui lòng xác nhận xóa!';
+      if (!confirm(message)) {
+        return;
+      }
+      const dataApi = button.getAttribute('data-api');
+      const method = button.getAttribute('data-method') || 'PATCH';
+      button.disabled = true;
+      fetch(dataApi, {
+        method: method,
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 'error') {
+            button.disabled = false;
+            notyf.error(data.message);
+          }
+          if (data.code === 'success') {
+            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
+            window.location.reload();
+          }
+        })
+        .catch(() => {
+          button.disabled = false;
+          notyf.error('Có lỗi xảy ra, vui lòng thử lại!');
+        });
+    });
+  });
+}
+// End button delete

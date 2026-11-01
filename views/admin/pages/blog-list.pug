@@ -1,0 +1,94 @@
+extends ../layouts/default.pug
+include ../mixins/checkbox.pug
+
+block main
+  if(pers.includes("blog-view"))
+    h1.box-title Quản lý bài viết
+
+    //- Section 4
+    .section-4
+      .inner-wrap
+        .inner-item
+          <i class="fa-solid fa-filter"></i> Bộ lọc
+        .inner-item
+          select(name="status" filter)
+            each status in blogStatusList
+              option(value=status.value) #{status.label}
+            option(value="all") Tất cả
+        .inner-item.inner-reset(button-reset-filter)
+          <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
+    //- End Section 4
+
+    //- Section 5
+    .section-5
+      form.inner-status(change-multi data-api=`/${pathAdmin}/blog/change-multi`)
+        .inner-item
+          select
+            option(value="") -- Hành động --
+            if(pers.includes("blog-publish"))
+              option(value="publish") Duyệt và đăng
+              option(value="pending") Gỡ bài (chờ duyệt)
+            if(pers.includes("blog-delete"))
+              option(value="delete") Xóa
+        .inner-item
+          button Áp dụng
+      form.inner-search
+        button <i class="fa-solid fa-magnifying-glass"></i>
+        input(type="text" placeholder="Tìm kiếm" input-search)
+    //- End Section 5
+
+    //- Section 6
+    .section-6
+      table
+        thead
+          tr
+            th
+              +checkbox-30("check-all", "")
+            th Tiêu đề
+            th Tour
+            th Trạng thái
+            th Thời điểm tạo
+            th Thời điểm đăng
+            th Hành động
+        tbody
+          if blogList.length > 0
+            each item in blogList
+              tr
+                td
+                  +checkbox-30("check-item", "", item.id)
+                td
+                  a(href=`/${pathAdmin}/blog/edit/${item.id}`) #{item.title}
+                td #{item.tourName}
+                td
+                  if item.status == "active"
+                    .tag.tag-green Đã đăng
+                  else
+                    .tag.tag-orange Chờ duyệt
+                td #{item.createdAtFormat}
+                td #{item.publishedAtFormat}
+                td
+                  .inner-action
+                    a(href=`/${pathAdmin}/blog/preview/${item.id}` target="_blank" title="Xem trước")
+                      i.fa-regular.fa-eye
+                    a(href=`/${pathAdmin}/blog/edit/${item.id}` title="Sửa")
+                      i.fa-regular.fa-pen-to-square
+                    if(pers.includes("blog-delete"))
+                      a(
+                        href="javascript:;"
+                        class="inner-remove"
+                        button-delete
+                        data-api=`/${pathAdmin}/blog/delete/${item.id}`
+                      ) <i class="fa-regular fa-trash-can"></i>
+          else
+            tr
+              td(colspan="7") Không có bài viết chờ duyệt
+    //- End Section 6
+
+    //- Section 7
+    if blogList.length > 0
+      .section-7
+        .inner-text Hiển thị #{pagination.skip+1} - #{pagination.skip+blogList.length} của #{pagination.totalRecord}
+        select(pagination)
+          - for(let i=1; i<= pagination.totalPages; i++)
+            option(value=i) Trang #{i}
+    //- End Section 7

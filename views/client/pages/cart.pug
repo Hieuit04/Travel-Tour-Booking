@@ -47,12 +47,14 @@ block main
               placeholder="Họ và tên" 
               name="fullname" 
               type="text"
+              value=account? account.fullName: ""
               )
           .inner-group
             input#phone(
               placeholder="Số điện thoại" 
               name="phone" 
               type="text"
+              value=account? account.phone: ""
               )
           .inner-group.inner-group-full
             textarea(

@@ -10,6 +10,7 @@ const contactRouters = require('./contact.route');
 const settingRouters = require('./setting.route');
 const profileRouters = require('./profile.route');
 const promotionRouters = require('./promotion.route');
+const blogRouters = require('./blog.route');
 const { verifyToken } = require('../../middlewares/admin/auth.middleware');
 
 router.use('/account', accountRouters);
@@ -17,6 +18,7 @@ router.use('/dashboard', verifyToken, dashboardRouters);
 router.use('/category',verifyToken, categoryRouters);
 router.use('/tour', verifyToken, tourRouters);
 router.use('/promotion', verifyToken, promotionRouters);
+router.use('/blog', verifyToken, blogRouters);
 router.use('/order', verifyToken, orderRouters);
 router.use('/user', verifyToken, userRouters);
 router.use('/contact', verifyToken, contactRouters);

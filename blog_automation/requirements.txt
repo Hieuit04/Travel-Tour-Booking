@@ -1,0 +1,5 @@
+anthropic
+pymongo
+markdown
+python-dotenv
+pydantic

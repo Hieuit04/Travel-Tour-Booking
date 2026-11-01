@@ -17,6 +17,7 @@ module.exports.createPost = async (req, res) => {
       const existOrder = await Order.findOne({ code: req.body.code });
       if (!existOrder) break;
     }
+    
     req.body.subTotal = 0;
     // Danh sách tour 
     for (const item of req.body.items) {
@@ -46,7 +47,7 @@ module.exports.createPost = async (req, res) => {
     req.body.total = req.body.subTotal - req.body.discount;
     req.body.paymentStatus = "unpaid";
     req.body.status = "initial";
-
+    req.body.accountId = res.locals.account ? res.locals.account.id : "";
     const order = new Order(req.body);
     await order.save();
 

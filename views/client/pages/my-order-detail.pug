@@ -1,0 +1,136 @@
+extends ../layouts/default.pug
+
+block main
+  - var orderStatusItem = orderStatusList.find(s => s.value === order.status)
+  - var paymentMethodItem = paymentMethodList.find(p => p.value === order.paymentMethod)
+  - var paymentStatusItem = paymentStatusList.find(p => p.value === order.paymentStatus)
+  - var orderPhone = order.phone.toString().startsWith("0") ? order.phone : "0" + order.phone
+  - var canPay = order.status === "initial" && order.paymentStatus === "unpaid"
+  - var canCancel = order.status === "initial" && order.paymentStatus !== "paid"
+
+  .container
+    .section-my-order-detail
+      a.inner-back(href="/my-orders")
+        i.fa-solid.fa-arrow-left
+        |  Quay lại danh sách
+      h1.inner-title Chi tiết đơn hàng
+
+      //- Thông tin đơn hàng
+      .inner-box
+        .inner-box-head Thông tin đơn hàng
+        .inner-grid
+          .inner-row
+            span.inner-label Mã đơn:
+            b.inner-code #{order.code}
+          .inner-row
+            span.inner-label Trạng thái đơn:
+            span #{orderStatusItem ? orderStatusItem.label : order.status}
+          .inner-row
+            span.inner-label Ngày đặt:
+            span #{moment(order.createdAt).format("HH:mm - DD/MM/YYYY")}
+          .inner-row
+            span.inner-label Trạng thái thanh toán:
+            span #{paymentStatusItem ? paymentStatusItem.label : order.paymentStatus}
+          .inner-row
+            span.inner-label Phương thức thanh toán:
+            span #{paymentMethodItem ? paymentMethodItem.label : order.paymentMethod}
+
+      //- Thông tin người đặt
+      .inner-box
+        .inner-box-head Thông tin người đặt
+        .inner-grid
+          .inner-row
+            span.inner-label Họ và tên:
+            span #{order.fullName}
+          .inner-row
+            span.inner-label Số điện thoại:
+            span #{orderPhone}
+          if order.note
+            .inner-row.inner-row-full
+              span.inner-label Ghi chú:
+              span #{order.note}
+
+      //- Danh sách tour
+      .inner-box
+        .inner-box-head Danh sách tour
+        each tour in order.items
+          .inner-tour
+            a.inner-image(href=`/tour/detail/${tour.slug}`)
+              img(
+                src=tour.avatar
+                alt=tour.tourName
+                onerror="this.src='https://placehold.co/160x110?text=No+Image'"
+              )
+            .inner-info
+              a.inner-name(href=`/tour/detail/${tour.slug}`) #{tour.tourName}
+              if tour.departureDate
+                .inner-meta
+                  i.fa-regular.fa-calendar-days
+                  |  Khởi hành: #{moment(tour.departureDate).format("DD/MM/YYYY")}
+              if tour.cityName
+                .inner-meta
+                  i.fa-solid.fa-location-dot
+                  |  Điểm xuất phát: #{tour.cityName}
+              table.inner-price-table
+                thead
+                  tr
+                    th Loại
+                    th Số lượng
+                    th Đơn giá
+                    th Thành tiền
+                tbody
+                  if tour.quantityAdult > 0
+                    tr
+                      td Người lớn
+                      td #{tour.quantityAdult}
+                      td #{tour.newPriceAdult.toLocaleString("vi-VN")}đ
+                      td #{(tour.quantityAdult * tour.newPriceAdult).toLocaleString("vi-VN")}đ
+                  if tour.quantityChildren > 0
+                    tr
+                      td Trẻ em
+                      td #{tour.quantityChildren}
+                      td #{tour.newPriceChildren.toLocaleString("vi-VN")}đ
+                      td #{(tour.quantityChildren * tour.newPriceChildren).toLocaleString("vi-VN")}đ
+                  if tour.quantityBaby > 0
+                    tr
+                      td Em bé
+                      td #{tour.quantityBaby}
+                      td #{tour.newPriceBaby.toLocaleString("vi-VN")}đ
+                      td #{(tour.quantityBaby * tour.newPriceBaby).toLocaleString("vi-VN")}đ
+
+      //- Tổng kết thanh toán
+      .inner-box
+        .inner-box-head Tổng kết thanh toán
+        .inner-summary
+          .inner-row
+            span Tạm tính
+            span #{order.subTotal.toLocaleString("vi-VN")}đ
+          .inner-row
+            span Giảm giá
+            span -#{order.discount.toLocaleString("vi-VN")}đ
+          .inner-row.inner-row-total
+            span Tổng cộng
+            span.inner-total #{order.total.toLocaleString("vi-VN")}đ
+
+      //- Hành động
+      if canPay || canCancel
+        .inner-actions
+          if canPay
+            a.inner-btn.inner-btn-zalopay(
+              href=`/order/payment-zalopay?orderCode=${order.code}&phone=${order.phone}`
+            )
+              i.fa-solid.fa-credit-card
+              |  Thanh toán lại bằng ZaloPay
+            a.inner-btn.inner-btn-vnpay(
+              href=`/order/payment-vnpay?orderCode=${order.code}&phone=${order.phone}`
+            )
+              i.fa-solid.fa-credit-card
+              |  Thanh toán lại bằng VNPay
+          if canCancel
+            button.inner-btn.inner-btn-cancel(
+              type="button"
+              button-delete
+              data-api=`/my-orders/cancel/${order.code}`
+              data-confirm="Bạn có chắc chắn muốn huỷ đơn hàng này?"
+            )
+              | Huỷ đơn hàng

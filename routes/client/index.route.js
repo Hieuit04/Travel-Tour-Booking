@@ -8,7 +8,9 @@ const contactRouters = require('./contact.route');
 const categoryRouters = require('./category.route');
 const searchRouters = require('./search.route');
 const orderRouters = require('./order.route');
+const blogRouters = require('./blog.route');
 const profileRouters = require('./profile.route');
+const myOrderRouters = require('./my-order.route');
 const settingMidelware = require('../../middlewares/client/setting.midelware');
 const categoryMidelware = require('../../middlewares/client/category.midelware');
 const { verifyToken } = require('../../middlewares/client/auth.middleware');
@@ -20,6 +22,7 @@ router.use(categoryMidelware.list)
 
 router.use('/account', accountRouters);
 router.use('/profile', verifyToken, profileRouters);
+router.use('/my-orders', verifyToken, myOrderRouters);
 router.use('/tour', getAccount, tourRouters);
 router.use('/cart', getAccount, cartRouters);
 router.use('/contact', getAccount, contactRouters);
@@ -27,5 +30,8 @@ router.use('/category', getAccount, categoryRouters);
 router.use('/search', searchRouters);
 router.use('/order', getAccount, orderRouters);
 router.use('/', getAccount, homeRouters);
+router.use('/blog', blogRouters);
+// router.use('/order', orderRouters);
+router.use('/', homeRouters);
 
 module.exports = router;

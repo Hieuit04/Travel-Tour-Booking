@@ -1,0 +1,95 @@
+extends ../layouts/default.pug
+
+block main
+  .container
+    .section-my-orders
+      h1.inner-title Đơn hàng của tôi
+
+      //- Tab lọc trạng thái
+      .inner-tabs
+        a.inner-tab(
+          href="/my-orders"
+          class=(currentStatus === "" ? "active" : "")
+        ) Tất cả
+        each statusItem in orderStatusList
+          a.inner-tab(
+            href=`/my-orders?status=${statusItem.value}`
+            class=(currentStatus === statusItem.value ? "active" : "")
+          ) #{statusItem.label}
+
+      if orderList.length > 0
+        .inner-list
+          each order in orderList
+            - var orderStatusItem = orderStatusList.find(s => s.value === order.status)
+            - var paymentMethodItem = paymentMethodList.find(p => p.value === order.paymentMethod)
+            - var paymentStatusItem = paymentStatusList.find(p => p.value === order.paymentStatus)
+            - var orderPhone = order.phone.toString().startsWith("0") ? order.phone : "0" + order.phone
+
+            .inner-card
+              .inner-card-head
+                .inner-code
+                  | Mã đơn: 
+                  b #{order.code}
+                .inner-date
+                  i.fa-regular.fa-calendar
+                  |  Ngày đặt: #{moment(order.createdAt).format("HH:mm - DD/MM/YYYY")}
+
+              .inner-tours
+                each tour, tourIndex in order.items
+                  .inner-tour
+                    a.inner-image(href=`/tour/detail/${tour.slug}`)
+                      img(
+                        src=tour.avatar
+                        alt=tour.tourName
+                        onerror="this.src='https://placehold.co/140x100?text=No+Image'"
+                      )
+                      if tourIndex === 0
+                        span.inner-badge.inner-status(
+                          class=(order.status === "done" ? "badge-green" : (order.status === "cancel" ? "badge-red" : "badge-orange"))
+                        ) #{orderStatusItem ? orderStatusItem.label : order.status}
+                    .inner-info
+                      a.inner-name(href=`/tour/detail/${tour.slug}`) #{tour.tourName}
+                      if tour.departureDate
+                        .inner-meta
+                          i.fa-regular.fa-calendar-days
+                          |  Khởi hành: #{moment(tour.departureDate).format("DD/MM/YYYY")}
+                      if tour.cityName
+                        .inner-meta
+                          i.fa-solid.fa-location-dot
+                          |  Điểm xuất phát: #{tour.cityName}
+                      .inner-meta
+                        i.fa-solid.fa-users
+                        |  
+                        - var guests = []
+                        - if (tour.quantityAdult > 0) guests.push(tour.quantityAdult + " người lớn")
+                        - if (tour.quantityChildren > 0) guests.push(tour.quantityChildren + " trẻ em")
+                        - if (tour.quantityBaby > 0) guests.push(tour.quantityBaby + " em bé")
+                        | #{guests.join(", ")}
+
+              .inner-card-foot
+                .inner-summary
+                  div
+                    | Tổng tiền: 
+                    span.inner-total #{order.total.toLocaleString("vi-VN")}đ
+                a.inner-detail(href=`/my-orders/${order.code}`) Xem chi tiết
+
+        //- Phân trang
+        if pagination.totalPages > 1
+          - var queryStatus = currentStatus ? `&status=${currentStatus}` : ""
+          .inner-pagination
+            if pagination.page > 1
+              a.inner-page(href=`/my-orders?page=${pagination.page - 1}${queryStatus}`)
+                i.fa-solid.fa-angle-left
+            - for (let i = 1; i <= pagination.totalPages; i++)
+              a.inner-page(
+                href=`/my-orders?page=${i}${queryStatus}`
+                class=(i === pagination.page ? "active" : "")
+              ) #{i}
+            if pagination.page < pagination.totalPages
+              a.inner-page(href=`/my-orders?page=${pagination.page + 1}${queryStatus}`)
+                i.fa-solid.fa-angle-right
+      else
+        .inner-empty
+          i.fa-solid.fa-suitcase-rolling
+          p Bạn chưa đặt tour nào
+          a.inner-button(href="/") Khám phá các tour

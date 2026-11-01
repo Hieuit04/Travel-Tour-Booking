@@ -1,0 +1,21 @@
+mixin price-suggest()
+  .inner-group.inner-two-col.inner-price-suggest(price-suggest)
+    label Gợi ý giá từ tour đối thủ
+    .inner-suggest-empty Chọn địa điểm và nhập thời gian (vd: 3 ngày 2 đêm) để xem gợi ý.
+    .inner-suggest-result(hidden)
+      .inner-suggest-summary
+        div
+          | Giá gợi ý (người lớn):
+          strong.inner-suggest-price
+          button.inner-suggest-apply(type="button") Dùng làm giá mới
+        .inner-suggest-range
+        .inner-suggest-basis
+      table.inner-suggest-table
+        thead
+          tr
+            th Nguồn
+            th Tour
+            th Thời lượng
+            th Khởi hành
+            th Giá
+        tbody

@@ -128,6 +128,33 @@ module.exports.permissionList = [
   {
     label: "Xoá đơn hàng",
     value: "order-delete",
+  },
+  {
+    label: "Xem bài viết",
+    value: "blog-view",
+  },
+  {
+    label: "Sửa bài viết",
+    value: "blog-edit",
+  },
+  {
+    label: "Duyệt và đăng bài viết",
+    value: "blog-publish",
+  },
+  {
+    label: "Xoá bài viết",
+    value: "blog-delete",
+  }
+];
+
+module.exports.blogStatusList = [
+  {
+    label: "Chờ duyệt",
+    value: "pending",
+  },
+  {
+    label: "Đã đăng",
+    value: "active",
   }
 ];
 

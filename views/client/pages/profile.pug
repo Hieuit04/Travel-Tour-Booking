@@ -69,16 +69,16 @@ block main
               .inner-field-item.inner-field-span-2
                 label.inner-label(for="inputEmail")
                   i.fa-regular.fa-envelope
-                  span Email *
-                  span.inner-required *
+                  span Email
                 .inner-val-box#valEmail= (profileUser && profileUser.email) ? profileUser.email : "Chưa cập nhật"
                 .inner-input-wrap
                   input.inner-control#inputEmail(
                     type="email"
                     name="email"
                     value=(profileUser && profileUser.email) ? profileUser.email : ""
-                    placeholder="Ví dụ: email@gmail.com"
+                    placeholder="email@gmail.com"
                     autocomplete="email"
+                    readonly
                   )
                   .inner-field-error#errEmail
 

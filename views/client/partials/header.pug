@@ -29,7 +29,7 @@ header.header
                       li
                         a(href=`/category/${itemChild.slug}`) #{itemChild.categoryName}
           li
-            a(href="#") Tin Tức
+            a(href="/blog") Tin Tức
           li
             a(href="#") Liên Hệ
       a.inner-cart(href="/cart")
@@ -52,7 +52,7 @@ header.header
             span.user-fullname= account.fullName
           .user-dropdown
             a(href="/profile") Thông tin cá nhân
-            a(href="/order") Đơn hàng đã đặt
+            a(href="/my-orders") Đơn hàng đã đặt
             a(href="/account/logout") Đăng xuất
       else
         a.inner-login(href="/account/login")

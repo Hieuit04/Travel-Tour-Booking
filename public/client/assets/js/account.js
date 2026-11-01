@@ -349,6 +349,30 @@ async function handleGoogleCredential(response) {
 }
 // End validate login with google
 
+// Render nút đăng nhập Google
+const googleSigninOverlay = document.querySelector('.google-signin-overlay') || document.querySelector('.google-signin');
+if (googleSigninOverlay) {
+    const initGoogleButton = () => {
+        google.accounts.id.initialize({
+            client_id: googleSigninOverlay.getAttribute('data-client-id'),
+            callback: handleGoogleCredential,
+            auto_select: false,
+        });
+        google.accounts.id.renderButton(googleSigninOverlay, {
+            type: "standard",
+            theme: "outline",
+            size: "large",
+            width: 400,
+        });
+    };
+    if (window.google && google.accounts && google.accounts.id) {
+        initGoogleButton();
+    } else {
+        window.onGoogleLibraryLoad = initGoogleButton;
+    }
+}
+// End render nút đăng nhập Google
+
 // Validate completeRegister form
 const completeRegisterForm = document.querySelector('.form-account #complete-register-form')
 if(completeRegisterForm) {

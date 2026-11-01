@@ -31,26 +31,12 @@ block main
           label(for="rememberPassword") Nhớ mật khẩu
         a(href=`/account/forgot-password`) Quên mật khẩu?
       button.inner-button(type="submit") Đăng nhập
-      //- Đăng nhập bằng Google
+
+    //- Đăng nhập bằng Google
     .inner-social
       .inner-social-title
         span Hoặc
-      //- Google Identity Services
-      div(
-        id="g_id_onload"
-        data-client_id=googleClientId
-        data-callback="handleGoogleCredential"
-        data-auto_prompt="false"
-      )
-      div.g_id_signin(
-        data-type="standard"
-        data-size="large"
-        data-theme="outline"
-        data-text="signin_with"
-        data-shape="rectangular"
-        data-logo_alignment="left"
-        data-width="350"
-      )
+      .google-signin(data-client-id=googleClientId)
     .inner-more
       span Bạn chưa có tài khoản?
       a(href="/account/register") Tạo tài khoản
