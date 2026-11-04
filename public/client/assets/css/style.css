@@ -3821,362 +3821,11 @@ button {
   .section-my-order-detail .inner-actions .inner-btn { width: 100%; text-align: center; }
 }
 
-
 /* ============================================================ */
-/*  CLIENT ORDER MANAGEMENT (MATCHING ADMIN UI)                 */
-/* ============================================================ */
-
-/* Box Title */
-.box-title {
-  font-weight: 700;
-  font-size: 32px;
-  color: var(--color-text);
-  margin-bottom: 24px;
-}
-
-/* Tag Status */
-.tag {
-  border-radius: 4.5px;
-  padding: 6px 18px;
-  font-weight: 700;
-  font-size: 12px;
-  display: inline-block;
-  text-align: center;
-}
-.tag-orange {
-  background-color: rgba(255, 168, 86, 0.2);
-  color: #FFA756;
-}
-.tag-green {
-  background-color: rgba(0, 182, 155, 0.2);
-  color: #00B69B;
-}
-.tag-red {
-  background-color: rgba(239, 55, 38, 0.2);
-  color: #EF3826;
-}
-.text-red {
-  color: #EF3826;
-}
-
-/* Section 4: Filter */
-.section-4 {
-  margin-bottom: 15px;
-}
-.section-4 .inner-wrap {
-  background-color: white;
-  border: 1px solid #D5D5D5;
-  border-radius: 14px;
-  display: inline-flex;
-  flex-wrap: wrap;
-}
-.section-4 .inner-item {
-  padding: 16px 20px;
-  border-right: 1px solid #D5D5D5;
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--color-text);
-}
-.section-4 .inner-item:last-child {
-  border-right: 0;
-}
-.section-4 .inner-item select, .section-4 .inner-item input {
-  border: 0;
-  outline: none;
-  background: transparent;
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--color-text);
-  cursor: pointer;
-}
-.section-4 .inner-item input {
-  width: 120px;
-}
-.section-4 .inner-item.inner-reset {
-  color: #EA0234;
-  cursor: pointer;
-}
-@media (max-width: 992px) {
-  .section-4 .inner-item {
-    padding: 10px 14px;
-    gap: 8px;
-  }
-}
-
-/* Section 5: Search */
-.section-5 {
-  margin-bottom: 25px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-.section-5 .inner-search {
-  background-color: white;
-  border: 1px solid #E2E2E2;
-  border-radius: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 15px;
-  padding: 14px 20px;
-  width: 360px;
-  max-width: 100%;
-}
-.section-5 .inner-search button {
-  cursor: pointer;
-  border: 0;
-  background-color: transparent;
-  padding: 0;
-  font-size: 18px;
-  color: var(--color-text);
-}
-.section-5 .inner-search input {
-  flex: 1;
-  border: 0;
-  outline: none;
-  background: transparent;
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--color-text);
-}
-
-/* Section 6: Table List */
-.section-6 {
-  overflow-x: auto;
-  margin-bottom: 20px;
-}
-.section-6 table {
-  background-color: white;
-  width: 100%;
-  border: 1px solid #D5D5D5;
-  border-radius: 14px;
-  overflow: hidden;
-  border-collapse: separate;
-  border-spacing: 0;
-  min-width: 1100px;
-}
-.section-6 thead th {
-  background-color: #FCFDFD;
-  padding: 16px;
-  border-bottom: 1px solid #D5D5D5;
-  font-weight: 800;
-  font-size: 14px;
-  color: var(--color-text);
-  text-align: left;
-}
-.section-6 tbody tr td {
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(151, 151, 151, 0.4);
-  font-weight: 500;
-  font-size: 14px;
-  color: var(--color-text);
-  vertical-align: middle;
-}
-.section-6 tbody tr:last-child td {
-  border-bottom: 0;
-}
-.section-6 .inner-action {
-  display: inline-flex;
-  background-color: #FAFBFD;
-  border: 1px solid #D5D5D5;
-  border-radius: 8px;
-  overflow: hidden;
-}
-.section-6 .inner-action a {
-  padding: 8px 16px;
-  display: inline-block;
-  font-size: 16px;
-  color: rgba(0, 0, 0, 0.65);
-  transition: all 0.2s;
-}
-.section-6 .inner-action a:hover {
-  background-color: var(--color-main);
-  color: white;
-}
-
-/* Tour List in Table & Detail */
-.tour-list {
-  display: grid;
-  gap: 10px;
-  max-height: 250px;
-  overflow-y: auto;
-  padding-right: 5px;
-}
-.tour-list .inner-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.tour-list .inner-item img {
-  width: 76px;
-  height: 60px;
-  border-radius: 6px;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-.tour-list.inner-large .inner-item img {
-  width: 115px;
-  height: 85px;
-}
-.tour-list .inner-item .inner-content {
-  flex: 1;
-  min-width: 0;
-}
-.tour-list .inner-item .inner-title {
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--color-text);
-  margin-bottom: 4px;
-}
-.tour-list .inner-item .inner-desc {
-  display: grid;
-  gap: 3px;
-  font-weight: 500;
-  font-size: 12px;
-  color: #666;
-}
-
-/* Section 7: Pagination */
-.section-7 {
-  margin-top: 15px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-.section-7 .inner-text {
-  font-weight: 600;
-  font-size: 14px;
-  color: #666;
-}
-.section-7 select {
-  background-color: white;
-  border: 1px solid #D5D5D5;
-  border-radius: 6px;
-  padding: 8px 16px;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  outline: none;
-}
-
-/* Section 8: Detail Form */
-.section-8 {
-  background-color: white;
-  border: 1px solid #B9B9B9;
-  border-radius: 14px;
-  padding: 40px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-}
-.section-8 form {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 25px;
-}
-.section-8 .inner-two-col {
-  grid-column: span 2;
-}
-.section-8 .inner-group label {
-  display: block;
-  font-weight: 600;
-  font-size: 14px;
-  color: #606060;
-  margin-bottom: 10px;
-}
-.section-8 .inner-group input, 
-.section-8 .inner-group select, 
-.section-8 .inner-group textarea {
-  border: 1px solid #D5D5D5;
-  background-color: #F5F6FA;
-  border-radius: 6px;
-  padding: 14px 18px;
-  font-weight: 500;
-  font-size: 14px;
-  color: var(--color-text);
-  width: 100%;
-  box-sizing: border-box;
-}
-.section-8 .inner-group input:disabled, 
-.section-8 .inner-group select:disabled, 
-.section-8 .inner-group textarea:disabled {
-  background-color: #F5F6FA;
-  color: #333;
-  cursor: not-allowed;
-  opacity: 1;
-}
-.section-8 .inner-group textarea {
-  resize: none;
-  height: 120px;
-}
-.section-8 .inner-group .inner-text {
-  line-height: 1.8;
-  font-size: 15px;
-  color: var(--color-text);
-}
-.section-8 .btn-create {
-  border: 0;
-  background-color: var(--color-main, #4361ee);
-  color: white !important;
-  font-weight: 700;
-  font-size: 16px;
-  padding: 14px 40px;
-  border-radius: 10px;
-  min-width: 250px;
-  opacity: 0.95;
-  cursor: pointer;
-  text-align: center;
-  transition: opacity 0.2s;
-}
-.section-8 .btn-create:hover {
-  opacity: 1;
-}
-.section-8 .inner-link {
-  text-align: center;
-  margin-top: 25px;
-}
-.section-8 .inner-link a {
-  font-weight: 700;
-  font-size: 16px;
-}
-@media (max-width: 768px) {
-  .section-8 {
-    padding: 20px;
-  }
-  .section-8 form {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-  .section-8 .inner-two-col {
-    grid-column: span 1;
-  }
-}
-
-/* ============================================================ */
-/*  CLIENT ORDER MANAGEMENT (MATCHING ADMIN UI)                 */
+/*  CLIENT ORDER MANAGEMENT (SCOPED TO AVOID HOME PAGE CONFLICT)*/
 /* ============================================================ */
 
-/* Box Title */
-.box-title {
-  font-weight: 700;
-  font-size: 32px;
-  color: var(--color-text);
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-/* Utility classes */
-.text-center {
-  text-align: center !important;
-}
-.text-right {
-  text-align: right !important;
-}
-.text-left {
-  text-align: left !important;
-}
-
-/* Tag Status */
+/* Utility classes & Tags */
 .tag {
   border-radius: 4.5px;
   padding: 6px 18px;
@@ -4202,8 +3851,16 @@ button {
   color: #EF3826;
 }
 
-/* Section Filter & Search Wrapper */
-.section-filter-wrap {
+/* Page: My Orders List */
+.page-my-orders .box-title {
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--color-text);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.page-my-orders .section-filter-wrap {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -4211,28 +3868,31 @@ button {
   gap: 12px;
   margin-bottom: 16px;
 }
-.section-filter-wrap .section-4,
-.section-filter-wrap .section-5 {
+.page-my-orders .section-filter-wrap .section-4,
+.page-my-orders .section-filter-wrap .section-5 {
   margin-bottom: 0;
+  padding-bottom: 0;
 }
-.section-filter-wrap .section-5 .inner-search {
+.page-my-orders .section-filter-wrap .section-5 .inner-search {
   padding: 11px 18px;
   width: 320px;
   max-width: 100%;
 }
 
-/* Section 4: Filter */
-.section-4 {
+.page-my-orders .section-4 {
   margin-bottom: 12px;
+  padding-bottom: 0;
 }
-.section-4 .inner-wrap {
+.page-my-orders .section-4 .inner-wrap {
   background-color: white;
   border: 1px solid #D5D5D5;
   border-radius: 14px;
-  display: inline-flex;
+  /* display: inline-flex; */
   flex-wrap: wrap;
+  margin-bottom: 0;
+  gap: 0;
 }
-.section-4 .inner-item {
+.page-my-orders .section-4 .inner-item {
   padding: 13px 18px;
   border-right: 1px solid #D5D5D5;
   display: inline-flex;
@@ -4242,10 +3902,11 @@ button {
   font-size: 14px;
   color: var(--color-text);
 }
-.section-4 .inner-item:last-child {
+.page-my-orders .section-4 .inner-item:last-child {
   border-right: 0;
 }
-.section-4 .inner-item select, .section-4 .inner-item input {
+.page-my-orders .section-4 .inner-item select, 
+.page-my-orders .section-4 .inner-item input {
   border: 0;
   outline: none;
   background: transparent;
@@ -4254,28 +3915,28 @@ button {
   color: var(--color-text);
   cursor: pointer;
 }
-.section-4 .inner-item input {
+.page-my-orders .section-4 .inner-item input {
   width: 120px;
 }
-.section-4 .inner-item.inner-reset {
+.page-my-orders .section-4 .inner-item.inner-reset {
   color: #EA0234;
   cursor: pointer;
 }
 @media (max-width: 992px) {
-  .section-4 .inner-item {
+  .page-my-orders .section-4 .inner-item {
     padding: 10px 14px;
     gap: 8px;
   }
 }
 
-/* Section 5: Search */
-.section-5 {
+.page-my-orders .section-5 {
   margin-bottom: 16px;
+  padding-bottom: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
 }
-.section-5 .inner-search {
+.page-my-orders .section-5 .inner-search {
   background-color: white;
   border: 1px solid #E2E2E2;
   border-radius: 14px;
@@ -4286,7 +3947,7 @@ button {
   width: 340px;
   max-width: 100%;
 }
-.section-5 .inner-search button {
+.page-my-orders .section-5 .inner-search button {
   cursor: pointer;
   border: 0;
   background-color: transparent;
@@ -4294,7 +3955,7 @@ button {
   font-size: 18px;
   color: var(--color-text);
 }
-.section-5 .inner-search input {
+.page-my-orders .section-5 .inner-search input {
   flex: 1;
   border: 0;
   outline: none;
@@ -4304,12 +3965,11 @@ button {
   color: var(--color-text);
 }
 
-/* Section 6: Table List */
-.section-6 {
+.page-my-orders .section-6 {
   overflow-x: auto;
   margin-bottom: 20px;
 }
-.section-6 table {
+.page-my-orders .section-6 table {
   background-color: white;
   width: 100%;
   border: 1px solid #D5D5D5;
@@ -4319,7 +3979,7 @@ button {
   border-spacing: 0;
   min-width: 1100px;
 }
-.section-6 thead th {
+.page-my-orders .section-6 thead th {
   background-color: #FCFDFD;
   padding: 14px 16px;
   border-bottom: 1px solid #D5D5D5;
@@ -4328,7 +3988,7 @@ button {
   color: var(--color-text);
   text-align: left;
 }
-.section-6 tbody tr td {
+.page-my-orders .section-6 tbody tr td {
   padding: 12px 16px;
   border-bottom: 1px solid rgba(151, 151, 151, 0.4);
   font-weight: 500;
@@ -4336,30 +3996,29 @@ button {
   color: var(--color-text);
   vertical-align: middle;
 }
-.section-6 tbody tr:last-child td {
+.page-my-orders .section-6 tbody tr:last-child td {
   border-bottom: 0;
 }
-.section-6 .inner-action {
+.page-my-orders .section-6 .inner-action {
   display: inline-flex;
   background-color: #FAFBFD;
   border: 1px solid #D5D5D5;
   border-radius: 8px;
   overflow: hidden;
 }
-.section-6 .inner-action a {
+.page-my-orders .section-6 .inner-action a {
   padding: 8px 16px;
   display: inline-block;
   font-size: 16px;
   color: rgba(0, 0, 0, 0.65);
   transition: all 0.2s;
 }
-.section-6 .inner-action a:hover {
+.page-my-orders .section-6 .inner-action a:hover {
   background-color: var(--color-main);
   color: white;
 }
 
-/* Tour List in Table & Detail */
-.tour-list {
+.page-my-orders .tour-list {
   display: grid;
   gap: 10px;
   max-height: 250px;
@@ -4367,33 +4026,29 @@ button {
   padding-right: 5px;
   width: 100%;
 }
-.tour-list .inner-item {
+.page-my-orders .tour-list .inner-item {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-.tour-list .inner-item img {
+.page-my-orders .tour-list .inner-item img {
   width: 76px;
   height: 60px;
   border-radius: 6px;
   object-fit: cover;
   flex-shrink: 0;
 }
-.tour-list.inner-large .inner-item img {
-  width: 115px;
-  height: 85px;
-}
-.tour-list .inner-item .inner-content {
+.page-my-orders .tour-list .inner-item .inner-content {
   flex: 1;
   min-width: 0;
 }
-.tour-list .inner-item .inner-title {
+.page-my-orders .tour-list .inner-item .inner-title {
   font-weight: 700;
   font-size: 14px;
   color: var(--color-text);
   margin-bottom: 4px;
 }
-.tour-list .inner-item .inner-desc {
+.page-my-orders .tour-list .inner-item .inner-desc {
   display: grid;
   gap: 3px;
   font-weight: 500;
@@ -4401,19 +4056,18 @@ button {
   color: #666;
 }
 
-/* Section 7: Pagination */
-.section-7 {
+.page-my-orders .section-7 {
   margin-top: 15px;
   display: flex;
   align-items: center;
   gap: 20px;
 }
-.section-7 .inner-text {
+.page-my-orders .section-7 .inner-text {
   font-weight: 600;
   font-size: 14px;
   color: #666;
 }
-.section-7 select {
+.page-my-orders .section-7 select {
   background-color: white;
   border: 1px solid #D5D5D5;
   border-radius: 6px;
@@ -4424,26 +4078,34 @@ button {
   outline: none;
 }
 
-/* Section 8: Detail Form */
-.section-8 {
+/* Page: My Order Detail */
+.page-my-order-detail .box-title {
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--color-text);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.page-my-order-detail .section-8 {
   background-color: white;
   border: 1px solid #B9B9B9;
   border-radius: 14px;
   padding: 40px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.04);
 }
-.section-8 form {
+.page-my-order-detail .section-8 form {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 25px;
 }
-.section-8 .inner-group {
+.page-my-order-detail .section-8 .inner-group {
   display: flex !important;
   flex-direction: column !important;
   align-items: stretch !important;
   width: 100%;
 }
-.section-8 .inner-group label {
+.page-my-order-detail .section-8 .inner-group label {
   display: block !important;
   font-weight: 600;
   font-size: 14px;
@@ -4452,16 +4114,16 @@ button {
   width: 100% !important;
   text-align: left !important;
 }
-.section-8 .inner-two-col {
+.page-my-order-detail .section-8 .inner-two-col {
   grid-column: 1 / -1 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: stretch !important;
   width: 100% !important;
 }
-.section-8 .inner-group input, 
-.section-8 .inner-group select, 
-.section-8 .inner-group textarea {
+.page-my-order-detail .section-8 .inner-group input, 
+.page-my-order-detail .section-8 .inner-group select, 
+.page-my-order-detail .section-8 .inner-group textarea {
   border: 1px solid #D5D5D5;
   background-color: #F5F6FA;
   border-radius: 6px;
@@ -4472,26 +4134,50 @@ button {
   width: 100%;
   box-sizing: border-box;
 }
-.section-8 .inner-group input:disabled, 
-.section-8 .inner-group select:disabled, 
-.section-8 .inner-group textarea:disabled {
+.page-my-order-detail .section-8 .inner-group input:disabled, 
+.page-my-order-detail .section-8 .inner-group select:disabled, 
+.page-my-order-detail .section-8 .inner-group textarea:disabled {
   background-color: #F5F6FA;
   color: #333;
   cursor: not-allowed;
   opacity: 1;
 }
-.section-8 .inner-group textarea {
+.page-my-order-detail .section-8 .inner-group textarea {
   resize: none;
   height: 120px;
   width: 100% !important;
   box-sizing: border-box !important;
 }
-.section-8 .inner-group .inner-text {
+.page-my-order-detail .section-8 .inner-group .inner-text {
   line-height: 1.8;
   font-size: 15px;
   color: var(--color-text);
 }
-.section-8 .inner-btn-wrap {
+.page-my-order-detail .tour-list.inner-large .inner-item img {
+  width: 115px;
+  height: 85px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.page-my-order-detail .tour-list .inner-item .inner-content {
+  flex: 1;
+  min-width: 0;
+}
+.page-my-order-detail .tour-list .inner-item .inner-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+.page-my-order-detail .tour-list .inner-item .inner-desc {
+  display: grid;
+  gap: 3px;
+  font-weight: 500;
+  font-size: 12px;
+  color: #666;
+}
+.page-my-order-detail .section-8 .inner-btn-wrap {
   grid-column: 1 / -1 !important;
   display: flex !important;
   flex-direction: row !important;
@@ -4500,7 +4186,7 @@ button {
   width: 100% !important;
   margin-top: 15px;
 }
-.section-8 .btn-create {
+.page-my-order-detail .section-8 .btn-create {
   border: 0;
   background-color: var(--color-main, #582be8);
   color: white !important;
@@ -4519,10 +4205,10 @@ button {
   text-decoration: none;
   margin: 0 auto;
 }
-.section-8 .btn-create:hover {
+.page-my-order-detail .section-8 .btn-create:hover {
   opacity: 1;
 }
-.section-8 .inner-link {
+.page-my-order-detail .section-8 .inner-link {
   text-align: center;
   margin-top: 25px;
   width: 100%;
@@ -4530,7 +4216,7 @@ button {
   justify-content: center;
   align-items: center;
 }
-.section-8 .inner-link a {
+.page-my-order-detail .section-8 .inner-link a {
   font-weight: 700;
   font-size: 16px;
   display: inline-flex;
@@ -4540,10 +4226,10 @@ button {
   text-decoration: underline;
 }
 @media (max-width: 768px) {
-  .section-8 {
+  .page-my-order-detail .section-8 {
     padding: 20px;
   }
-  .section-8 form {
+  .page-my-order-detail .section-8 form {
     grid-template-columns: 1fr;
     gap: 15px;
   }

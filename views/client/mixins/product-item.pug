@@ -5,6 +5,7 @@ mixin product-item(item)
         img(
           alt=item.tourName
           src=item.avatar
+          onerror="this.src='https://placehold.co/270x237?text=No+Image'"
           )
       .inner-content
         .inner-discount
