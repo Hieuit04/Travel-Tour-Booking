@@ -4,6 +4,8 @@ const { formatTourItem } = require("../../helpers/tour.helper")
 const categoryFilter = require('../../helpers/categoryFilter.helper');
 
 const Promotion = require("../../models/promotion.model");
+const Blog = require("../../models/blog.model");
+const moment = require("moment");
 
 module.exports.home = async (req, res) => {
   // section2 (Promotion)
@@ -128,6 +130,20 @@ module.exports.home = async (req, res) => {
   }
   // end section6
 
+  // section8: Tin tức mới
+  const blogList = await Blog.find({
+    status: 'active',
+    deleted: false,
+  })
+    .sort({ createdAt: -1 })
+    .limit(5)
+    .lean();
+
+  blogList.forEach((item) => {
+    item.createdAtFormat = moment(item.createdAt).format('DD/MM/YYYY');
+  });
+  // end section8
+
   res.render('client/pages/home.pug', {
     pageTitle: 'Trang chủ',
     tourListSection2: tourListSection2,
@@ -137,5 +153,6 @@ module.exports.home = async (req, res) => {
     categorySection6: categorySection6,
     promotion: promotion,
     isUpcoming: isUpcoming,
+    blogList: blogList,
   });
 }

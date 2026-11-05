@@ -103,6 +103,10 @@ block main
                   .tag.tag-green Hoạt động
                 else if(item.status == "inactive")
                   .tag.tag-red Tạm dừng
+                else if(item.status == "processing")
+                  .tag.tag-orange Đang xử lý ảnh
+                else if(item.status == "upload_failed")
+                  .tag.tag-red Lỗi tải ảnh
               td
                 div #{item.createdByName}
                 .inner-time #{item.createdAtFormat}

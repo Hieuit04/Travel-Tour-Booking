@@ -1,3 +1,4 @@
+const { sendToQueue } = require('../../configs/rabbitmq.config');
 const Category = require('../../models/category.model');
 const AccountAdmin = require('../../models/accounts-admin.model');
 const buildCategoryTree = require('../../helpers/categoryTree.helper');
@@ -115,13 +116,25 @@ module.exports.createPost = async (req, res) => {
         req.body.position = 1;
       }
     }
-    req.body.avatar = req.file ? req.file.path : "";
+    const avatarPath = req.file ? req.file.path : null;
+    req.body.avatar = "";
     req.body.createdBy = res.locals.account.id;
     const newRecord = new Category(req.body);
     await newRecord.save();
+
+    if (avatarPath) {
+      await sendToQueue("media_upload_queue", {
+        model: "Category",
+        id: newRecord.id,
+        files: [{ field: "avatar", path: avatarPath, folder: "categories" }],
+      });
+    }
+
     res.json({
       code: "success",
-      message: "Danh mục đã được tạo thành công",
+      message: avatarPath 
+        ? "Danh mục đã được tạo thành công! Ảnh đang được tải lên máy chủ ngầm." 
+        : "Danh mục đã được tạo thành công",
     })
   } catch (error) {
     console.log("===> LỖI CREATE POST:", error);
@@ -183,16 +196,26 @@ module.exports.editPatch = async (req, res) => {
         req.body.position = 1;
       }
     }
-    if (req.file) {
-      req.body.avatar = req.file.path;
-    }
+    const avatarPath = req.file ? req.file.path : null;
+    delete req.body.avatar; // giữ avatar cũ trên DB trong lúc chờ upload
     req.body.updatedBy = res.locals.account.id;
     await Category.updateOne({
       _id: id
-    }, req.body)
+    }, req.body);
+
+    if (avatarPath) {
+      await sendToQueue("media_upload_queue", {
+        model: "Category",
+        id: id,
+        files: [{ field: "avatar", path: avatarPath, folder: "categories" }],
+      });
+    }
+
     res.json({
       code: "success",
-      message: "Danh mục đã được cập nhật thành công",
+      message: avatarPath 
+        ? "Danh mục đã được cập nhật thành công! Ảnh đang được tải lên máy chủ ngầm." 
+        : "Danh mục đã được cập nhật thành công",
     })
   } catch (error) {
     res.json({

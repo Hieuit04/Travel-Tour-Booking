@@ -1,3 +1,4 @@
+const { sendToQueue } = require('../../configs/rabbitmq.config');
 const AccountAdmin = require('../../models/accounts-admin.model');
 const jwt = require('jsonwebtoken');
 
@@ -43,12 +44,19 @@ module.exports.editPatch = async (req, res) => {
       }
     }
     
-    if (req.file) {
-      req.body.avatar = req.file.path;
-    }
+    const avatarPath = req.file ? req.file.path : null;
+    delete req.body.avatar;
     req.body.updatedBy = id;
 
     await AccountAdmin.findByIdAndUpdate(id, req.body);
+
+    if (avatarPath) {
+      await sendToQueue("media_upload_queue", {
+        model: "AccountAdmin",
+        id: id,
+        files: [{ field: "avatar", path: avatarPath, folder: "accounts-admin" }],
+      });
+    }
 
     const token = jwt.sign(
     {
@@ -69,7 +77,9 @@ module.exports.editPatch = async (req, res) => {
   })
     res.json({
       code: "success",
-      message: "Đã cập nhật!",
+      message: avatarPath 
+        ? "Đã cập nhật thông tin! Ảnh đại diện đang được tải lên máy chủ ngầm." 
+        : "Đã cập nhật!",
     })
   }catch (error){
     console.log(error);

@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const settingController = require('../../controllers/admin/setting.controller');
-const {storage} = require('../../helpers/cloundinary.helper'); // Import multer storage configuration
-const multer = require('multer')
-const upload = multer({ storage: storage })
+const { uploadDisk } = require('../../helpers/upload-disk.helper');
 const {checkPermission} = require('../../middlewares/admin/permission.middleware');
 
 
@@ -16,7 +14,7 @@ router.get('/account-admin/create', settingController.accountAdminCreate);
 router.post(
   '/account-admin/create',
   checkPermission("account-admin-create"),
-  upload.single('avatar'),
+  uploadDisk.single('avatar'),
   settingController.accountAdminCreatePost
 );
 
@@ -25,7 +23,7 @@ router.get('/account-admin/edit/:id', settingController.accountAdminEdit);
 router.patch(
   '/account-admin/edit/:id',
   checkPermission("account-admin-edit"),
-  upload.single("avatar"),
+  uploadDisk.single("avatar"),
   settingController.accountAdminEditPatch
 );
 
@@ -56,7 +54,7 @@ router.get('/role/create', settingController.roleCreate);
 router.patch(
   '/website-info',
   checkPermission("website-info-edit"),
-  upload.fields([
+  uploadDisk.fields([
     { name: 'logo', maxCount: 1 },
     { name: 'favicon', maxCount: 1 }
   ]),

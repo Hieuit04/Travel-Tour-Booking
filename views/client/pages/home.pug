@@ -296,29 +296,122 @@ block main
         data-aos-duration="1000" 
         data-aos="fade-up"
         )
-        .inner-item-1
-          a(href="#")
-            img(
-              alt="" 
-              src="/client/assets/images/demo/blog-1.jpg"
-              )
-            .inner-content
-              .inner-date 23/05/2024
-              h3.inner-title Homestay “cổ tích” giữa Đà Lạt mộng mơ
-        .inner-item-2
-          a(href="#")
-            img(
-              alt="" 
-              src="/client/assets/images/demo/blog-2.jpg"
-              )
-            .inner-content
-              .inner-date 23/05/2024
-              h3.inner-title Top 5 điểm check in độc đáo tại Singapore
-              .inner-desc
-                | Nếu bạn nghĩ du lịch Singapore rất nhàm chán vì chỉ mãi quanh quẩn trong những khối bê tông vô cảm thì
-                |   bạn “chắc chưa?”. Tuy đảo quốc Sư Tử không phải là một quốc gia rộng lớn nhưng các địa điểm du lịch tại
-                |   Singapore chưa từng đánh mất sức hút đối với cộng đồng xê dịch quốc tế.
-        .inner-item-1 Item 3
-        .inner-item-1 Item 4
-        .inner-item-1 Item 5
+        if blogList && blogList.length > 0
+          //- 1. Trên bên trái: Tin mới thứ 2 (blogList[1])
+          if blogList[1]
+            .inner-item-1.item-top-left
+              a(href=`/blog/${blogList[1].slug}`)
+                img(
+                  alt=blogList[1].title 
+                  src=blogList[1].avatar || "/client/assets/images/demo/blog-1.jpg"
+                  onerror="this.src='/client/assets/images/demo/blog-1.jpg'"
+                  )
+                .inner-content
+                  .inner-date #{blogList[1].createdAtFormat}
+                  h3.inner-title #{blogList[1].title}
+
+          //- 2. Ở giữa (Lớn): Tin mới nhất (blogList[0])
+          if blogList[0]
+            .inner-item-2.item-center
+              a(href=`/blog/${blogList[0].slug}`)
+                img(
+                  alt=blogList[0].title 
+                  src=blogList[0].avatar || "/client/assets/images/demo/blog-2.jpg"
+                  onerror="this.src='/client/assets/images/demo/blog-2.jpg'"
+                  )
+                .inner-content
+                  .inner-date #{blogList[0].createdAtFormat}
+                  h3.inner-title #{blogList[0].title}
+                  if blogList[0].excerpt
+                    .inner-desc #{blogList[0].excerpt}
+
+          //- 3. Trên bên phải: Tin mới thứ 3 (blogList[2])
+          if blogList[2]
+            .inner-item-1.item-top-right
+              a(href=`/blog/${blogList[2].slug}`)
+                img(
+                  alt=blogList[2].title 
+                  src=blogList[2].avatar || "/client/assets/images/demo/blog-1.jpg"
+                  onerror="this.src='/client/assets/images/demo/blog-1.jpg'"
+                  )
+                .inner-content
+                  .inner-date #{blogList[2].createdAtFormat}
+                  h3.inner-title #{blogList[2].title}
+
+          //- 4. Dưới bên trái: Tin mới thứ 4 (blogList[3])
+          if blogList[3]
+            .inner-item-1.item-bottom-left
+              a(href=`/blog/${blogList[3].slug}`)
+                img(
+                  alt=blogList[3].title 
+                  src=blogList[3].avatar || "/client/assets/images/demo/blog-1.jpg"
+                  onerror="this.src='/client/assets/images/demo/blog-1.jpg'"
+                  )
+                .inner-content
+                  .inner-date #{blogList[3].createdAtFormat}
+                  h3.inner-title #{blogList[3].title}
+
+          //- 5. Dưới bên phải: Tin mới thứ 5 (blogList[4])
+          if blogList[4]
+            .inner-item-1.item-bottom-right
+              a(href=`/blog/${blogList[4].slug}`)
+                img(
+                  alt=blogList[4].title 
+                  src=blogList[4].avatar || "/client/assets/images/demo/blog-1.jpg"
+                  onerror="this.src='/client/assets/images/demo/blog-1.jpg'"
+                  )
+                .inner-content
+                  .inner-date #{blogList[4].createdAtFormat}
+                  h3.inner-title #{blogList[4].title}
+        else
+          //- Fallback dữ liệu mẫu khi chưa có bài viết
+          .inner-item-1.item-top-left
+            a(href="#")
+              img(
+                alt="" 
+                src="/client/assets/images/demo/blog-1.jpg"
+                )
+              .inner-content
+                .inner-date 23/05/2024
+                h3.inner-title Homestay “cổ tích” giữa Đà Lạt mộng mơ
+          .inner-item-2.item-center
+            a(href="#")
+              img(
+                alt="" 
+                src="/client/assets/images/demo/blog-2.jpg"
+                )
+              .inner-content
+                .inner-date 23/05/2024
+                h3.inner-title Top 5 điểm check in độc đáo tại Singapore
+                .inner-desc
+                  | Nếu bạn nghĩ du lịch Singapore rất nhàm chán vì chỉ mãi quanh quẩn trong những khối bê tông vô cảm thì
+                  |   bạn “chắc chưa?”. Tuy đảo quốc Sư Tử không phải là một quốc gia rộng lớn nhưng các địa điểm du lịch tại
+                  |   Singapore chưa từng đánh mất sức hút đối với cộng đồng xê dịch quốc tế.
+          .inner-item-1.item-top-right
+            a(href="#")
+              img(
+                alt="" 
+                src="/client/assets/images/demo/blog-1.jpg"
+                )
+              .inner-content
+                .inner-date 22/05/2024
+                h3.inner-title Khám phá thiên đường biển đảo Phú Quốc
+          .inner-item-1.item-bottom-left
+            a(href="#")
+              img(
+                alt="" 
+                src="/client/assets/images/demo/blog-1.jpg"
+                )
+              .inner-content
+                .inner-date 20/05/2024
+                h3.inner-title Kinh nghiệm săn mây Tà Xùa cho người mới
+          .inner-item-1.item-bottom-right
+            a(href="#")
+              img(
+                alt="" 
+                src="/client/assets/images/demo/blog-1.jpg"
+                )
+              .inner-content
+                .inner-date 18/05/2024
+                h3.inner-title 10 món ngon không thể bỏ lỡ tại Hà Nội
   // End Section 8

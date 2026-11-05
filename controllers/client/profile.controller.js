@@ -1,3 +1,4 @@
+const { sendToQueue } = require('../../configs/rabbitmq.config');
 const AccountClient = require('../../models/accounts-clients.model');
 const jwt = require('jsonwebtoken');
 
@@ -65,6 +66,7 @@ module.exports.editPatch = async (req, res) => {
       }
 
       // Handle avatar file upload if provided
+      const avatarPath = req.file ? req.file.path : null;
       const updateData = {
         fullName: req.body.fullName ? req.body.fullName.trim() : account.fullName,
         email: req.body.email ? req.body.email.trim() : account.email,
@@ -72,11 +74,15 @@ module.exports.editPatch = async (req, res) => {
         updatedBy: id
       };
 
-      if (req.file) {
-        updateData.avatar = req.file.path;
-      }
-
       await AccountClient.findByIdAndUpdate(id, updateData);
+
+      if (avatarPath) {
+        await sendToQueue("media_upload_queue", {
+          model: "AccountClient",
+          id: id,
+          files: [{ field: "avatar", path: avatarPath, folder: "accounts-client" }],
+        });
+      }
 
       // Re-issue JWT cookie if email changed
       const newToken = jwt.sign(
@@ -98,12 +104,14 @@ module.exports.editPatch = async (req, res) => {
 
       return res.json({
         code: 'success',
-        message: 'Cập nhật thông tin thành công!',
+        message: avatarPath 
+          ? 'Cập nhật thông tin thành công! Ảnh đang được tải lên máy chủ ngầm.' 
+          : 'Cập nhật thông tin thành công!',
         data: {
           fullName: updateData.fullName,
           email: updateData.email,
           phone: updateData.phone,
-          avatar: updateData.avatar || account.avatar
+          avatar: account.avatar
         }
       });
     }
