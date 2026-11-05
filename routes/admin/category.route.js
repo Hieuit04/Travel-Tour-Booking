@@ -5,10 +5,7 @@ const categoryValidate = require('../../validates/admin/category.validate');
 const {checkPermission} = require('../../middlewares/admin/permission.middleware');
 
 
-const {storage} = require('../../helpers/cloundinary.helper'); // Import multer storage configuration
-
-const multer  = require('multer')
-const upload = multer({ storage: storage })
+const { uploadDisk } = require('../../helpers/upload-disk.helper');
 
 
 
@@ -19,7 +16,7 @@ router.get('/create', categoryController.create);
 router.post(
   '/create',
   checkPermission("category-create"),
-  upload.single("avatar"),
+  uploadDisk.single("avatar"),
   categoryValidate.categoryCreatePost, 
   categoryController.createPost
 );
@@ -29,7 +26,7 @@ router.get('/edit/:id', categoryController.edit);
 router.patch(
   '/edit/:id',
   checkPermission("category-edit"),
-  upload.single("avatar"),
+  uploadDisk.single("avatar"),
   categoryValidate.categoryCreatePost, 
   categoryController.editPatch
 );

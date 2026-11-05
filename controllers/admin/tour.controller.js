@@ -9,7 +9,8 @@ const moment = require('moment');
 const buildCategoryTree = require('../../helpers/categoryTree.helper');
 const categoryFilter = require('../../helpers/categoryFilter.helper');
 const slugify = require('slugify')
-const {checkPermission} = require('../../helpers/permission.helper')
+const {checkPermission} = require('../../helpers/permission.helper');
+const { sendToQueue } = require('../../configs/rabbitmq.config');
 
 
 module.exports.list = async (req, res) => {
@@ -213,22 +214,21 @@ module.exports.createPost = async (req, res) => {
         req.body.position = 1;
       }
     }
-    // Avatar
-    if (req.files.avatar && req.files.avatar.length > 0) { 
-      req.body.avatar = req.files.avatar[0].path;
+    // 1. Lấy đường dẫn file tạm đã được Multer DiskStorage lưu vào uploads/
+    const avatarPath = (req.files && req.files.avatar && req.files.avatar.length > 0) 
+      ? req.files.avatar[0].path 
+      : null;
+
+    const imagePaths = (req.files && req.files.images && req.files.images.length > 0) 
+      ? req.files.images.map(file => file.path) 
+      : [];
+
+    // 2. Tạm thời để trống ảnh trên DB; nếu có ảnh cần upload thì đặt status = 'processing'
+    req.body.avatar = "";
+    req.body.images = [];
+    if (avatarPath || imagePaths.length > 0) {
+      req.body.status = "processing";
     }
-    else {
-      req.body.avatar = "";
-    }
-    // end Avatar
-    // Images
-    if (req.files.images && req.files.images.length > 0) { 
-      req.body.images = req.files.images.map(file => file.path);
-    }
-    else {
-      req.body.images = "";
-    }
-    // end Images
     req.body.createdBy = res.locals.account.id;
     req.body.priceAdult = req.body.priceAdult ? parseInt(req.body.priceAdult) : 0;
     req.body.priceChildren = req.body.priceChildren ? parseInt(req.body.priceChildren) : 0;
@@ -247,9 +247,41 @@ module.exports.createPost = async (req, res) => {
 
     const newRecord = new Tour(req.body);
     await newRecord.save();
+
+    // 3. Nếu có ảnh, bắn thông điệp vào RabbitMQ để Worker đa năng xử lý upload ngầm
+    if (avatarPath || imagePaths.length > 0) {
+      const mediaFiles = [];
+      if (avatarPath) {
+        mediaFiles.push({
+          field: "avatar",
+          path: avatarPath,
+          folder: "tours/avatar",
+          isArray: false,
+        });
+      }
+      if (imagePaths && imagePaths.length > 0) {
+        mediaFiles.push({
+          field: "images",
+          paths: imagePaths,
+          folder: "tours/gallery",
+          isArray: true,
+        });
+      }
+
+      await sendToQueue("media_upload_queue", {
+        model: "Tour",
+        id: newRecord.id,
+        files: mediaFiles,
+        statusSuccess: "active",
+        statusFail: "upload_failed",
+      });
+    }
+
     res.json({
       code: "success",
-      message: "Tour đã được tạo thành công",
+      message: (avatarPath || imagePaths.length > 0)
+        ? "Tour đã được tạo thành công! Hình ảnh đang được tải lên máy chủ ngầm."
+        : "Tour đã được tạo thành công!",
     })
   } catch (error) {
     console.log("===> LỖI CREATE POST:", error);
@@ -314,22 +346,28 @@ module.exports.editPatch = async (req, res) => {
         req.body.position = 1;
       }
     }
-    // Avatar
-    if (req.files.avatar && req.files.avatar.length > 0) { 
-      req.body.avatar = req.files.avatar[0].path;
+    // 1. Lấy đường dẫn file tạm đã được Multer DiskStorage lưu vào uploads/
+    const avatarPath = (req.files && req.files.avatar && req.files.avatar.length > 0) 
+      ? req.files.avatar[0].path 
+      : null;
+
+    const imagePaths = (req.files && req.files.images && req.files.images.length > 0) 
+      ? req.files.images.map(file => file.path) 
+      : [];
+
+    // Nếu không upload avatar mới thì giữ nguyên avatar cũ
+    if (!avatarPath) {
+      delete req.body.avatar;
+    } else {
+      delete req.body.avatar; // để worker cập nhật sau
     }
-    else {
-      req.body.avatar = "";
+
+    // Nếu không upload images mới thì giữ nguyên images cũ
+    if (imagePaths.length === 0) {
+      delete req.body.images;
+    } else {
+      delete req.body.images; // để worker cập nhật sau
     }
-    // end Avatar
-    // Images
-    if (req.files.images && req.files.images.length > 0) { 
-      req.body.images = req.files.images.map(file => file.path);
-    }
-    else {
-      req.body.images = "";
-    }
-    // end Images
     req.body.createdBy = res.locals.account.id;
     req.body.priceAdult = req.body.priceAdult ? parseInt(req.body.priceAdult) : 0;
     req.body.priceChildren = req.body.priceChildren ? parseInt(req.body.priceChildren) : 0;
@@ -346,9 +384,39 @@ module.exports.editPatch = async (req, res) => {
     req.body.updatedBy = res.locals.account.id;
 
     await Tour.findByIdAndUpdate(id, req.body);
+
+    // Bắn thông điệp vào RabbitMQ nếu có ảnh mới
+    if (avatarPath || imagePaths.length > 0) {
+      const mediaFiles = [];
+      if (avatarPath) {
+        mediaFiles.push({
+          field: "avatar",
+          path: avatarPath,
+          folder: "tours/avatar",
+          isArray: false,
+        });
+      }
+      if (imagePaths && imagePaths.length > 0) {
+        mediaFiles.push({
+          field: "images",
+          paths: imagePaths,
+          folder: "tours/gallery",
+          isArray: true,
+        });
+      }
+
+      await sendToQueue("media_upload_queue", {
+        model: "Tour",
+        id: id,
+        files: mediaFiles,
+      });
+    }
+
     res.json({
       code: "success",
-      message: "Tour đã được cập nhật thành công",
+      message: (avatarPath || imagePaths.length > 0)
+        ? "Tour đã được cập nhật thành công! Hình ảnh đang được tải lên máy chủ ngầm."
+        : "Tour đã được cập nhật thành công",
     })
   } catch (error) {
     console.log(error)

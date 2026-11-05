@@ -1,3 +1,4 @@
+const { sendToQueue } = require('../../configs/rabbitmq.config');
 const SettingWebsiteInfo = require('../../models/setting-website-info.model');
 const { permissionList } = require('../../configs/variable.config');
 const bcrypt = require('bcryptjs');
@@ -29,13 +30,34 @@ module.exports.websiteInfo = async (req, res) => {
 };
 
 module.exports.websiteInfoPatch = async (req, res) => {
-  req.body.logo = req.files.logo ? req.files.logo[0].path : "";
-  req.body.favicon = req.files.favicon ? req.files.favicon[0].path : "";
-  await SettingWebsiteInfo.findOneAndUpdate({}, req.body, { upsert: true });
+  const logoPath = (req.files && req.files.logo && req.files.logo.length > 0) ? req.files.logo[0].path : null;
+  const faviconPath = (req.files && req.files.favicon && req.files.favicon.length > 0) ? req.files.favicon[0].path : null;
+
+  delete req.body.logo;
+  delete req.body.favicon;
+
+  const record = await SettingWebsiteInfo.findOneAndUpdate({}, req.body, { upsert: true, new: true });
+
+  const filesToUpload = [];
+  if (logoPath) {
+    filesToUpload.push({ field: "logo", path: logoPath, folder: "website-info" });
+  }
+  if (faviconPath) {
+    filesToUpload.push({ field: "favicon", path: faviconPath, folder: "website-info" });
+  }
+
+  if (filesToUpload.length > 0) {
+    await sendToQueue("media_upload_queue", {
+      model: "SettingWebsiteInfo",
+      id: record.id,
+      files: filesToUpload,
+    });
+  }
+
   res.json({
     code: "success",
-    message: "Thông tin Website đã được cập nhật thành công",
-  })
+    message: "Thông tin Website đã được cập nhật thành công! Hình ảnh đang được tải lên máy chủ ngầm.",
+  });
 };
 
 module.exports.accountAdminList = async (req, res) => {
@@ -150,13 +172,25 @@ module.exports.accountAdminCreatePost = async (req, res) => {
     }
     const salt = await bcrypt.genSalt(10); // Tạo chuỗi ngẫu nhiên 10 ký tự 
     req.body.passWord = await bcrypt.hash(req.body.passWord, salt); // Hash mật khẩu
-    req.body.avatar = req.file ? req.file.path : "";
+    const avatarPath = req.file ? req.file.path : null;
+    req.body.avatar = "";
     req.body.createdBy = res.locals.account.id;
     const newRecord = new AccountAdmin(req.body);
     await newRecord.save();
+
+    if (avatarPath) {
+      await sendToQueue("media_upload_queue", {
+        model: "AccountAdmin",
+        id: newRecord.id,
+        files: [{ field: "avatar", path: avatarPath, folder: "accounts-admin" }],
+      });
+    }
+
     res.json({
       code: "success",
-      message: "Tài khoản quản trị đã được tạo thành công",
+      message: avatarPath 
+        ? "Tài khoản quản trị đã được tạo thành công! Ảnh đang được tải lên máy chủ ngầm." 
+        : "Tài khoản quản trị đã được tạo thành công",
     })
   } catch (error) {
     console.log("===> LỖI CREATE POST:", error);
@@ -206,9 +240,6 @@ module.exports.accountAdminEditPatch = async (req, res) => {
       res.redirect(`/${pathAdmin}/setting/account-admin/list`);
       return;
     }
-    if (req.file) {
-      req.body.avatar = req.file.path;
-    }
     if (req.body.email != res.locals.account.email) {
       const existEmail = await AccountAdmin.findOne({
         email: req.body.email,
@@ -240,13 +271,25 @@ module.exports.accountAdminEditPatch = async (req, res) => {
         return;
       }
     }
-    req.body.avatar = req.file ? req.file.path : "";
+    const avatarPath = req.file ? req.file.path : null;
+    delete req.body.avatar;
     req.body.updatedBy = res.locals.account.id;
 
     await AccountAdmin.findByIdAndUpdate(id, req.body);
+
+    if (avatarPath) {
+      await sendToQueue("media_upload_queue", {
+        model: "AccountAdmin",
+        id: id,
+        files: [{ field: "avatar", path: avatarPath, folder: "accounts-admin" }],
+      });
+    }
+
     res.json({
       code: "success",
-      message: "Tài khoản quản trị đã được cập nhật thành công",
+      message: avatarPath 
+        ? "Tài khoản quản trị đã được cập nhật thành công! Ảnh đang được tải lên máy chủ ngầm." 
+        : "Tài khoản quản trị đã được cập nhật thành công",
     })
   } catch (error) {
     console.log(error)

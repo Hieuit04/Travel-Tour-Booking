@@ -1,3 +1,4 @@
+const { sendToQueue } = require('../../configs/rabbitmq.config');
 const Blog = require('../../models/blog.model');
 const Tour = require('../../models/tour.model');
 const moment = require('moment');
@@ -171,9 +172,7 @@ module.exports.editPatch = async (req, res) => {
       content: content,
       updatedBy: res.locals.account.id
     };
-    if (req.file) {
-      dataUpdate.avatar = req.file.path;
-    }
+    const avatarPath = req.file ? req.file.path : null;
     let message = "Đã lưu nháp bài viết!";
     if (action == "publish") {
       dataUpdate.status = "active";
@@ -190,6 +189,14 @@ module.exports.editPatch = async (req, res) => {
     }
 
     await Blog.updateOne({ _id: blogDetail.id }, dataUpdate);
+
+    if (avatarPath) {
+      await sendToQueue("media_upload_queue", {
+        model: "Blog",
+        id: blogDetail.id,
+        files: [{ field: "avatar", path: avatarPath, folder: "blogs" }],
+      });
+    }
 
     res.json({
       code: "success",

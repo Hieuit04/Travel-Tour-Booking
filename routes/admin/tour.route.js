@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const tourController = require('../../controllers/admin/tour.controller');
-const { storage } = require('../../helpers/cloundinary.helper'); // Import multer storage configuration
-const multer = require('multer')
-const upload = multer({ storage: storage })
+const { uploadDisk } = require('../../helpers/upload-disk.helper');
 const { checkPermission } = require('../../middlewares/admin/permission.middleware');
 
 
@@ -15,22 +13,21 @@ router.get('/price-suggest', tourController.priceSuggest);
 router.post(
   '/create',
   checkPermission("tour-create"),
-  upload.fields([
+  uploadDisk.fields([
     { name: "avatar", maxCount: 1 },
-    { name: "images", maxCount: 15 }
+    { name: "images", maxCount: 15 } 
   ]),
   tourController.createPost);
 
 router.get(
   '/edit/:id',
-  upload.single("avatar"),
   tourController.edit
 );
 
 router.patch(
   '/edit/:id',
   checkPermission("tour-edit"),
-  upload.fields([
+  uploadDisk.fields([
     { name: "avatar", maxCount: 1 },
     { name: "images", maxCount: 15 }
   ]),

@@ -7,6 +7,7 @@ const path = require('path');
 var cookieParser = require('cookie-parser')
 require('dotenv').config();
 const connectDB = require('./configs/database.config');
+const { connectRabbitMQ } = require('./configs/rabbitmq.config'); // kết nối rabbitmq
 const adminRouter = require('./routes/admin/index.route');
 const clientRouter = require('./routes/client/index.route');
 const { pathAdmin } = require('./configs/variable.config');
@@ -15,6 +16,7 @@ const app = express();
 const port = 3000;
 
 connectDB(); // Kết nối đến cơ sở dữ liệu MongoDB
+connectRabbitMQ(); // kết nối rabbitmq
 
 // Cấu hình thư mục mặc định chứa giao diện 
 app.set('views', path.join(__dirname, 'views'));
@@ -44,3 +46,7 @@ app.use(`/`, clientRouter);
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 }); 
+
+// Khởi động Worker xử lý tải ảnh ngầm song song với server
+const startMediaWorker = require('./workers/media-upload.worker');
+startMediaWorker();

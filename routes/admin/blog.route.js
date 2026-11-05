@@ -5,10 +5,7 @@ const {checkPermission} = require('../../middlewares/admin/permission.middleware
 const settingMidelware = require('../../middlewares/client/setting.midelware');
 const categoryMidelware = require('../../middlewares/client/category.midelware');
 
-const {storage} = require('../../helpers/cloundinary.helper');
-
-const multer  = require('multer')
-const upload = multer({ storage: storage })
+const { uploadDisk } = require('../../helpers/upload-disk.helper');
 
 router.get('/list', blogController.list);
 
@@ -17,7 +14,7 @@ router.get('/edit/:id', blogController.edit);
 router.patch(
   '/edit/:id',
   checkPermission("blog-edit"),
-  upload.single("avatar"),
+  uploadDisk.single("avatar"),
   blogController.editPatch
 );
 
