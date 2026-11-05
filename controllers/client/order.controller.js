@@ -2,6 +2,7 @@ const { randomNumberString } = require('../../helpers/generate.helper');
 const Order = require('../../models/order.model');
 const Tour = require('../../models/tour.model');
 const City = require('../../models/city.model');
+const Cart = require('../../models/cart.model');
 
 const axios = require('axios').default; // npm install axios
 const CryptoJS = require('crypto-js'); // npm install crypto-js
@@ -18,6 +19,27 @@ module.exports.createPost = async (req, res) => {
       if (!existOrder) break;
     }
     
+    // Đã đăng nhập: lấy các tour được chọn từ giỏ hàng trong DB, không tin dữ liệu client
+    if (res.locals.account) {
+      const cart = await Cart.findOne({ accountId: res.locals.account.id });
+      req.body.items = cart
+        ? cart.items.filter(item => item.checked).map(item => ({
+            tourId: String(item.tourId),
+            locationForm: item.locationForm ? String(item.locationForm) : "",
+            quantityAdult: item.quantityAdult || 0,
+            quantityChildren: item.quantityChildren || 0,
+            quantityBaby: item.quantityBaby || 0,
+            checked: true,
+          }))
+        : [];
+    }
+    if (!Array.isArray(req.body.items) || req.body.items.length === 0) {
+      return res.json({
+        code: "error",
+        message: "Vui lòng chọn ít nhất 1 tour!",
+      })
+    }
+
     req.body.subTotal = 0;
     // Danh sách tour 
     for (const item of req.body.items) {
@@ -49,6 +71,14 @@ module.exports.createPost = async (req, res) => {
     req.body.accountId = res.locals.account ? res.locals.account.id : "";
     const order = new Order(req.body);
     await order.save();
+
+    // Xoá các tour đã đặt khỏi giỏ hàng trong DB
+    if (res.locals.account) {
+      await Cart.updateOne(
+        { accountId: res.locals.account.id },
+        { $pull: { items: { checked: true } } }
+      );
+    }
 
     res.json({
       code: "success",

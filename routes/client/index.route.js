@@ -20,17 +20,17 @@ const { getAccount } = require('../../middlewares/client/get-account.middlewares
 router.use(settingMidelware.websiteInfo)
 router.use(categoryMidelware.list)
 
-router.use('/account', accountRouters);
+router.use('/account', getAccount, accountRouters);
 router.use('/profile', verifyToken, profileRouters);
 router.use('/my-orders', verifyToken, myOrderRouters);
 router.use('/tour', getAccount, tourRouters);
 router.use('/cart', getAccount, cartRouters);
 router.use('/contact', getAccount, contactRouters);
 router.use('/category', getAccount, categoryRouters);
-router.use('/search', searchRouters);
+router.use('/search', getAccount, searchRouters);
 router.use('/order', getAccount, orderRouters);
 router.use('/', getAccount, homeRouters);
-router.use('/blog', blogRouters);
+router.use('/blog', getAccount, blogRouters);
 // router.use('/order', orderRouters);
 router.use('/', homeRouters);
 

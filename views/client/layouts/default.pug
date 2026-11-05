@@ -30,7 +30,7 @@ html
       href="/client/assets/css/style.css?v=6" 
       rel="stylesheet"
       )
-  body 
+  body(data-logged-in=account ? "1" : "0")
     include ../partials/top-header.pug
     include ../partials/box-contact.pug
     include ../partials/header.pug

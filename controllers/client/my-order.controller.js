@@ -7,7 +7,6 @@ const variableConfig = require('../../configs/variable.config');
 module.exports.list = async (req, res) => {
   try {
     const account = res.locals.account;
-
     const find = {
       $or: [
         { accountId: account.id },

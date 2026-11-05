@@ -1,10 +1,74 @@
-
-
 // Khởi tạo giỏ hàng
-const initialCart = localStorage.getItem('cart');
-if (!initialCart) {
-  localStorage.setItem('cart', JSON.stringify([]));
-}
+let loggedIn = document.body.dataset.loggedIn === "1";
+
+const cartStore = {
+  getLocal() {
+    try {
+      return JSON.parse(localStorage.getItem('cart')) || [];
+    } catch (e) {
+      return [];
+    }
+  },
+  setLocal(cart) {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  },
+  // Gọi API; nếu 401 thì chuyển sang chế độ localStorage
+  async callApi(url, method, body) {
+    const res = await fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    if (res.status === 401) {
+      loggedIn = false;
+      notyf.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
+      return null;
+    }
+    return res.json();
+  },
+  // Thêm mới hoặc cập nhật một phần item
+  async upsert(item) {
+    if (loggedIn) {
+      const data = await this.callApi('/cart/add', 'POST', item);
+      if (data) return data;
+    }
+    const cart = this.getLocal();
+    const existItem = cart.find(i => i.tourId === item.tourId);
+    if (existItem) {
+      Object.assign(existItem, item);
+    } else {
+      cart.unshift({ checked: true, ...item });
+    }
+    this.setLocal(cart);
+    return { code: "success", existed: !!existItem };
+  },
+  async remove(tourId) {
+    if (loggedIn) {
+      const data = await this.callApi(`/cart/item/${tourId}`, 'DELETE');
+      if (data) return data;
+    }
+    this.setLocal(this.getLocal().filter(i => i.tourId !== tourId));
+    return { code: "success" };
+  },
+  async count() {
+    if (loggedIn) {
+      const data = await this.callApi('/cart/count', 'GET');
+      if (data && data.code === "success") return data.count;
+    }
+    return this.getLocal().length;
+  },
+};
+
+// Gộp giỏ hàng localStorage vào DB khi đã đăng nhập (idempotent, chạy mỗi lần tải trang)
+const mergeLocalCart = async () => {
+  if (!loggedIn) return;
+  const local = cartStore.getLocal();
+  if (local.length === 0) return;
+  const data = await cartStore.callApi('/cart/merge', 'POST', local);
+  if (data && data.code === "success") {
+    cartStore.setLocal([]);
+  }
+};
 // end Khởi tạo giỏ hàng
 
 // Khởi tạo AOS\
@@ -345,11 +409,14 @@ if (orderForm) {
       const note = event.target.note.value
       const paymentMethod = event.target.paymentMethod.value
 
-      let cart = JSON.parse(localStorage.getItem("cart"))
-      cart = cart.filter(item => item.checked)
-      if (cart.length == 0) {
-        notyf.error("Vui lòng chọn ít nhất 1 tour!");
-        return;
+      // Đã đăng nhập: server tự lấy các tour được chọn từ giỏ hàng trong DB
+      let cart = [];
+      if (!loggedIn) {
+        cart = cartStore.getLocal().filter(item => item.checked);
+        if (cart.length == 0) {
+          notyf.error("Vui lòng chọn ít nhất 1 tour!");
+          return;
+        }
       }
       const dataFinal = {
         fullName: fullName,
@@ -372,9 +439,9 @@ if (orderForm) {
           }
           if (data.code === 'success') {
             // Cập nhật lại gior hàng
-            let cart = JSON.parse(localStorage.getItem("cart"));
-            cart = cart.filter(item => item.checked == false)
-            localStorage.setItem("cart", JSON.stringify(cart));
+            if (!loggedIn) {
+              cartStore.setLocal(cartStore.getLocal().filter(item => item.checked == false));
+            }
             
             switch (paymentMethod) {
               case "money":
@@ -488,16 +555,15 @@ if (formSearch) {
 // end Form serch
 
 // Hiển thị mini cart
-const drawMiniCart = () => {
+const drawMiniCart = async () => {
   const miniCart = document.querySelector("[miniCart]");
   if (miniCart) {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    miniCart.innerHTML = cart.length > 0 ? cart.length : "0";
+    const count = await cartStore.count();
+    miniCart.innerHTML = count > 0 ? count : "0";
   }
 }
 // end Hiển thị mini cart
 
-drawMiniCart();
 // box tour detail
 const boxTourDetail = document.querySelector(".box-tour-detail")
 if (boxTourDetail) {
@@ -528,7 +594,7 @@ if (boxTourDetail) {
   })
   // Thêm vào giỏ hàng
   const buttonAddToCart = boxTourDetail.querySelector("[button-add-cart]")
-  buttonAddToCart.addEventListener("click", () => {
+  buttonAddToCart.addEventListener("click", async () => {
     const tourId = buttonAddToCart.getAttribute("tour-id")
     const locationForm = document.querySelector(`[name="locationForm"]`).value
     const quantityAdult = parseInt(document.querySelector(`[name="stockAdult"]`).value)
@@ -538,28 +604,19 @@ if (boxTourDetail) {
       notyf.error("Vui lòng chọn số lượng ");
       return;
     }
-    const cart = JSON.parse(localStorage.getItem('cart'));
-
-    const existItem = cart.find(item => item.tourId === tourId);
-    if (existItem) {
-      existItem.locationForm = locationForm;
-      existItem.quantityAdult = quantityAdult;
-      existItem.quantityChildren = quantityChildren;
-      existItem.quantityBaby = quantityBaby;
-      notyf.success("Đã cập nhật giỏ hàng");
-    } else {
-      const cartItem = {
-        tourId: tourId,
-        locationForm: locationForm,
-        quantityAdult: quantityAdult,
-        quantityChildren: quantityChildren,
-        quantityBaby: quantityBaby,
-        checked: true
-      };
-      cart.unshift(cartItem)
-      notyf.success("Đã thêm vào giỏ hàng");
+    const result = await cartStore.upsert({
+      tourId: tourId,
+      locationForm: locationForm,
+      quantityAdult: quantityAdult,
+      quantityChildren: quantityChildren,
+      quantityBaby: quantityBaby,
+      checked: true
+    });
+    if (result.code === "error") {
+      notyf.error(result.message);
+      return;
     }
-    localStorage.setItem('cart', JSON.stringify(cart));
+    notyf.success(result.existed ? "Đã cập nhật giỏ hàng" : "Đã thêm vào giỏ hàng");
     drawMiniCart();
   })
   // Thêm vào giỏ hàng
@@ -571,7 +628,7 @@ if (boxTourDetail) {
 const eventInputQuantity = () => {
   const listInputQuantity = document.querySelectorAll("[inputQuantity]");
   listInputQuantity.forEach(input => {
-    input.addEventListener("change", () => {
+    input.addEventListener("change", async () => {
       const name = input.name
       let value = parseInt(input.value) || 0
       const min = parseInt(input.min) || 0
@@ -588,13 +645,8 @@ const eventInputQuantity = () => {
         notyf.error(`Số lượng tối đa là ${max}`)
       }
       const tourId = input.getAttribute("tourId")
-      const cart = JSON.parse(localStorage.getItem('cart'));
-      const existItem = cart.find(item => item.tourId === tourId);
-      if (existItem) {
-        existItem[name] = value;
-        localStorage.setItem('cart', JSON.stringify(cart));
-        drawCart();
-      }
+      await cartStore.upsert({ tourId: tourId, [name]: value });
+      drawCart();
     })
   })
 }
@@ -602,16 +654,12 @@ const eventInputQuantity = () => {
 const eventRemove = () => {
   const listButtonRemove = document.querySelectorAll("[button-remove")
   listButtonRemove.forEach(button => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       const tourId = button.getAttribute("tourId")
-      const cart = JSON.parse(localStorage.getItem("cart"))
-      const indexItem = cart.findIndex(item => item.tourId === tourId)
-      cart.splice(indexItem, 1)
-      localStorage.setItem("cart", JSON.stringify(cart))
+      await cartStore.remove(tourId);
       drawCart();
       drawMiniCart();
       notyf.success("Đã xoá!");
-
     })
   })
 }
@@ -619,20 +667,16 @@ const eventRemove = () => {
 const eventCheck = () => {
   const listInputCheck = document.querySelectorAll("[inputCheck]")
   listInputCheck.forEach(input => {
-    input.addEventListener("change", () => {
+    input.addEventListener("change", async () => {
       const tourId = input.getAttribute("tourId")
-      const cart = JSON.parse(localStorage.getItem("cart"))
-      const existItem = cart.find(item => item.tourId === tourId);
-      if (existItem) {
-        existItem.checked = input.checked;
-        localStorage.setItem("cart", JSON.stringify(cart));
-        drawCart();
-      }
+      await cartStore.upsert({ tourId: tourId, checked: input.checked });
+      drawCart();
     })
   })
 }
 const drawCart = () => {
-  const cartItems = localStorage.getItem('cart');
+  // Đã đăng nhập: server tự lấy giỏ hàng từ DB, không cần gửi dữ liệu
+  const cartItems = loggedIn ? "[]" : JSON.stringify(cartStore.getLocal());
   fetch("/cart/detail", {
     method: 'POST',
     headers: {
@@ -643,11 +687,19 @@ const drawCart = () => {
     .then(res => res.json())
     .then(data => {
       if (data.code === 'error') {
-        localStorage.setItem('cart', JSON.stringify([]));
+        if (!loggedIn) {
+          cartStore.setLocal([]);
+        }
         drawMiniCart();
         notyf.error(data.message);
       }
       if (data.code === 'success') {
+        // Cờ đăng nhập ở client lệch với server => đồng bộ lại rồi vẽ lại
+        if (data.loggedIn !== loggedIn) {
+          loggedIn = data.loggedIn;
+          drawCart();
+          return;
+        }
         let subTotal = 0;
         const htmlArray = data.cartDetail.map(item => {
           const { detail } = item;
@@ -746,9 +798,14 @@ const drawCart = () => {
 }
 
 const pageCart = document.querySelector("[page-cart]")
-if (pageCart) {
-  drawCart();
-}
+
+// Khởi tạo: gộp giỏ hàng localStorage vào DB (nếu đã đăng nhập) rồi vẽ lại
+mergeLocalCart().then(() => {
+  drawMiniCart();
+  if (pageCart) {
+    drawCart();
+  }
+});
 // end Trang giỏ hàng
 
 // Ph�n trang

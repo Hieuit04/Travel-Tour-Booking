@@ -2,9 +2,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const googleClient = require("../../configs/google.config");
 const AccountClient = require("../../models/accounts-clients.model");
+const Cart = require('../../models/cart.model');
 const OtpVerification = require("../../models/otp-verification.model");
 const sendMail = require("../../helpers/mail.helper")
-const randomNumber = require("../../helpers/generate.helper")
+const randomNumber = require("../../helpers/generate.helper");
+
 
 module.exports.login = (req, res) =>{
     res.render("client/pages/login", {
@@ -376,6 +378,15 @@ module.exports.otpVerificationPost = async(req, res) =>{
                 status: "active",
             });
             await newAccount.save();
+            
+            // Tạo giỏ hàng
+            const accountId = newAccount._id;
+            const newCart = new Cart({
+                accountId: accountId,
+                items: []
+            })
+            await newCart.save();
+
             delete req.session.registerData;
             res.json({
                 code: "success",
