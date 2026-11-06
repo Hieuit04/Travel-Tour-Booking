@@ -2,6 +2,10 @@
 
 const STALE_MS = 7 * 24 * 60 * 60 * 1000;  // giá cũ hơn 7 ngày vẫn hiện nhưng kèm cảnh báo
 
+// shortcut: chỉ liệt kê điểm đến có trong DB và điểm phổ biến, thêm vào đây khi có địa điểm mới ở miền Trung/Nam
+const SOUTH = ["ho chi minh", "can tho", "vung tau", "da lat", "lam dong", "phu quoc", "an giang", "nha trang"];
+const CENTRAL = ["hue", "da nang", "hoi an", "quang binh", "quang tri"];
+
 const normalize = (text) => (text || "")
   .replace(/đ/g, "d").replace(/Đ/g, "D")
   .normalize("NFD").replace(/[̀-ͯ]/g, "")
@@ -12,6 +16,14 @@ const parseDuration = (text) => {
   const t = normalize(text);
   const m = t.match(/(\d+)\s*(?:ngay|n)\s*(\d+)\s*(?:dem|d)\b/) || t.match(/(\d+)\s*ngay/);
   return m ? { days: +m[1], nights: m[2] !== undefined ? +m[2] : null } : { days: null, nights: null };
+};
+
+// Khởi hành xa điểm đến -> giá thường gồm vé máy bay, đắt gấp 2-3 lần giá tour đường bộ
+const isFlown = (row, text, cityKeys) => {
+  const from = normalize(row.departure_city) || (text.match(/ tu (tp hcm|ho chi minh|ha noi) /) || [])[1] || "";
+  if (/ho chi minh|hcm/.test(from)) return cityKeys.every(c => !SOUTH.includes(c));
+  if (/ha noi/.test(from)) return cityKeys.every(c => SOUTH.includes(c) || CENTRAL.includes(c));
+  return false;
 };
 
 const percentile = (sorted, p) => {
@@ -34,23 +46,30 @@ module.exports = (rows, cities, time, now = new Date()) => {
     // "từ Hà Nội" là nơi khởi hành, không phải điểm đến
     const matched = cityKeys.filter(c => text.split(` ${c} `).length - text.split(` tu ${c} `).length > 0);
     if (matched.length) {
-      matches.push({ ...row, matchedCities: matched.length, sameDuration: sameDuration(row, want) });
+      matches.push({ ...row, matchedCities: matched.length, sameDuration: sameDuration(row, want), flown: isFlown(row, text, cityKeys) });
     }
   }
   matches.sort((a, b) => (b.matchedCities - a.matchedCities) || (b.sameDuration - a.sameDuration) || (a.price_adult - b.price_adult));
 
   // thời lượng ảnh hưởng giá nhiều nhất: lấy nhóm đầu tiên có đủ 3 tour, không có thì nhóm đầu tiên khác rỗng
-  const best = matches.filter(m => m.matchedCities === (matches[0] || {}).matchedCities);
+  const land = matches.filter(m => !m.flown);
+  const pool = land.length ? land : matches;
+  const best = pool.filter(m => m.matchedCities === pool[0].matchedCities);
   const near = (m) => want.days !== null && m.duration_days != null && Math.abs(m.duration_days - want.days) <= 1;
   const tiers = [
     ["cùng địa điểm và cùng thời lượng", best.filter(m => m.sameDuration)],
-    ["cùng thời lượng, khớp một phần địa điểm", matches.filter(m => m.sameDuration)],
-    ["thời lượng chênh tối đa 1 ngày", best.filter(near)],
-    ["thời lượng chênh tối đa 1 ngày, khớp một phần địa điểm", matches.filter(near)],
-    ["cùng địa điểm, mọi thời lượng", best],
+    ["cùng thời lượng, khớp một phần địa điểm", pool.filter(m => m.sameDuration)],
+    ["thời lượng chênh tối đa 1 ngày, đã quy đổi theo số ngày", best.filter(near)],
+    ["thời lượng chênh tối đa 1 ngày, khớp một phần địa điểm, đã quy đổi theo số ngày", pool.filter(near)],
+    want.days !== null
+      ? ["cùng địa điểm, thời lượng khác, đã quy đổi theo số ngày", best.filter(m => m.duration_days)]
+      : ["cùng địa điểm, mọi thời lượng", best],
   ];
   const [basisText, basis] = tiers.find(([, t]) => t.length >= 3) || tiers.find(([, t]) => t.length) || tiers[4];
-  const prices = basis.map(m => m.price_adult).sort((a, b) => a - b);
+  // quy về đúng số ngày cần tính để tour dài/ngắn hơn không làm lệch giá
+  const prices = basis
+    .map(m => (want.days !== null && m.duration_days ? Math.round(m.price_adult * want.days / m.duration_days / 1000) * 1000 : m.price_adult))
+    .sort((a, b) => a - b);
   const stats = prices.length ? {
     count: prices.length,
     min: prices[0],
@@ -65,6 +84,8 @@ module.exports = (rows, cities, time, now = new Date()) => {
     basisText,
     stats,
     staleCount: basis.filter(m => now - new Date(m.scraped_at) > STALE_MS).length,
+    flownCount: matches.length - land.length,
+    allFlown: matches.length > 0 && !land.length,
     suggestedPrice: stats ? Math.round(stats.median / 10000) * 10000 : null,  // làm tròn 10.000đ
     tours: matches.slice(0, 30),
   };
