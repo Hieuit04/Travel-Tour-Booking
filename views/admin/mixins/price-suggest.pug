@@ -1,7 +1,25 @@
 mixin price-suggest()
   .inner-group.inner-two-col.inner-price-suggest(price-suggest)
     label Gợi ý giá từ tour đối thủ
-    .inner-suggest-empty Chọn địa điểm và nhập thời gian (vd: 3 ngày 2 đêm) để xem gợi ý.
+    .inner-group
+      label Địa điểm
+      .inner-checkbox-list
+        each item in cityList
+          .inner-checkbox-item
+            +checkbox-30("suggestLocations", `suggest-location-${item.id}`, item.id)
+            label(for=`suggest-location-${item.id}`) #{item.name}
+    .inner-group
+      label Thời gian
+      .inner-suggest-durations
+        label
+          input(type="radio" name="suggestTime" value="" checked)
+          | Chưa chọn
+        each days in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+          - const duration = days === 1 ? "1 ngày" : `${days} ngày ${days - 1} đêm`
+          label
+            input(type="radio" name="suggestTime" value=duration)
+            | #{duration}
+    .inner-suggest-empty Chọn địa điểm và thời gian để xem gợi ý.
     .inner-suggest-result(hidden)
       .inner-suggest-summary
         div
@@ -11,13 +29,15 @@ mixin price-suggest()
         .inner-suggest-range
         .inner-suggest-basis
         .inner-suggest-stale(hidden)
-      table.inner-suggest-table
-        thead
-          tr
-            th Nguồn
-            th Tour
-            th Thời lượng
-            th Khởi hành
-            th Giá
-            th Cập nhật
-        tbody
+      details
+        summary.inner-suggest-toggle
+        table.inner-suggest-table
+          thead
+            tr
+              th Nguồn
+              th Tour
+              th Thời lượng
+              th Khởi hành
+              th Giá
+              th Cập nhật
+          tbody

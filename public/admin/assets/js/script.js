@@ -1693,10 +1693,10 @@ if (priceSuggest) {
   };
 
   const load = () => {
-    const locations = [...form.querySelectorAll('input[name="locations"]:checked')].map(i => i.value);
-    const time = form.time.value.trim();
+    const locations = [...priceSuggest.querySelectorAll('input[name="suggestLocations"]:checked')].map(i => i.value);
+    const time = priceSuggest.querySelector('input[name="suggestTime"]:checked').value;
     if (!locations.length) {
-      showEmpty('Chọn địa điểm và nhập thời gian (vd: 3 ngày 2 đêm) để xem gợi ý.');
+      showEmpty('Chọn địa điểm và thời gian để xem gợi ý.');
       return;
     }
     const params = new URLSearchParams({ locations: locations.join(','), time });
@@ -1712,7 +1712,10 @@ if (priceSuggest) {
         priceSuggest.querySelector('.inner-suggest-range').textContent =
           `Khoảng phổ biến: ${money(s.p25)} – ${money(s.p75)} · thấp nhất ${money(s.min)} · cao nhất ${money(s.max)}`;
         priceSuggest.querySelector('.inner-suggest-basis').textContent =
-          `Tính từ ${s.count} tour ${data.basisText}${data.duration.days ? '' : ' (chưa nhập thời gian)'}.`;
+          `Tính từ ${s.count} tour ${data.basisText}${data.duration.days ? '' : ' (chưa chọn thời gian)'}.`
+          + (data.allFlown ? ' Các tour này đều khởi hành từ xa, giá có thể gồm vé máy bay nên cao hơn tour đường bộ.'
+            : data.flownCount ? ` Không tính ${data.flownCount} tour khởi hành từ xa (giá thường gồm vé máy bay).` : '');
+        priceSuggest.querySelector('.inner-suggest-toggle').textContent = `Xem ${data.tours.length} tour đối thủ`;
 
         const stale = priceSuggest.querySelector('.inner-suggest-stale');
         stale.textContent = `Dữ liệu giá đã cũ: ${data.staleCount}/${s.count} tour cập nhật hơn 7 ngày trước.`;
@@ -1742,11 +1745,16 @@ if (priceSuggest) {
   };
 
   const schedule = () => { clearTimeout(timer); timer = setTimeout(load, 400); };
-  form.addEventListener('change', (e) => { if (e.target.name === 'locations') schedule(); });
-  form.time.addEventListener('input', schedule);
+  priceSuggest.addEventListener('change', schedule);
   priceSuggest.querySelector('.inner-suggest-apply').addEventListener('click', () => {
     if (suggested) form.newPriceAdult.value = suggested;
   });
+  // trang sửa tour: điền sẵn theo tour đang sửa
+  form.querySelectorAll('input[name="locations"]:checked').forEach(i => {
+    priceSuggest.querySelector(`input[name="suggestLocations"][value="${i.value}"]`).checked = true;
+  });
+  const current = [...priceSuggest.querySelectorAll('input[name="suggestTime"]')].find(i => i.value === form.time.value.trim());
+  if (current) current.checked = true;
   load();
 }
 // End price suggest
