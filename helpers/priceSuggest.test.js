@@ -31,10 +31,19 @@ const hn = suggest(rows, ["Hà Nội"], "3N2Đ");
 assert.deepStrictEqual(hn.tours.map(t => t.tour_name), ["Hà Nội - Hạ Long"]);
 assert.strictEqual(hn.stats.count, 1);
 
-// tour khớp đủ 2 địa điểm được xếp trước và là cơ sở tính giá
+// tour khớp đủ 2 địa điểm được xếp trước; giá lấy nơi đắt nhất (Hạ Long 3,7tr) cộng 10% cho điểm thêm
 const hl = suggest(rows, ["Hà Nội", "Hạ Long"], "3N2Đ");
 assert.strictEqual(hl.tours[0].tour_name, "Hà Nội - Hạ Long");
-assert.strictEqual(hl.stats.count, 1);
+assert.strictEqual(hl.stats.count, 2);
+assert.strictEqual(hl.suggestedPrice, 4070000);
+
+// tick thêm địa điểm thì giá luôn tăng, kể cả địa điểm rẻ hơn hoặc chưa có dữ liệu
+const dalat = suggest(rows, ["Đà Lạt"], "3N2Đ").suggestedPrice;
+const dalatCheap = suggest(rows, ["Đà Lạt", "Mộc Châu"], "3N2Đ");
+assert.ok(dalatCheap.suggestedPrice > dalat);
+assert.ok(suggest(rows, ["Đà Lạt", "Mộc Châu", "Hạ Long"], "3N2Đ").suggestedPrice > dalatCheap.suggestedPrice);
+assert.ok(suggest(rows, ["Đà Lạt", "Côn Đảo"], "3N2Đ").suggestedPrice > dalat);
+assert.strictEqual(suggest(rows, ["Côn Đảo", "Phú Yên"], "3N2Đ").stats, null);
 
 // thiếu tour cùng thời lượng -> lấy tour chênh 1 ngày, không lấy tour 5 ngày
 const dl = suggest(rows, ["Đà Lạt"], "4 ngày 3 đêm");

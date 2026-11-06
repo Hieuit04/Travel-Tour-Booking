@@ -5,6 +5,7 @@ const STALE_MS = 7 * 24 * 60 * 60 * 1000;  // giá cũ hơn 7 ngày vẫn hiện
 // shortcut: chỉ liệt kê điểm đến có trong DB và điểm phổ biến, thêm vào đây khi có địa điểm mới ở miền Trung/Nam
 const SOUTH = ["ho chi minh", "can tho", "vung tau", "da lat", "lam dong", "phu quoc", "an giang", "nha trang"];
 const CENTRAL = ["hue", "da nang", "hoi an", "quang binh", "quang tri"];
+const EXTRA_STOP = 0.1;  // mỗi địa điểm thêm +10%: giá/ngày tour nội địa tăng khoảng 7-9% mỗi điểm dừng trên dữ liệu cào được
 
 const normalize = (text) => (text || "")
   .replace(/đ/g, "d").replace(/Đ/g, "D")
@@ -36,7 +37,7 @@ const sameDuration = (row, want) => want.days !== null && row.duration_days === 
   && (want.nights === null || row.duration_nights == null || row.duration_nights === want.nights);
 
 // rows: tour đối thủ; cities: tên thành phố của tour mình; time: chuỗi thời lượng
-module.exports = (rows, cities, time, now = new Date()) => {
+const suggestFor = (rows, cities, time, now) => {
   const want = parseDuration(time);
   const cityKeys = cities.map(normalize).filter(Boolean);
 
@@ -88,6 +89,29 @@ module.exports = (rows, cities, time, now = new Date()) => {
     allFlown: matches.length > 0 && !land.length,
     suggestedPrice: stats ? Math.round(stats.median / 10000) * 10000 : null,  // làm tròn 10.000đ
     tours: matches.slice(0, 30),
+  };
+};
+
+// Nhiều địa điểm: lấy nơi giá cao nhất rồi cộng phí điểm thêm, nên tick thêm địa điểm thì giá luôn tăng
+module.exports = (rows, cities, time, now = new Date()) => {
+  const all = suggestFor(rows, cities, time, now);
+  if (cities.length < 2) return all;
+  const top = cities.map(city => ({ city, ...suggestFor(rows, [city], time, now) }))
+    .filter(r => r.stats)
+    .sort((a, b) => b.suggestedPrice - a.suggestedPrice)[0];
+  if (!top) return all;
+
+  const extra = cities.length - 1;
+  const scale = (n) => Math.round(n * (1 + EXTRA_STOP * extra) / 1000) * 1000;
+  const { count, min, p25, median, p75, max } = top.stats;
+  return {
+    ...all,
+    basisText: `${top.basisText}, theo ${top.city} (giá cao nhất), cộng ${Math.round(EXTRA_STOP * extra * 100)}% cho ${extra} điểm thêm`,
+    stats: { count, min: scale(min), p25: scale(p25), median: scale(median), p75: scale(p75), max: scale(max) },
+    suggestedPrice: Math.round(scale(median) / 10000) * 10000,
+    staleCount: top.staleCount,
+    flownCount: top.flownCount,
+    allFlown: top.allFlown,
   };
 };
 
