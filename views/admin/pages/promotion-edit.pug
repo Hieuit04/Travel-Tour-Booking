@@ -25,6 +25,9 @@ block main
       .inner-group
         label(for="discountUpTo") Giảm đến (đ)
         input(type="number" name="discountUpTo" id="discountUpTo" placeholder="VD: 990000" value=promotionDetail.discountUpTo)
+      .inner-group
+        label(for="couponCode") Mã giảm giá (khách nhập ở giỏ hàng)
+        input(type="text" name="couponCode" id="couponCode" placeholder="VD: HE2026" value=promotionDetail.couponCode)
 
       //- Khu vực hiển thị tour đã chọn
       .inner-group.inner-two-col

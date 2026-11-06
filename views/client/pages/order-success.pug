@@ -28,6 +28,14 @@ block main
           
           p Ngày đặt: <b>#{moment(order.createdAt).format("HH:mm - DD/MM/YYYY")}</b>
 
+          if order.status === "initial" && ["zalopay", "vnpay"].includes(order.paymentMethod)
+            p(style="color: #EF3826;") Đơn hàng chưa được thanh toán.
+              | 
+              a(
+                href=`/order/payment-${order.paymentMethod}?orderCode=${order.code}&phone=${encodeURIComponent(order.phone)}`
+                style="font-weight: 700; text-decoration: underline;"
+              ) Thanh toán lại
+
     if order && order.items && order.items.length > 0
       .section-11(style="padding-top: 20px;")
         .inner-wrap

@@ -68,6 +68,12 @@ block main
 
       //- Nút ở dưới: Thay bằng nút "Hủy đơn hàng" (chỉ khi trạng thái là khởi tạo)
       if orderDetail.status === "initial"
+        if ["zalopay", "vnpay"].includes(orderDetail.paymentMethod)
+          .inner-link(style="text-align: center; margin-top: 25px; width: 100%;")
+            a(
+              href=`/order/payment-${orderDetail.paymentMethod}?orderCode=${orderDetail.code}&phone=${encodeURIComponent(orderDetail.phone)}`
+              style="font-weight: 700; font-size: 16px; text-decoration: underline;"
+            ) Thanh toán lại
         .inner-link(style="text-align: center; margin-top: 25px; width: 100%;")
           a(
             href="javascript:;" 

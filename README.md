@@ -251,7 +251,7 @@ python3 -m venv .venv && .venv/bin/pip install -r blog_automation/requirements.t
 .venv/bin/python blog_automation/test_generate_blog.py          # helper tests
 ```
 
-Run it on a schedule (e.g. cron) to keep the blog filled automatically.
+`.github/workflows/scheduled-jobs.yml` runs the blog job daily at 06:00 and the price scraper at 02:00 (Vietnam time); add the secrets listed at the top of that file to the repo.
 
 ---
 

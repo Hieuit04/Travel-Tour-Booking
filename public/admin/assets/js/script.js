@@ -1704,7 +1704,7 @@ if (priceSuggest) {
       .then(res => res.json())
       .then(data => {
         if (data.code === 'error') return showEmpty(data.message);
-        if (!data.stats) return showEmpty('Chưa có tour đối thủ nào cùng điểm đến.');
+        if (!data.stats) return showEmpty('Chưa có dữ liệu giá thị trường cho tour này.');
 
         suggested = data.suggestedPrice;
         const s = data.stats;
@@ -1713,6 +1713,10 @@ if (priceSuggest) {
           `Khoảng phổ biến: ${money(s.p25)} – ${money(s.p75)} · thấp nhất ${money(s.min)} · cao nhất ${money(s.max)}`;
         priceSuggest.querySelector('.inner-suggest-basis').textContent =
           `Tính từ ${s.count} tour ${data.basisText}${data.duration.days ? '' : ' (chưa nhập thời gian)'}.`;
+
+        const stale = priceSuggest.querySelector('.inner-suggest-stale');
+        stale.textContent = `Dữ liệu giá đã cũ: ${data.staleCount}/${s.count} tour cập nhật hơn 7 ngày trước.`;
+        stale.hidden = !data.staleCount;
 
         tbody.replaceChildren(...data.tours.map(t => {
           const tr = document.createElement('tr');
@@ -1726,6 +1730,7 @@ if (priceSuggest) {
             t.duration_days ? `${t.duration_days}N${t.duration_nights ?? ''}${t.duration_nights != null ? 'Đ' : ''}` : '—',
             [t.departure_city, t.departure_date].filter(Boolean).join(' · ') || '—',
             money(t.price_adult) + (t.original_price ? ` (gốc ${money(t.original_price)})` : ''),
+            new Date(t.scraped_at).toLocaleDateString('vi-VN'),
           ];
           cells.forEach(c => { const td = document.createElement('td'); td.append(c); tr.append(td); });
           return tr;

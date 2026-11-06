@@ -2,6 +2,7 @@ const moment = require('moment');
 const Order = require('../../models/order.model');
 const City = require('../../models/city.model');
 const variableConfig = require('../../configs/variable.config');
+const { releaseOrderStock } = require('../../helpers/order.helper');
 
 // [GET] /my-orders
 module.exports.list = async (req, res) => {
@@ -88,7 +89,6 @@ module.exports.list = async (req, res) => {
       moment: moment,
       orderStatusList: variableConfig.orderStatusList,
       paymentMethodList: variableConfig.paymentMethodList,
-      paymentStatusList: variableConfig.paymentStatusList,
     });
   } catch (error) {
     console.log(error);
@@ -129,7 +129,6 @@ module.exports.detail = async (req, res) => {
       moment: moment,
       orderStatusList: variableConfig.orderStatusList,
       paymentMethodList: variableConfig.paymentMethodList,
-      paymentStatusList: variableConfig.paymentStatusList,
     });
   } catch (error) {
     console.log(error);
@@ -161,17 +160,11 @@ module.exports.cancelPatch = async (req, res) => {
       });
     }
 
-    if (order.paymentStatus === "paid") {
-      return res.json({
-        code: "error",
-        message: "Đơn hàng đã thanh toán, vui lòng liên hệ để được hỗ trợ huỷ và hoàn tiền!",
-      });
-    }
-
     await Order.updateOne({ _id: order.id }, {
       status: "cancel",
       updatedBy: res.locals.account.id,
     });
+    await releaseOrderStock(order);
 
     res.json({ code: "success", message: "Huỷ đơn hàng thành công!" });
   } catch (error) {

@@ -27,7 +27,7 @@ router.use('/tour', getAccount, tourRouters);
 router.use('/cart', getAccount, cartRouters);
 router.use('/contact', getAccount, contactRouters);
 router.use('/category', getAccount, categoryRouters);
-router.use('/search', searchRouters);
+router.use('/search', getAccount, searchRouters);
 router.use('/order', getAccount, orderRouters);
 router.use('/', getAccount, homeRouters);
 router.use('/blog', blogRouters);
