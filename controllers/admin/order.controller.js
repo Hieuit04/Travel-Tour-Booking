@@ -3,6 +3,7 @@ const AccountAdmin = require('../../models/accounts-admin.model');
 const moment = require('moment');
 const variableConfig = require('../../configs/variable.config');
 const { checkPermission } = require('../../helpers/permission.helper');
+const { syncOrderStock, releaseDeletedOrders } = require('../../helpers/order.helper');
 
 module.exports.list = async (req, res) => {
   const find = {
@@ -103,6 +104,15 @@ module.exports.editPatch = async (req, res) => {
       adminId = res.locals.account.id;
     }
     
+    const order = await Order.findById(id);
+    if (!(await syncOrderStock(order, req.body.status))) {
+      res.json({
+        code: "error",
+        message: "Tour không còn đủ chỗ để mở lại đơn hàng",
+      });
+      return;
+    }
+
     await Order.findByIdAndUpdate(id, {
       ...req.body,
       updatedBy: adminId
@@ -132,6 +142,7 @@ module.exports.deletePatch = async (req, res) => {
       adminId = res.locals.account.id;
     }
 
+    await releaseDeletedOrders([id]);
     await Order.findByIdAndUpdate(id, {
       deleted: true,
       deletedBy: adminId,
@@ -162,22 +173,30 @@ module.exports.changeMultiPatch = async (req, res) => {
 
     if (isValidStatus) {
       if (!checkPermission(res, "order-edit")) return;
+      const updatedIds = [];
+      const orders = await Order.find({ _id: { $in: listId } });
+      for (const order of orders) {
+        if (await syncOrderStock(order, option)) updatedIds.push(order.id);
+      }
       await Order.updateMany(
-        { _id: { $in: listId } },
+        { _id: { $in: updatedIds } },
         { 
           status: option,
           updatedBy: adminId
         }
       );
       if (option === "paid") {
-        await Order.updateMany({ _id: { $in: listId }, paidAt: null }, { paidAt: new Date() });
+        await Order.updateMany({ _id: { $in: updatedIds }, paidAt: null }, { paidAt: new Date() });
       }
       res.json({
         code: "success",
-        message: "Cập nhật trạng thái thành công"
+        message: updatedIds.length < orders.length
+          ? `Đã cập nhật ${updatedIds.length}/${orders.length} đơn, các đơn còn lại không đủ chỗ để mở lại`
+          : "Cập nhật trạng thái thành công"
       });
     } else if (option === "delete") {
       if (!checkPermission(res, "order-delete")) return;
+      await releaseDeletedOrders(listId);
       await Order.updateMany(
         { _id: { $in: listId } },
         {
