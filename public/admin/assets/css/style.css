@@ -1777,6 +1777,9 @@ input, textarea, select, button {
 .section-8 .inner-suggest-empty, .section-8 .inner-suggest-basis {
   color: #606060;
 }
+.section-8 .inner-suggest-stale {
+  color: #EF3826;
+}
 .section-8 .inner-suggest-summary {
   display: grid;
   gap: 6px;
