@@ -1,81 +1,9 @@
-﻿const Tour = require('../../models/tour.model.js');
+﻿const { isValidObjectId } = require('../../helpers/validate.helper');
+const Tour = require('../../models/tour.model.js');
 const City = require('../../models/city.model.js');
-const { itemAmount, findCouponDiscount } = require('../../helpers/order.helper');
-
-module.exports.cart = (req, res) => {
-  res.render('client/pages/cart', {
-    pageTitle: 'Giỏ hàng',
 const Cart = require('../../models/cart.model.js');
+const { itemAmount, findCouponDiscount } = require('../../helpers/order.helper');
 const moment = require('moment');
-const mongoose = require('mongoose');
-
-const unauthorized = (res) => {
-  return res.status(401).json({
-    code: "unauthorized",
-    message: "Vui lòng đăng nhập để thực hiện chức năng này!"
-  });
-}
-
-// Chuyển item trong DB thành object thuần để gửi cho client
-const toPlainItem = (item) => ({
-  tourId: String(item.tourId),
-  locationForm: item.locationForm ? String(item.locationForm) : "",
-  quantityAdult: item.quantityAdult || 0,
-  quantityChildren: item.quantityChildren || 0,
-  quantityBaby: item.quantityBaby || 0,
-  checked: item.checked,
-});
-
-// Làm sạch dữ liệu từ client, chỉ giữ các trường hợp lệ
-const sanitizeItem = (raw) => {
-  if (!raw || !mongoose.isValidObjectId(raw.tourId)) return null;
-  const fields = {};
-  for (const key of ["quantityAdult", "quantityChildren", "quantityBaby"]) {
-    if (raw[key] !== undefined) {
-      const value = parseInt(raw[key]);
-      fields[key] = Number.isNaN(value) || value < 0 ? 0 : value;
-    }
-  }
-  if (raw.checked !== undefined) fields.checked = !!raw.checked;
-  if (raw.locationForm && mongoose.isValidObjectId(raw.locationForm)) {
-    fields.locationForm = raw.locationForm;
-  }
-  return { tourId: String(raw.tourId), fields };
-}
-
-// Lấy thông tin chi tiết tour cho danh sách item
-const buildCartDetail = async (items) => {
-  const cartDetail = [];
-  for (const item of items) {
-    const tourDetail = await Tour.findOne({
-      _id: item.tourId,
-      status: "active",
-      deleted: false,
-    });
-    if (tourDetail) {
-      const city = item.locationForm
-        ? await City.findOne({ _id: item.locationForm })
-        : null;
-      cartDetail.push({
-        ...item,
-        detail: {
-          avatar: tourDetail.avatar,
-          tourName: tourDetail.tourName,
-          slug: tourDetail.slug,
-          departureDate: moment(tourDetail.departureDate).format("DD/MM/YYYY"),
-          cityName: city ? city.name : "",
-          stockAdult: tourDetail.stockAdult,
-          stockChildren: tourDetail.stockChildren,
-          stockBaby: tourDetail.stockBaby,
-          newPriceAdult: tourDetail.newPriceAdult,
-          newPriceChildren: tourDetail.newPriceChildren,
-          newPriceBaby: tourDetail.newPriceBaby,
-        }
-      });
-    }
-  }
-  return cartDetail;
-}
 
 module.exports.cart = async (req, res) => {
   res.render('client/pages/cart', {
@@ -90,12 +18,48 @@ module.exports.detailPost = async (req, res) => {
     if (loggedIn) {
       // Đã đăng nhập: lấy giỏ hàng từ DB
       const cart = await Cart.findOne({ accountId: res.locals.account.id });
-      items = cart ? cart.items.map(toPlainItem) : [];
+      items = cart ? cart.items.map(item => ({
+        tourId: String(item.tourId),
+        locationForm: item.locationForm ? String(item.locationForm) : "",
+        quantityAdult: item.quantityAdult || 0,
+        quantityChildren: item.quantityChildren || 0,
+        quantityBaby: item.quantityBaby || 0,
+        checked: item.checked,
+      })) : [];
     } else {
       // Chưa đăng nhập: lấy giỏ hàng client gửi lên (localStorage)
       items = Array.isArray(req.body) ? req.body : [];
     }
-    const cartDetail = await buildCartDetail(items);
+
+    const cartDetail = [];
+    for (const item of items) {
+      const tourDetail = await Tour.findOne({
+        _id: item.tourId,
+        status: "active",
+        deleted: false,
+      });
+      if (tourDetail) {
+        const city = item.locationForm
+          ? await City.findOne({ _id: item.locationForm })
+          : null;
+        cartDetail.push({
+          ...item,
+          detail: {
+            avatar: tourDetail.avatar,
+            tourName: tourDetail.tourName,
+            slug: tourDetail.slug,
+            departureDate: moment(tourDetail.departureDate).format('DD/MM/YYYY'),
+            cityName: city ? city.name : "",
+            stockAdult: tourDetail.stockAdult,
+            stockChildren: tourDetail.stockChildren,
+            stockBaby: tourDetail.stockBaby,
+            newPriceAdult: tourDetail.newPriceAdult,
+            newPriceChildren: tourDetail.newPriceChildren,
+            newPriceBaby: tourDetail.newPriceBaby,
+          }
+        });
+      }
+    }
     res.json({
       code: "success",
       message: items.length === 0 ? "Giỏ hàng rỗng" : "Thành công",
@@ -134,7 +98,12 @@ module.exports.couponPost = async (req, res) => {
 
 module.exports.countGet = async (req, res) => {
   try {
-    if (!res.locals.account) return unauthorized(res);
+    if (!res.locals.account) {
+      return res.status(401).json({
+        code: "unauthorized",
+        message: "Vui lòng đăng nhập để thực hiện chức năng này!"
+      });
+    }
     const cart = await Cart.findOne({ accountId: res.locals.account.id });
     res.json({
       code: "success",
@@ -149,26 +118,44 @@ module.exports.countGet = async (req, res) => {
 // Thêm mới hoặc cập nhật (một phần) item trong giỏ hàng
 module.exports.addPost = async (req, res) => {
   try {
-    if (!res.locals.account) return unauthorized(res);
-    const data = sanitizeItem(req.body);
-    if (!data) {
+    if (!res.locals.account) {
+      return res.status(401).json({
+        code: "unauthorized",
+        message: "Vui lòng đăng nhập để thực hiện chức năng này!"
+      });
+    }
+    const raw = req.body;
+    if (!raw || !isValidObjectId(raw.tourId)) {
       return res.json({ code: "error", message: "Dữ liệu không hợp lệ" });
     }
+    // Chỉ giữ các trường hợp lệ
+    const fields = {};
+    for (const key of ["quantityAdult", "quantityChildren", "quantityBaby"]) {
+      if (raw[key] !== undefined) {
+        const value = parseInt(raw[key]);
+        fields[key] = Number.isNaN(value) || value < 0 ? 0 : value;
+      }
+    }
+    if (raw.checked !== undefined) fields.checked = !!raw.checked;
+    if (raw.locationForm && isValidObjectId(raw.locationForm)) {
+      fields.locationForm = raw.locationForm;
+    }
+
     const accountId = res.locals.account.id;
     let cart = await Cart.findOne({ accountId: accountId });
     if (!cart) cart = new Cart({ accountId: accountId, items: [] });
 
-    const existItem = cart.items.find(item => String(item.tourId) === data.tourId);
+    const existItem = cart.items.find(item => String(item.tourId) === raw.tourId);
     if (existItem) {
-      Object.assign(existItem, data.fields);
+      Object.assign(existItem, fields);
     } else {
-      const total = (data.fields.quantityAdult || 0)
-        + (data.fields.quantityChildren || 0)
-        + (data.fields.quantityBaby || 0);
+      const total = (fields.quantityAdult || 0)
+        + (fields.quantityChildren || 0)
+        + (fields.quantityBaby || 0);
       if (total === 0) {
         return res.json({ code: "error", message: "Vui lòng chọn số lượng" });
       }
-      cart.items.unshift({ tourId: data.tourId, ...data.fields });
+      cart.items.unshift({ tourId: raw.tourId, ...fields });
     }
     await cart.save();
     res.json({
@@ -184,9 +171,14 @@ module.exports.addPost = async (req, res) => {
 
 module.exports.itemDelete = async (req, res) => {
   try {
-    if (!res.locals.account) return unauthorized(res);
+    if (!res.locals.account) {
+      return res.status(401).json({
+        code: "unauthorized",
+        message: "Vui lòng đăng nhập để thực hiện chức năng này!"
+      });
+    }
     const { tourId } = req.params;
-    if (!mongoose.isValidObjectId(tourId)) {
+    if (!isValidObjectId(tourId)) {
       return res.json({ code: "error", message: "Dữ liệu không hợp lệ" });
     }
     await Cart.updateOne(
@@ -203,34 +195,49 @@ module.exports.itemDelete = async (req, res) => {
 // Gộp giỏ hàng localStorage vào giỏ hàng trong DB sau khi đăng nhập
 module.exports.mergePost = async (req, res) => {
   try {
-    if (!res.locals.account) return unauthorized(res);
+    if (!res.locals.account) {
+      return res.status(401).json({
+        code: "unauthorized",
+        message: "Vui lòng đăng nhập để thực hiện chức năng này!"
+      });
+    }
     const localItems = Array.isArray(req.body) ? req.body : [];
     const accountId = res.locals.account.id;
     let cart = await Cart.findOne({ accountId: accountId });
     if (!cart) cart = new Cart({ accountId: accountId, items: [] });
 
     for (const raw of localItems) {
-      const data = sanitizeItem(raw);
-      if (!data) continue;
+      if (!raw || !isValidObjectId(raw.tourId)) continue;
       const tour = await Tour.findOne({
-        _id: data.tourId,
+        _id: raw.tourId,
         status: "active",
         deleted: false,
       });
       if (!tour) continue;
-      // Kẹp số lượng theo tồn kho
-      if (data.fields.quantityAdult !== undefined)
-        data.fields.quantityAdult = Math.min(data.fields.quantityAdult, tour.stockAdult);
-      if (data.fields.quantityChildren !== undefined)
-        data.fields.quantityChildren = Math.min(data.fields.quantityChildren, tour.stockChildren);
-      if (data.fields.quantityBaby !== undefined)
-        data.fields.quantityBaby = Math.min(data.fields.quantityBaby, tour.stockBaby);
 
-      const existItem = cart.items.find(item => String(item.tourId) === data.tourId);
+      // Chỉ giữ các trường hợp lệ, kẹp số lượng theo tồn kho
+      const stock = {
+        quantityAdult: tour.stockAdult,
+        quantityChildren: tour.stockChildren,
+        quantityBaby: tour.stockBaby,
+      };
+      const fields = {};
+      for (const key of Object.keys(stock)) {
+        if (raw[key] !== undefined) {
+          const value = parseInt(raw[key]);
+          fields[key] = Number.isNaN(value) || value < 0 ? 0 : Math.min(value, stock[key]);
+        }
+      }
+      if (raw.checked !== undefined) fields.checked = !!raw.checked;
+      if (raw.locationForm && isValidObjectId(raw.locationForm)) {
+        fields.locationForm = raw.locationForm;
+      }
+
+      const existItem = cart.items.find(item => String(item.tourId) === raw.tourId);
       if (existItem) {
-        Object.assign(existItem, data.fields);
+        Object.assign(existItem, fields);
       } else {
-        cart.items.unshift({ tourId: data.tourId, ...data.fields });
+        cart.items.unshift({ tourId: raw.tourId, ...fields });
       }
     }
     await cart.save();
