@@ -7,7 +7,9 @@ const schema = new mongoose.Schema({
   address: String,
   logo: String,
   favicon: String,
+  titleSection4: String,
   categoryIdSection4: String,
+  titleSection6: String,
   categoryIdSection6: String,
 },{timestamps: true});
 

@@ -220,22 +220,25 @@ block main
   // Section 4
   .section-4
     .container
+      - const titleSection4 = (settingWebsiteInfo && settingWebsiteInfo.titleSection4) ? settingWebsiteInfo.titleSection4 : (categorySection4 ? categorySection4.categoryName : 'Tour Trong Nước')
       h2.box-title(
         data-aos-duration="1000" 
         data-aos="fade-up"
-        ) #{categorySection4.categoryName}
+        ) #{titleSection4}
       .inner-wrap(
         data-aos-delay="300" 
         data-aos-duration="1000" 
         data-aos="fade-up"
         )
-        each item in tourListSection4
-          +product-item(item)
+        if tourListSection4 && tourListSection4.length > 0
+          each item in tourListSection4
+            +product-item(item)
       .inner-button(
         data-aos-duration="1000" 
         data-aos="fade-up"
         )
-        a.button-outline(href=`/category/${categorySection4.slug}`) Xem tất cả
+        if categorySection4
+          a.button-outline(href=`/category/${categorySection4.slug}`) Xem tất cả
   // End Section 4
   // Section 5
   .section-5(
@@ -252,10 +255,11 @@ block main
   // Section 6
   .section-4
     .container
+      - const titleSection6 = (settingWebsiteInfo && settingWebsiteInfo.titleSection6) ? settingWebsiteInfo.titleSection6 : (categorySection6 ? categorySection6.categoryName : 'Tour Nước Ngoài')
       h2.box-title(
         data-aos-duration="1000" 
         data-aos="fade-up"
-        ) #{categorySection6 ? categorySection6.categoryName : 'Tour Nước Ngoài'}
+        ) #{titleSection6}
       .inner-wrap(
         data-aos-delay="300" 
         data-aos-duration="1000" 

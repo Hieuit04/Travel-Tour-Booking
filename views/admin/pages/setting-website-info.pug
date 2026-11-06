@@ -21,14 +21,20 @@ block main
           label(for="address") Địa chỉ
           input(type="text" name="address" id="address" value = settingWebsiteInfo.address)
         .inner-group
-          label(for="categoryIdSection4") Danh mục của Section 4 (Tour trong nước)
+          label(for="titleSection4") Tiêu đề của Section 4
+          input(type="text" name="titleSection4" id="titleSection4" value=(settingWebsiteInfo && settingWebsiteInfo.titleSection4 ? settingWebsiteInfo.titleSection4 : "") placeholder="Nhập tiêu đề Section 4...")
+        .inner-group
+          label(for="categoryIdSection4") Danh mục của Section 4
           select(name="categoryIdSection4" id="categoryIdSection4")
             option(value="") -- Chọn danh mục --
             //- 2. Gọi mixin truyền vào categoryTree từ backend
             if categoryTree
               +select-tree(categoryTree,1,settingWebsiteInfo.categoryIdSection4)
         .inner-group
-          label(for="categoryIdSection6") Danh mục của Section 6 (Tour nước ngoài)
+          label(for="titleSection6") Tiêu đề của Section 6
+          input(type="text" name="titleSection6" id="titleSection6" value=(settingWebsiteInfo && settingWebsiteInfo.titleSection6 ? settingWebsiteInfo.titleSection6 : "") placeholder="Nhập tiêu đề Section 6...")
+        .inner-group
+          label(for="categoryIdSection6") Danh mục của Section 6 
           select(name="categoryIdSection6" id="categoryIdSection6")
             option(value="") -- Chọn danh mục --
             if categoryTree
