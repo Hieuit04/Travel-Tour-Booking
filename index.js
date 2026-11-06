@@ -16,7 +16,7 @@ const app = express();
 const port = 3000;
 
 connectDB(); // Kết nối đến cơ sở dữ liệu MongoDB
-connectRabbitMQ(); // kết nối rabbitmq
+connectRabbitMQ().catch(() => {}); // lỗi đã được log; web vẫn chạy, sendToQueue sẽ tự kết nối lại
 
 // Cấu hình thư mục mặc định chứa giao diện 
 app.set('views', path.join(__dirname, 'views'));
