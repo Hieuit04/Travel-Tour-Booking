@@ -1,5 +1,7 @@
 // Gợi ý giá người lớn từ giá tour đối thủ (collection competitor_prices)
 
+const STALE_MS = 7 * 24 * 60 * 60 * 1000;  // giá cũ hơn 7 ngày vẫn hiện nhưng kèm cảnh báo
+
 const normalize = (text) => (text || "")
   .replace(/đ/g, "d").replace(/Đ/g, "D")
   .normalize("NFD").replace(/[̀-ͯ]/g, "")
@@ -22,7 +24,7 @@ const sameDuration = (row, want) => want.days !== null && row.duration_days === 
   && (want.nights === null || row.duration_nights == null || row.duration_nights === want.nights);
 
 // rows: tour đối thủ; cities: tên thành phố của tour mình; time: chuỗi thời lượng
-module.exports = (rows, cities, time) => {
+module.exports = (rows, cities, time, now = new Date()) => {
   const want = parseDuration(time);
   const cityKeys = cities.map(normalize).filter(Boolean);
 
@@ -62,6 +64,7 @@ module.exports = (rows, cities, time) => {
     duration: want,
     basisText,
     stats,
+    staleCount: basis.filter(m => now - new Date(m.scraped_at) > STALE_MS).length,
     suggestedPrice: stats ? Math.round(stats.median / 10000) * 10000 : null,  // làm tròn 10.000đ
     tours: matches.slice(0, 30),
   };

@@ -43,4 +43,9 @@ assert.strictEqual(dl.stats.max, 9000000);
 assert.strictEqual(suggest(rows, ["Đà Lạt"], "2 ngày 1 đêm").stats.max, 5000000);
 
 assert.strictEqual(suggest(rows, ["Côn Đảo"], "").stats, null);
+
+const now = new Date("2026-11-06");
+const dated = (scraped_at) => ({ ...row("Tour Đà Lạt", 1000000, 2, 1), scraped_at: new Date(scraped_at) });
+assert.strictEqual(suggest([dated("2026-11-05"), dated("2026-10-30")], ["Đà Lạt"], "2 ngày 1 đêm", now).staleCount, 0);
+assert.strictEqual(suggest([dated("2026-11-05"), dated("2026-10-29")], ["Đà Lạt"], "2 ngày 1 đêm", now).staleCount, 1);
 console.log("ok");

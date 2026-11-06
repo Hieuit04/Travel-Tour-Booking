@@ -12,8 +12,8 @@ const schema = new mongoose.Schema({
   discount: Number,
   total: Number,
   paymentMethod: String,
-  paymentStatus: String,
   status: String,
+  stockReserved: Boolean,
   paidAt: Date,
   updatedBy: String,
   deleted: {

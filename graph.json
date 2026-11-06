@@ -1,0 +1,324 @@
+{
+  "configs/database.config.js": [
+    "configs/variable.config.js",
+    "models/accounts-admin.model.js",
+    "models/role.model.js"
+  ],
+  "configs/google.config.js": [],
+  "configs/rabbitmq.config.js": [],
+  "configs/variable.config.js": [],
+  "controllers/admin/account.controller.js": [
+    "helpers/generate.helper.js",
+    "helpers/mail.helper.js",
+    "models/accounts-admin.model.js",
+    "models/forgot-password.model.js"
+  ],
+  "controllers/admin/blog.controller.js": [
+    "configs/rabbitmq.config.js",
+    "configs/variable.config.js",
+    "helpers/permission.helper.js",
+    "models/blog.model.js",
+    "models/tour.model.js"
+  ],
+  "controllers/admin/category.controller.js": [
+    "configs/rabbitmq.config.js",
+    "helpers/categoryTree.helper.js",
+    "helpers/permission.helper.js",
+    "models/accounts-admin.model.js",
+    "models/category.model.js"
+  ],
+  "controllers/admin/contact.controller.js": [
+    "helpers/permission.helper.js",
+    "models/contact.model.js"
+  ],
+  "controllers/admin/dashboard.controller.js": [
+    "configs/variable.config.js",
+    "models/accounts-admin.model.js",
+    "models/order.model.js"
+  ],
+  "controllers/admin/order.controller.js": [
+    "configs/variable.config.js",
+    "helpers/permission.helper.js",
+    "models/accounts-admin.model.js",
+    "models/order.model.js"
+  ],
+  "controllers/admin/profile.controller.js": [
+    "configs/rabbitmq.config.js",
+    "models/accounts-admin.model.js"
+  ],
+  "controllers/admin/promotion.controller.js": [
+    "helpers/categoryFilter.helper.js",
+    "helpers/categoryTree.helper.js",
+    "helpers/permission.helper.js",
+    "models/accounts-admin.model.js",
+    "models/category.model.js",
+    "models/promotion.model.js",
+    "models/tour.model.js"
+  ],
+  "controllers/admin/setting.controller.js": [
+    "configs/rabbitmq.config.js",
+    "configs/variable.config.js",
+    "helpers/categoryTree.helper.js",
+    "helpers/permission.helper.js",
+    "models/accounts-admin.model.js",
+    "models/category.model.js",
+    "models/role.model.js",
+    "models/setting-website-info.model.js"
+  ],
+  "controllers/admin/tour.controller.js": [
+    "configs/rabbitmq.config.js",
+    "helpers/categoryFilter.helper.js",
+    "helpers/categoryTree.helper.js",
+    "helpers/permission.helper.js",
+    "helpers/priceSuggest.helper.js",
+    "models/accounts-admin.model.js",
+    "models/category.model.js",
+    "models/city.model.js",
+    "models/competitor-price.model.js",
+    "models/tour.model.js"
+  ],
+  "controllers/admin/user.controller.js": [
+    "configs/variable.config.js",
+    "helpers/permission.helper.js",
+    "models/accounts-clients.model.js"
+  ],
+  "controllers/client/account.controller.js": [
+    "configs/google.config.js",
+    "helpers/generate.helper.js",
+    "helpers/mail.helper.js",
+    "models/accounts-clients.model.js",
+    "models/otp-verification.model.js"
+  ],
+  "controllers/client/blog.controller.js": [
+    "models/blog.model.js",
+    "models/tour.model.js"
+  ],
+  "controllers/client/cart.controller.js": [
+    "models/city.model.js",
+    "models/tour.model.js"
+  ],
+  "controllers/client/category.controller.js": [
+    "helpers/breadcrumb.helper.js",
+    "helpers/categoryFilter.helper.js",
+    "helpers/tour.helper.js",
+    "models/category.model.js",
+    "models/city.model.js",
+    "models/tour.model.js"
+  ],
+  "controllers/client/contact.controller.js": [
+    "models/contact.model.js"
+  ],
+  "controllers/client/home.controller.js": [
+    "helpers/categoryFilter.helper.js",
+    "helpers/tour.helper.js",
+    "models/blog.model.js",
+    "models/category.model.js",
+    "models/promotion.model.js",
+    "models/tour.model.js"
+  ],
+  "controllers/client/my-order.controller.js": [
+    "configs/variable.config.js",
+    "models/city.model.js",
+    "models/order.model.js"
+  ],
+  "controllers/client/order.controller.js": [
+    "configs/variable.config.js",
+    "helpers/generate.helper.js",
+    "models/city.model.js",
+    "models/order.model.js",
+    "models/tour.model.js"
+  ],
+  "controllers/client/profile.controller.js": [
+    "configs/rabbitmq.config.js",
+    "models/accounts-clients.model.js"
+  ],
+  "controllers/client/search.controller.js": [
+    "helpers/tour.helper.js",
+    "models/city.model.js",
+    "models/tour.model.js"
+  ],
+  "controllers/client/tour.controller.js": [
+    "helpers/breadcrumb.helper.js",
+    "models/category.model.js",
+    "models/city.model.js",
+    "models/tour.model.js"
+  ],
+  "helpers/breadcrumb.helper.js": [],
+  "helpers/categoryFilter.helper.js": [],
+  "helpers/categoryTree.helper.js": [],
+  "helpers/generate.helper.js": [],
+  "helpers/mail.helper.js": [],
+  "helpers/permission.helper.js": [],
+  "helpers/priceSuggest.helper.js": [],
+  "helpers/tour.helper.js": [],
+  "helpers/upload-disk.helper.js": [],
+  "index.js": [
+    "configs/database.config.js",
+    "configs/rabbitmq.config.js",
+    "configs/variable.config.js",
+    "routes/admin/index.route.js",
+    "routes/client/index.route.js",
+    "workers/media-upload.worker.js"
+  ],
+  "middlewares/admin/auth.middleware.js": [
+    "configs/variable.config.js",
+    "models/accounts-admin.model.js",
+    "models/role.model.js"
+  ],
+  "middlewares/admin/permission.middleware.js": [],
+  "middlewares/client/auth.middleware.js": [
+    "models/accounts-clients.model.js"
+  ],
+  "middlewares/client/category.midelware.js": [
+    "helpers/categoryTree.helper.js",
+    "models/category.model.js"
+  ],
+  "middlewares/client/get-account.middlewares.js": [
+    "models/accounts-clients.model.js"
+  ],
+  "middlewares/client/setting.midelware.js": [
+    "models/setting-website-info.model.js"
+  ],
+  "models/accounts-admin.model.js": [],
+  "models/accounts-clients.model.js": [],
+  "models/blog.model.js": [],
+  "models/category.model.js": [],
+  "models/city.model.js": [],
+  "models/competitor-price.model.js": [],
+  "models/contact.model.js": [],
+  "models/forgot-password.model.js": [],
+  "models/order.model.js": [],
+  "models/otp-verification.model.js": [],
+  "models/promotion.model.js": [],
+  "models/role.model.js": [],
+  "models/setting-website-info.model.js": [],
+  "models/tour.model.js": [],
+  "routes/admin/account.route.js": [
+    "controllers/admin/account.controller.js",
+    "validates/admin/account.validate.js"
+  ],
+  "routes/admin/blog.route.js": [
+    "controllers/admin/blog.controller.js",
+    "helpers/upload-disk.helper.js",
+    "middlewares/admin/permission.middleware.js",
+    "middlewares/client/category.midelware.js",
+    "middlewares/client/setting.midelware.js"
+  ],
+  "routes/admin/category.route.js": [
+    "controllers/admin/category.controller.js",
+    "helpers/upload-disk.helper.js",
+    "middlewares/admin/permission.middleware.js",
+    "validates/admin/category.validate.js"
+  ],
+  "routes/admin/contact.route.js": [
+    "controllers/admin/contact.controller.js",
+    "middlewares/admin/permission.middleware.js"
+  ],
+  "routes/admin/dashboard.route.js": [
+    "controllers/admin/dashboard.controller.js"
+  ],
+  "routes/admin/index.route.js": [
+    "middlewares/admin/auth.middleware.js",
+    "routes/admin/account.route.js",
+    "routes/admin/blog.route.js",
+    "routes/admin/category.route.js",
+    "routes/admin/contact.route.js",
+    "routes/admin/dashboard.route.js",
+    "routes/admin/order.route.js",
+    "routes/admin/profile.route.js",
+    "routes/admin/promotion.route.js",
+    "routes/admin/setting.route.js",
+    "routes/admin/tour.route.js",
+    "routes/admin/user.route.js"
+  ],
+  "routes/admin/order.route.js": [
+    "controllers/admin/order.controller.js",
+    "middlewares/admin/permission.middleware.js"
+  ],
+  "routes/admin/profile.route.js": [
+    "controllers/admin/profile.controller.js",
+    "helpers/upload-disk.helper.js"
+  ],
+  "routes/admin/promotion.route.js": [
+    "controllers/admin/promotion.controller.js",
+    "middlewares/admin/permission.middleware.js"
+  ],
+  "routes/admin/setting.route.js": [
+    "controllers/admin/setting.controller.js",
+    "helpers/upload-disk.helper.js",
+    "middlewares/admin/permission.middleware.js"
+  ],
+  "routes/admin/tour.route.js": [
+    "controllers/admin/tour.controller.js",
+    "helpers/upload-disk.helper.js",
+    "middlewares/admin/permission.middleware.js"
+  ],
+  "routes/admin/user.route.js": [
+    "controllers/admin/user.controller.js",
+    "middlewares/admin/permission.middleware.js"
+  ],
+  "routes/client/account.route.js": [
+    "controllers/client/account.controller.js",
+    "validates/client/account.validate.js"
+  ],
+  "routes/client/blog.route.js": [
+    "controllers/client/blog.controller.js"
+  ],
+  "routes/client/cart.route.js": [
+    "controllers/client/cart.controller.js"
+  ],
+  "routes/client/category.route.js": [
+    "controllers/client/category.controller.js"
+  ],
+  "routes/client/contact.route.js": [
+    "controllers/client/contact.controller.js"
+  ],
+  "routes/client/home.route.js": [
+    "controllers/client/home.controller.js"
+  ],
+  "routes/client/index.route.js": [
+    "middlewares/client/auth.middleware.js",
+    "middlewares/client/category.midelware.js",
+    "middlewares/client/get-account.middlewares.js",
+    "middlewares/client/setting.midelware.js",
+    "routes/client/account.route.js",
+    "routes/client/blog.route.js",
+    "routes/client/cart.route.js",
+    "routes/client/category.route.js",
+    "routes/client/contact.route.js",
+    "routes/client/home.route.js",
+    "routes/client/my-order.route.js",
+    "routes/client/order.route.js",
+    "routes/client/profile.route.js",
+    "routes/client/search.route.js",
+    "routes/client/tour.route.js"
+  ],
+  "routes/client/my-order.route.js": [
+    "controllers/client/my-order.controller.js"
+  ],
+  "routes/client/order.route.js": [
+    "controllers/client/order.controller.js"
+  ],
+  "routes/client/profile.route.js": [
+    "controllers/client/profile.controller.js",
+    "helpers/upload-disk.helper.js"
+  ],
+  "routes/client/search.route.js": [
+    "controllers/client/search.controller.js"
+  ],
+  "routes/client/tour.route.js": [
+    "controllers/client/tour.controller.js"
+  ],
+  "validates/admin/account.validate.js": [],
+  "validates/admin/category.validate.js": [],
+  "validates/client/account.validate.js": [],
+  "workers/media-upload.worker.js": [
+    "configs/rabbitmq.config.js",
+    "models/accounts-admin.model.js",
+    "models/accounts-clients.model.js",
+    "models/blog.model.js",
+    "models/category.model.js",
+    "models/setting-website-info.model.js",
+    "models/tour.model.js"
+  ]
+}

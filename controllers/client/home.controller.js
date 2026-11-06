@@ -74,29 +74,35 @@ module.exports.home = async (req, res) => {
   // end section2
 
   // section4
-  const categoryIdSection4 = res.locals.settingWebsiteInfo.categoryIdSection4;
+  const categoryIdSection4 = res.locals.settingWebsiteInfo ? res.locals.settingWebsiteInfo.categoryIdSection4 : null;
   const categoryList = await Category.find({
     deleted: false,
   });
-  const categorySection4 = await Category.findOne({
-    _id: categoryIdSection4,
-    deleted: false,
-    status: "active",
-  })
-  const tourListSection4 = await Tour
-    .find({
+  let categorySection4 = null;
+  let tourListSection4 = [];
+  if (categoryIdSection4) {
+    categorySection4 = await Category.findOne({
+      _id: categoryIdSection4,
       deleted: false,
       status: "active",
-      category: {
-        $in: categoryFilter(categoryList, categoryIdSection4)
+    });
+    if (categorySection4) {
+      tourListSection4 = await Tour
+        .find({
+          deleted: false,
+          status: "active",
+          category: {
+            $in: categoryFilter(categoryList, categoryIdSection4)
+          }
+        })
+        .sort({
+          position: "desc"
+        })
+        .limit(8);
+      for (const item of tourListSection4) {
+        formatTourItem(item);
       }
-    })
-    .sort({
-      position: "desc"
-    })
-    .limit(8);
-  for (const item of tourListSection4) {
-    formatTourItem(item)
+    }
   }
   // end section4
 

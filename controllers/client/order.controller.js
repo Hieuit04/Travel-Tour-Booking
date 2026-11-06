@@ -9,15 +9,42 @@ const CryptoJS = require('crypto-js'); // npm install crypto-js
 const moment = require('moment');
 const variableConfig = require('../../configs/variable.config');
 const { callbackPromise } = require('nodemailer/lib/shared');
+const { reserveStock, releaseStock, validQuantities, itemAmount, findCouponDiscount } = require('../../helpers/order.helper');
+
+// Thanh toán lỗi: quay về trang đơn hàng, nơi có nút thanh toán lại
+const orderUrl = ({ orderCode, phone }) => `/order/success?orderCode=${encodeURIComponent(orderCode)}&phone=${encodeURIComponent(phone)}`;
 
 module.exports.createPost = async (req, res) => {
+  let reservedItems = null;
   try {
+    if (!res.locals.account) {
+      return res.json({
+        code: "error",
+        message: "Vui lòng đăng nhập để đặt tour!",
+        redirect: "/account/login",
+      })
+    }
+
+    const { fullName, phone, note, paymentMethod, items, coupon } = req.body;
+    const validMethod = variableConfig.paymentMethodList.some(method => method.value === paymentMethod);
+    if (!fullName || !phone || !validMethod || !Array.isArray(items) || items.length === 0) {
+      return res.json({
+        code: "error",
+        message: "Dữ liệu không hợp lệ",
+      })
+    }
+
     // mã đơn hàng
+    let code;
     while (true) {
-      req.body.code = `OD${randomNumberString(8)}`
-      const existOrder = await Order.findOne({ code: req.body.code });
+      code = `OD${randomNumberString(8)}`
+      const existOrder = await Order.findOne({ code: code });
       if (!existOrder) break;
     }
+
+    let subTotal = 0;
+    const orderItems = [];
+    const lines = [];
     
     // Đã đăng nhập: lấy các tour được chọn từ giỏ hàng trong DB, không tin dữ liệu client
     if (res.locals.account) {
@@ -42,34 +69,77 @@ module.exports.createPost = async (req, res) => {
 
     req.body.subTotal = 0;
     // Danh sách tour 
-    for (const item of req.body.items) {
-      const tourDetail = await Tour.findOne({ _id: item.tourId });
+    for (const item of items) {
+      if (!validQuantities(item)) {
+        return res.json({
+          code: "error",
+          message: "Mỗi tour cần ít nhất 1 người lớn và số lượng hợp lệ!",
+        })
+      }
+      const tourDetail = await Tour.findOne({ _id: String(item.tourId), status: "active", deleted: false });
       if (!tourDetail) {
         return res.json({
           code: "error",
           message: "Tour không tồn tại",
         })
       }
-      item.avatar = tourDetail.avatar;
-      item.tourName = tourDetail.tourName;
-      item.slug = tourDetail.slug;
-      item.newPriceAdult = tourDetail.newPriceAdult;
-      item.newPriceChildren = tourDetail.newPriceChildren;
-      item.newPriceBaby = tourDetail.newPriceBaby;
-      item.departureDate = tourDetail.departureDate;
+      const orderItem = {
+        tourId: tourDetail.id,
+        locationForm: item.locationForm,
+        quantityAdult: item.quantityAdult,
+        quantityChildren: item.quantityChildren,
+        quantityBaby: item.quantityBaby,
+        avatar: tourDetail.avatar,
+        tourName: tourDetail.tourName,
+        slug: tourDetail.slug,
+        newPriceAdult: tourDetail.newPriceAdult,
+        newPriceChildren: tourDetail.newPriceChildren,
+        newPriceBaby: tourDetail.newPriceBaby,
+        departureDate: tourDetail.departureDate,
+      };
 
       if (item.locationForm) {
-        const city = await City.findOne({ _id: item.locationForm });
-        if (city) item.cityName = city.name;
+        const city = await City.findOne({ _id: String(item.locationForm) });
+        if (city) orderItem.cityName = city.name;
       }
 
-      req.body.subTotal += (item.newPriceAdult * item.quantityAdult) + (item.newPriceChildren * item.quantityChildren) + (item.newPriceBaby * item.quantityBaby);
+      const amount = itemAmount(item, tourDetail);
+      subTotal += amount;
+      lines.push({ tourId: tourDetail.id, amount: amount });
+      orderItems.push(orderItem);
     }
-    req.body.discount = 0;
-    req.body.total = req.body.subTotal - req.body.discount;
-    req.body.status = "initial";
-    req.body.accountId = res.locals.account ? res.locals.account.id : "";
-    const order = new Order(req.body);
+
+    const discount = await findCouponDiscount(coupon, lines);
+    if (coupon && !discount) {
+      return res.json({
+        code: "error",
+        message: "Mã giảm giá không hợp lệ hoặc không áp dụng cho tour đã chọn!",
+      })
+    }
+
+    const failedItem = await reserveStock(orderItems);
+    if (failedItem) {
+      return res.json({
+        code: "error",
+        message: `Tour "${failedItem.tourName}" không còn đủ chỗ!`,
+      })
+    }
+    reservedItems = orderItems;
+
+    const order = new Order({
+      code: code,
+      accountId: res.locals.account.id,
+      fullName: fullName,
+      phone: phone,
+      note: note,
+      items: orderItems,
+      subTotal: subTotal,
+      discount: discount,
+      total: subTotal - discount,
+      paymentMethod: paymentMethod,
+      status: "initial",
+      stockReserved: true,
+    });
     await order.save();
 
     // Xoá các tour đã đặt khỏi giỏ hàng trong DB
@@ -83,10 +153,11 @@ module.exports.createPost = async (req, res) => {
     res.json({
       code: "success",
       message: "Đặt hàng thành công",
-      orderCode: req.body.code,
+      orderCode: code,
     })
   } catch (error) {
     console.log(error);
+    if (reservedItems) await releaseStock(reservedItems).catch(console.log);
     res.json({
       code: "error",
       message: "Dữ liệu không hợp lệ",
@@ -130,11 +201,12 @@ module.exports.paymentZalopay = async (req, res) => {
     const orderDetail = await Order.findOne({
       code: orderCode,
       phone: phone,
+      status: "initial",
       deleted: false
     });
 
     if (!orderDetail) {
-      res.redirect('/');
+      res.redirect(orderUrl(req.query));
       return;
     }
 
@@ -174,11 +246,11 @@ module.exports.paymentZalopay = async (req, res) => {
     if (result.return_code == 1) {
       res.redirect(result.order_url);
     } else {
-      res.redirect('/');
+      res.redirect(orderUrl(req.query));
     }
   } catch (error) {
     console.log(error);
-    res.redirect('/');
+    res.redirect(orderUrl(req.query));
   }
 }
 
@@ -234,11 +306,12 @@ module.exports.paymentVnpay = async (req, res) => {
     const orderDetail = await Order.findOne({
       code: orderCode,
       phone: phone,
+      status: "initial",
       deleted: false
     });
 
     if (!orderDetail) {
-      res.redirect('/');
+      res.redirect(orderUrl(req.query));
       return;
     }
 
@@ -294,7 +367,7 @@ module.exports.paymentVnpay = async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    res.redirect('/');
+    res.redirect(orderUrl(req.query));
   }
 }
 
@@ -336,8 +409,8 @@ module.exports.paymentVnpayResult = async (req, res) => {
 
   if (secureHash === signed) {
     // Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
+    const [orderCode, phone] = vnp_Params['vnp_TxnRef'].split('-');
     if (vnp_Params['vnp_ResponseCode'] === '00' && vnp_Params['vnp_TransactionStatus'] === '00') {
-      const [orderCode, phone] = vnp_Params['vnp_TxnRef'].split('-');
       await Order.updateOne({
         code: orderCode,
         phone: phone,
@@ -350,7 +423,7 @@ module.exports.paymentVnpayResult = async (req, res) => {
 
       res.redirect(`${process.env.DOMAIN_WEBSITE}/order/success?orderCode=${orderCode}&phone=${phone}`);
     } else {
-      res.redirect('/');
+      res.redirect(orderUrl({ orderCode, phone }));
     }
   } else {
     res.redirect('/');

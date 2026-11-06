@@ -648,6 +648,8 @@ button {
 
 .header .inner-login .inner-icon-login {
   width: 28px;
+  height: 28px;
+  border-radius: 100%;
 }
 
 .header .inner-login .inner-icon-arrow {

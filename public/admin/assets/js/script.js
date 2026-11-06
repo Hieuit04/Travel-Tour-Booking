@@ -855,7 +855,9 @@ if (settingWebsiteInfoForm) {
       const phone = event.target.phone.value;
       const email = event.target.email.value;
       const address = event.target.address.value;
+      const titleSection4 = event.target.titleSection4 ? event.target.titleSection4.value : "";
       const categoryIdSection4 = event.target.categoryIdSection4.value;
+      const titleSection6 = event.target.titleSection6 ? event.target.titleSection6.value : "";
       const categoryIdSection6 = event.target.categoryIdSection6.value;
       const logo = filePond.logo?.getFile()?.file || null;
       const favicon = filePond.favicon?.getFile()?.file || null;
@@ -865,7 +867,9 @@ if (settingWebsiteInfoForm) {
       formData.append('phone', phone);
       formData.append('email', email);
       formData.append('address', address);
+      formData.append('titleSection4', titleSection4);
       formData.append('categoryIdSection4', categoryIdSection4);
+      formData.append('titleSection6', titleSection6);
       formData.append('categoryIdSection6', categoryIdSection6);
       if (logo) {
         formData.append('logo', logo, logo.name || 'logo.png');
@@ -1700,7 +1704,7 @@ if (priceSuggest) {
       .then(res => res.json())
       .then(data => {
         if (data.code === 'error') return showEmpty(data.message);
-        if (!data.stats) return showEmpty('Chưa có tour đối thủ nào cùng điểm đến.');
+        if (!data.stats) return showEmpty('Chưa có dữ liệu giá thị trường cho tour này.');
 
         suggested = data.suggestedPrice;
         const s = data.stats;
@@ -1709,6 +1713,10 @@ if (priceSuggest) {
           `Khoảng phổ biến: ${money(s.p25)} – ${money(s.p75)} · thấp nhất ${money(s.min)} · cao nhất ${money(s.max)}`;
         priceSuggest.querySelector('.inner-suggest-basis').textContent =
           `Tính từ ${s.count} tour ${data.basisText}${data.duration.days ? '' : ' (chưa nhập thời gian)'}.`;
+
+        const stale = priceSuggest.querySelector('.inner-suggest-stale');
+        stale.textContent = `Dữ liệu giá đã cũ: ${data.staleCount}/${s.count} tour cập nhật hơn 7 ngày trước.`;
+        stale.hidden = !data.staleCount;
 
         tbody.replaceChildren(...data.tours.map(t => {
           const tr = document.createElement('tr');
@@ -1722,6 +1730,7 @@ if (priceSuggest) {
             t.duration_days ? `${t.duration_days}N${t.duration_nights ?? ''}${t.duration_nights != null ? 'Đ' : ''}` : '—',
             [t.departure_city, t.departure_date].filter(Boolean).join(' · ') || '—',
             money(t.price_adult) + (t.original_price ? ` (gốc ${money(t.original_price)})` : ''),
+            new Date(t.scraped_at).toLocaleDateString('vi-VN'),
           ];
           cells.forEach(c => { const td = document.createElement('td'); td.append(c); tr.append(td); });
           return tr;

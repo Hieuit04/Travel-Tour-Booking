@@ -355,6 +355,7 @@ if (emailForm) {
 // End Email Form
 
 // Coupon Form
+let appliedCoupon = "";
 const couponForm = document.querySelector('#couponForm');
 if (couponForm) {
   const validator = new JustValidate('#couponForm');
@@ -366,7 +367,8 @@ if (couponForm) {
       }
     ])
     .onSuccess((event) => {
-      console.log(event.target.elements.coupon.value) //coupon là th thuộc tính name, element có thể bỏ bớt đc 
+      appliedCoupon = event.target.elements.coupon.value.trim();
+      drawCart();
     })
 }
 // End Coupon Form
@@ -424,6 +426,7 @@ if (orderForm) {
         note: note,
         paymentMethod: paymentMethod,
         items: cart,
+        coupon: appliedCoupon,
       }
       fetch('/order/create', {
         method: 'POST',
@@ -435,6 +438,11 @@ if (orderForm) {
         .then((res) => res.json())
         .then((data) => {
           if (data.code === 'error') {
+            if (data.redirect) {
+              drawNotyf('error', data.message);
+              window.location.href = data.redirect;
+              return;
+            }
             notyf.error(data.message);
           }
           if (data.code === 'success') {
@@ -600,8 +608,8 @@ if (boxTourDetail) {
     const quantityAdult = parseInt(document.querySelector(`[name="stockAdult"]`).value)
     const quantityChildren = parseInt(document.querySelector(`[name="stockChildren"]`).value)
     const quantityBaby = parseInt(document.querySelector(`[name="stockBaby"]`).value)
-    if (quantityAdult + quantityChildren + quantityBaby == 0) {
-      notyf.error("Vui lòng chọn số lượng ");
+    if (quantityAdult < 1) {
+      notyf.error("Vui lòng chọn ít nhất 1 người lớn");
       return;
     }
     const result = await cartStore.upsert({
@@ -735,7 +743,7 @@ const drawCart = () => {
                       name="quantityAdult"
                       tourId="${item.tourId}" 
                       type="number"
-                      min = "0"
+                      min = "1"
                       max = "${detail.stockAdult}"
                       inputQuantity
                     />
@@ -780,16 +788,35 @@ const drawCart = () => {
           </div>
           `
         })
-        const discount = 0
-        const total = subTotal - discount;
         const elementCartList = document.querySelector("[cart-list]");
         elementCartList.innerHTML = htmlArray.join('');
         const elementSubTotal = pageCart.querySelector("[sub-total]");
         elementSubTotal.innerHTML = subTotal.toLocaleString("vi-VN");
-        const elementDiscount = pageCart.querySelector("[discount]");
-        elementDiscount.innerHTML = discount.toLocaleString("vi-VN");
-        const elementTotal = pageCart.querySelector("[total]");
-        elementTotal.innerHTML = total.toLocaleString("vi-VN");
+        const drawDiscount = (discount) => {
+          pageCart.querySelector("[discount]").innerHTML = discount.toLocaleString("vi-VN");
+          pageCart.querySelector("[total]").innerHTML = (subTotal - discount).toLocaleString("vi-VN");
+        };
+        drawDiscount(0);
+        if (appliedCoupon) {
+          fetch("/cart/coupon", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              coupon: appliedCoupon,
+              items: data.cartDetail.filter(item => item.checked),
+            }),
+          })
+            .then(res => res.json())
+            .then(result => {
+              if (result.code === 'error') {
+                appliedCoupon = "";
+                notyf.error(result.message);
+              }
+              if (result.code === 'success') drawDiscount(result.discount);
+            })
+        }
         eventInputQuantity();
         eventRemove();
         eventCheck();

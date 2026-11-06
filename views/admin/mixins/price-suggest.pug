@@ -10,6 +10,7 @@ mixin price-suggest()
           button.inner-suggest-apply(type="button") Dùng làm giá mới
         .inner-suggest-range
         .inner-suggest-basis
+        .inner-suggest-stale(hidden)
       table.inner-suggest-table
         thead
           tr
@@ -18,4 +19,5 @@ mixin price-suggest()
             th Thời lượng
             th Khởi hành
             th Giá
+            th Cập nhật
         tbody

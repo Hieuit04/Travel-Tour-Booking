@@ -4,6 +4,7 @@ const schema = new mongoose.Schema({
   promotionName: String,
   description: String,
   discountUpTo: Number, // Số tiền giảm tối đa để hiển thị "GIẢM ĐẾN X đ" trên UI
+  couponCode: String, // Mã khách nhập ở giỏ hàng, viết hoa; giảm tối đa discountUpTo
   timeStart: Date,
   timeEnd: Date,
   status: {

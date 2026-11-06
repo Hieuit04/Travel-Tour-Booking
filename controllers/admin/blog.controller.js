@@ -1,4 +1,5 @@
 const { sendToQueue } = require('../../configs/rabbitmq.config');
+const fs = require('fs');
 const Blog = require('../../models/blog.model');
 const Tour = require('../../models/tour.model');
 const moment = require('moment');
@@ -191,11 +192,17 @@ module.exports.editPatch = async (req, res) => {
     await Blog.updateOne({ _id: blogDetail.id }, dataUpdate);
 
     if (avatarPath) {
-      await sendToQueue("media_upload_queue", {
-        model: "Blog",
-        id: blogDetail.id,
-        files: [{ field: "avatar", path: avatarPath, folder: "blogs" }],
-      });
+      // bài đã lưu ở trên, lỗi hàng đợi chỉ ảnh hưởng ảnh đại diện
+      try {
+        await sendToQueue("media_upload_queue", {
+          model: "Blog",
+          id: blogDetail.id,
+          files: [{ field: "avatar", path: avatarPath, folder: "blogs" }],
+        });
+      } catch (error) {
+        fs.unlink(avatarPath, () => {});
+        message += " Chưa cập nhật được ảnh đại diện, vui lòng tải lại ảnh sau.";
+      }
     }
 
     res.json({

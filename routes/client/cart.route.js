@@ -5,6 +5,7 @@ const cartController = require('../../controllers/client/cart.controller.js');
 router.get('/', cartController.cart);
 router.get('/count', cartController.countGet);
 router.post('/detail', cartController.detailPost);
+router.post('/coupon', cartController.couponPost);
 router.post('/add', cartController.addPost);
 router.delete('/item/:tourId', cartController.itemDelete);
 router.post('/merge', cartController.mergePost);
