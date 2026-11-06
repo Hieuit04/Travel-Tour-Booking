@@ -106,6 +106,27 @@ input, textarea, select, button {
   color: #A6A6A6;
 }
 
+.form-account .inner-group .inner-password {
+  position: relative;
+}
+
+.form-account .inner-group .inner-password .inner-control {
+  width: 100%;
+  padding-right: 45px;
+}
+
+.form-account .inner-group .inner-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #777;
+  font-size: 16px;
+}
+
 .form-account .inner-meta {
   display: flex;
   align-items: center;

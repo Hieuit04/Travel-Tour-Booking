@@ -315,3 +315,24 @@ if (resetPasswordForm) {
     });
 }
 // End validate reset password form
+
+// Toggle password visibility
+const passwordToggles = document.querySelectorAll('.inner-password-toggle');
+passwordToggles.forEach((toggle) => {
+  toggle.addEventListener('click', () => {
+    const passwordGroup = toggle.closest('.inner-password');
+    const passwordInput = passwordGroup.querySelector('input');
+    const isPassword = passwordInput.type === 'password';
+    passwordInput.type = isPassword ? 'text' : 'password';
+
+    toggle.innerHTML = isPassword
+      ? '<i class="fa-solid fa-eye-slash"></i>'
+      : '<i class="fa-solid fa-eye"></i>';
+
+    toggle.setAttribute(
+      'aria-label',
+      isPassword ? 'Ẩn mật khẩu' : 'Hiển thị mật khẩu'
+    );
+  });
+});
+// End toggle password visibility

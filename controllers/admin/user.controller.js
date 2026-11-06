@@ -133,6 +133,7 @@ module.exports.deletePatch = async (req, res) => {
     }
 
     await AccountClient.findByIdAndUpdate(id, {
+      status: "inactive",
       deleted: true,
       deletedBy: adminId,
       deletedAt: new Date(),

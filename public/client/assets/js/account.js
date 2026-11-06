@@ -351,7 +351,7 @@ async function handleGoogleCredential(response) {
 // End validate login with google
 
 // Render nút đăng nhập Google
-const googleSigninOverlay = document.querySelector('.google-signin-overlay') || document.querySelector('.google-signin');
+const googleSigninOverlay = document.querySelector('.google-signin');
 if (googleSigninOverlay) {
   const initGoogleButton = () => {
     google.accounts.id.initialize({
@@ -361,9 +361,10 @@ if (googleSigninOverlay) {
     });
     google.accounts.id.renderButton(googleSigninOverlay, {
       type: "standard",
+      text: "signin_with",
       theme: "outline",
       size: "large",
-      width: 400,
+      width: "100%",
     });
   };
   if (window.google && google.accounts && google.accounts.id) {
@@ -460,3 +461,24 @@ if (completeRegisterForm) {
     })
 }
 // End Validate register form
+
+// Toggle password visibility
+const passwordToggles = document.querySelectorAll('.inner-password-toggle');
+passwordToggles.forEach((toggle) => {
+  toggle.addEventListener('click', () => {
+    const passwordGroup = toggle.closest('.inner-password');
+    const passwordInput = passwordGroup.querySelector('input');
+    const isPassword = passwordInput.type === 'password';
+    passwordInput.type = isPassword ? 'text' : 'password';
+
+    toggle.innerHTML = isPassword
+      ? '<i class="fa-solid fa-eye-slash"></i>'
+      : '<i class="fa-solid fa-eye"></i>';
+
+    toggle.setAttribute(
+      'aria-label',
+      isPassword ? 'Ẩn mật khẩu' : 'Hiển thị mật khẩu'
+    );
+  });
+});
+// End toggle password visibility

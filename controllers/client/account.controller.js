@@ -24,8 +24,6 @@ module.exports.loginPost = async (req, res) => {
                 message: "Email không tồn tại!",
             });
         }
-        console.log("Mật khẩu nhập vào:", passWord);
-        console.log("Mật khẩu trong CSDL:", existAccount);
         const isMatchPassword = await bcrypt.compare(passWord, existAccount.passWord);
         if(!isMatchPassword){
             return res.json({

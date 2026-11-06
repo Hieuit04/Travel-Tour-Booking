@@ -26,18 +26,26 @@ block main
                 )
             .inner-group 
                 label.inner-label(for="password") Mật khẩu *
-                input(
-                type="password" 
-                id="password" 
-                name="password" 
-                placeholder="********"
-                class="inner-control"
-                )
+                .inner-password
+                    input(
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Nhập mật khẩu của bạn"
+                        autocomplete="current-password"
+                        class="inner-control"
+                    )
+                    button(
+                        type="button"
+                        class="inner-password-toggle"
+                        aria-label="Hiển thị mật khẩu"
+                    )
+                        i.fa-solid.fa-eye
             .inner-meta
                 .inner-check
-                +checkbox-30("agree", "agree")
-                label(for="agree") Tôi chấp nhận các điều khoản và điều kiện
+                    +checkbox-30("agree", "agree")
+                    label(for="agree") Tôi chấp nhận các điều khoản và điều kiện
             button.inner-button Hoàn tất đăng ký
             .inner-more
-            span Bạn đã có tài khoản? 
-            a(href=`/account/login`) Đăng nhập
+                span Bạn đã có tài khoản? 
+                a(href=`/account/login`) Đăng nhập
