@@ -2,6 +2,7 @@ const dns = require('node:dns');
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 require('dotenv').config();
+const { MEDIA_QUEUE } = require('../configs/rabbitmq.config');
 const amqp = require('amqplib');
 const mongoose = require('mongoose');
 const fs = require('fs');
@@ -46,7 +47,7 @@ const startMediaWorker = async () => {
     const rabbitUrl = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
     const connection = await amqp.connect(rabbitUrl);
     const channel = await connection.createChannel();
-    const queue = 'media_upload_queue';
+    const queue = MEDIA_QUEUE;
 
     await channel.assertQueue(queue, { durable: true });
     channel.prefetch(1); // Xử lý tuần tự từng lượt để tối ưu băng thông và RAM
@@ -61,9 +62,10 @@ const startMediaWorker = async () => {
 
       try {
         const updateData = {};
+        let hasAnyUploadSuccess = false;
 
         // 3. Xử lý tải từng mục file lên Cloudinary
-        if (files && Array.isArray(files)) {
+        if (files && Array.isArray(files) && files.length > 0) {
           for (const item of files) {
             // Trường hợp 1: Mảng nhiều ảnh (Ví dụ: images của Tour)
             if (item.isArray && Array.isArray(item.paths)) {
@@ -75,16 +77,29 @@ const startMediaWorker = async () => {
                 );
                 const results = await Promise.all(uploadPromises);
                 updateData[item.field] = results.map((r) => r.secure_url);
+                hasAnyUploadSuccess = true;
+              } else {
+                console.warn(`[Media Worker] Cảnh báo: Không tìm thấy file hợp lệ nào trên đĩa cho trường [${item.field}]! Paths:`, item.paths);
               }
             }
             // Trường hợp 2: Ảnh đơn lẻ (Ví dụ: avatar, logo, favicon)
-            else if (item.path && fs.existsSync(item.path)) {
-              console.log(`Đang tải ảnh cho trường [${item.field}] vào thư mục [${item.folder}]...`);
-              const uploadRes = await cloudinary.uploader.upload(item.path, {
-                folder: item.folder || 'general',
-              });
-              updateData[item.field] = uploadRes.secure_url;
+            else if (item.path) {
+              if (fs.existsSync(item.path)) {
+                console.log(`Đang tải ảnh cho trường [${item.field}] vào thư mục [${item.folder}]...`);
+                const uploadRes = await cloudinary.uploader.upload(item.path, {
+                  folder: item.folder || 'general',
+                });
+                updateData[item.field] = uploadRes.secure_url;
+                hasAnyUploadSuccess = true;
+              } else {
+                console.warn(`[Media Worker] Cảnh báo: File không tồn tại trên đĩa cho trường [${item.field}]: ${item.path}`);
+              }
             }
+          }
+
+          // Nếu có danh sách file cần tải nhưng không có file nào tải thành công -> Báo lỗi
+          if (!hasAnyUploadSuccess) {
+            throw new Error('Tất cả file ảnh tạm đều không tồn tại trên máy chủ này! (Có thể do chạy nhầm worker giữa local và deploy)');
           }
         }
 

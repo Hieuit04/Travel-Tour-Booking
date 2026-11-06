@@ -14,6 +14,16 @@ const initTinyMCE = (selector) => {
 initTinyMCE()
 // End Init Tiny MCE 
 
+// Hàm cuộn lên đầu trang Admin (layout admin có thanh cuộn nằm trong .content)
+const scrollToTopAdmin = () => {
+  const content = document.querySelector('.content');
+  if (content) {
+    content.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+}; 
+
 // Sider
 const sider = document.querySelector('.sider')
 if (sider) {
@@ -279,16 +289,25 @@ if (categoryCreateForm) {
           btnSubmit.disabled = false;
           btnSubmit.innerText = "Tạo mới";
           if (data.code === 'error') {
-            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
-            // drawNotyf("error", data.message); // In ra thông báo lỗi khi bị load lại trang
+            notyf.error(data.message);
           }
           if (data.code === 'success') {
-            console.log(data)
-            //notyf.success(data.message); // In ra thông báo thành công khi ko bị load lại trang
-            drawNotyf(data.code, data.message);// In ra thông báo thành công khi bị load lại trang
-            window.location.reload();
+            notyf.success(data.message);
+            event.target.reset();
+            if (filePond.avatar) {
+              filePond.avatar.removeFiles();
+            }
+            if (tinymce.get('description')) {
+              tinymce.get('description').setContent('');
+            }
+            scrollToTopAdmin();
           }
         })
+        .catch(err => {
+          btnSubmit.disabled = false;
+          btnSubmit.innerText = "Tạo mới";
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+        });
     });
 }
 // End validate category create form
@@ -306,6 +325,11 @@ if (categoryEditForm) {
     ])
 
     .onSuccess((event) => {
+      const btnSubmit = event.target.querySelector('button[type="submit"]');
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Đang cập nhật...";
+      }
       const id = event.target.elements['id'].value;
       const categoryName = event.target.categoryName.value;
       const parent = event.target.parent.value;
@@ -331,16 +355,24 @@ if (categoryEditForm) {
       })
         .then(res => res.json())
         .then(data => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
           if (data.code === 'error') {
-            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
-            // drawNotyf("error", data.message); // In ra thông báo lỗi khi bị load lại trang
+            notyf.error(data.message);
           }
           if (data.code === 'success') {
-            console.log(data)
-            notyf.success(data.message); // In ra thông báo thành công khi ko bị load lại trang
-
+            notyf.success(data.message);
           }
         })
+        .catch(err => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+        });
     });
 }
 // End validate category edit form
@@ -358,10 +390,19 @@ if (blogEditForm) {
     ])
 
     .onSuccess((event) => {
+      const btnSubmit = event.target.querySelector('button[type="submit"]');
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Đang lưu...";
+      }
       const id = event.target.elements['id'].value;
       const action = event.submitter ? event.submitter.value : 'draft';
       const content = tinymce.get('content').getContent();
       if (!tinymce.get('content').getContent({ format: 'text' }).trim()) {
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          btnSubmit.innerText = "Lưu";
+        }
         notyf.error('Tiêu đề và nội dung không được để trống!');
         return;
       }
@@ -381,6 +422,10 @@ if (blogEditForm) {
       })
         .then(res => res.json())
         .then(data => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Lưu";
+          }
           if (data.code === 'error') {
             notyf.error(data.message);
           }
@@ -389,6 +434,13 @@ if (blogEditForm) {
             window.location.href = `/${pathAdmin}/blog/list`;
           }
         })
+        .catch(err => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Lưu";
+          }
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+        });
     });
 }
 // End validate blog edit form
@@ -407,6 +459,11 @@ if (tourCreateForm) {
     ])
 
     .onSuccess((event) => {
+      const btnSubmit = event.target.querySelector('button[type="submit"]');
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Đang tạo...";
+      }
       const tourName = event.target.tourName.value;
       const category = event.target.category.value;
       const position = event.target.position.value;
@@ -481,14 +538,41 @@ if (tourCreateForm) {
       })
         .then(res => res.json())
         .then(data => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Tạo mới";
+          }
           if (data.code === 'error') {
-            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
-            // drawNotyf("error", data.message); // In ra thông báo lỗi khi bị load lại trang
+            notyf.error(data.message);
           }
           if (data.code === 'success') {
-            drawNotyf(data.code, data.message);// In ra thông báo thành công khi bị load lại trang
-            window.location.reload();
+            notyf.success(data.message);
+            // Làm sạch toàn bộ form ngay lập tức (không cần reload trang)
+            event.target.reset();
+            if (filePond.avatar) {
+              filePond.avatar.removeFiles();
+            }
+            if (filePond.images) {
+              filePond.images.removeFiles();
+            }
+            if (tinymce.get('information')) {
+              tinymce.get('information').setContent('');
+            }
+            const scheduleTextareas = document.querySelectorAll('.section-8 .inner-schedule-list [textarea-mce]');
+            scheduleTextareas.forEach(textarea => {
+              if (textarea.id && tinymce.get(textarea.id)) {
+                tinymce.get(textarea.id).setContent('');
+              }
+            });
+            scrollToTopAdmin();
           }
+        })
+        .catch(err => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Tạo mới";
+          }
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
         });
     })
 }
@@ -508,6 +592,11 @@ if (tourEditForm) {
     ])
 
     .onSuccess((event) => {
+      const btnSubmit = event.target.querySelector('button[type="submit"]');
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Đang lưu...";
+      }
       const id = event.target.elements['id'].value;
       const tourName = event.target.tourName.value;
       const category = event.target.category.value;
@@ -583,13 +672,23 @@ if (tourEditForm) {
       })
         .then(res => res.json())
         .then(data => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
           if (data.code === 'error') {
-            notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
-            // drawNotyf("error", data.message); // In ra thông báo lỗi khi bị load lại trang
+            notyf.error(data.message);
           }
           if (data.code === 'success') {
             notyf.success(data.message);
           }
+        })
+        .catch(err => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
         });
     })
 }
@@ -642,17 +741,19 @@ if (orderEditForm) {
       })
         .then(res => res.json())
         .then(data => {
+          btnSubmit.disabled = false;
+          btnSubmit.innerText = "Cập nhật";
           if (data.code == "success") {
             notyf.success(data.message);
-            setTimeout(() => {
-              window.location.reload();
-            }, 1500);
           } else {
             notyf.error(data.message);
-            btnSubmit.disabled = false;
-            btnSubmit.innerText = "Cập nhật"
           }
         })
+        .catch(err => {
+          btnSubmit.disabled = false;
+          btnSubmit.innerText = "Cập nhật";
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+        });
     })
 }
 // End validate order edit form
@@ -693,21 +794,18 @@ if (userEditForm) {
       })
         .then(res => res.json())
         .then(data => {
+          btnSubmit.disabled = false;
+          btnSubmit.innerText = "Cập nhật";
           if (data.code == "success") {
             notyf.success(data.message);
-            setTimeout(() => {
-              window.location.reload();
-            }, 1500);
           } else {
             notyf.error(data.message);
-            btnSubmit.disabled = false;
-            btnSubmit.innerText = "Cập nhật";
           }
         })
         .catch(err => {
-          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
           btnSubmit.disabled = false;
           btnSubmit.innerText = "Cập nhật";
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
         });
     });
 }
@@ -748,6 +846,11 @@ if (settingWebsiteInfoForm) {
       }
     ])
     .onSuccess((event) => {
+      const btnSubmit = event.target.querySelector('button[type="submit"]');
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Đang lưu...";
+      }
       const nameWebsite = event.target.nameWebsite.value;
       const phone = event.target.phone.value;
       const email = event.target.email.value;
@@ -777,14 +880,24 @@ if (settingWebsiteInfoForm) {
       })
         .then(res => res.json())
         .then(data => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
           if (data.code === 'error') {
             notyf.error(data.message);
           }
           if (data.code === 'success') {
-            drawNotyf(data.code, data.message);
-            window.location.reload();
+            notyf.success(data.message);
           }
         })
+        .catch(err => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+        });
     });
 }
 // End validate setting website info form
@@ -857,6 +970,11 @@ if (settingAccountAdminCreateForm) {
       }
     ])
     .onSuccess((event) => {
+      const btnSubmit = event.target.querySelector('button[type="submit"]');
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Đang tạo...";
+      }
       const fullName = event.target.fullName.value;
       const email = event.target.email.value;
       const phone = event.target.phone.value;
@@ -883,14 +1001,29 @@ if (settingAccountAdminCreateForm) {
       })
         .then(res => res.json())
         .then(data => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Tạo mới";
+          }
           if (data.code === 'error') {
             notyf.error(data.message);
           }
           if (data.code === 'success') {
-            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
-            window.location.reload();
+            notyf.success(data.message);
+            event.target.reset();
+            if (filePond.avatar) {
+              filePond.avatar.removeFiles();
+            }
+            scrollToTopAdmin();
           }
         })
+        .catch(err => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Tạo mới";
+          }
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+        });
     });
 }
 // End validate setting account admin create form
@@ -934,6 +1067,11 @@ if (settingAccountAdminEditForm) {
       },
     ])
     .onSuccess((event) => {
+      const btnSubmit = event.target.querySelector('button[type="submit"]');
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Đang lưu...";
+      }
       const id = event.target.elements['id'].value;
       const fullName = event.target.fullName.value;
       const email = event.target.email.value;
@@ -959,6 +1097,10 @@ if (settingAccountAdminEditForm) {
       })
         .then(res => res.json())
         .then(data => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
           if (data.code === 'error') {
             notyf.error(data.message);
           }
@@ -966,6 +1108,13 @@ if (settingAccountAdminEditForm) {
             notyf.success(data.message);
           }
         })
+        .catch(err => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+        });
     });
 }
 // End validate setting account admin edit form
@@ -1004,6 +1153,11 @@ if (settingAccountAdminChangePasswordForm) {
       }
     ])
     .onSuccess((event) => {
+      const btnSubmit = event.target.querySelector('button[type="submit"]');
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Đang lưu...";
+      }
       const id = event.target.elements['id'].value;
       const passWord = event.target.passWord.value;
       const dataFinal = {
@@ -1018,6 +1172,10 @@ if (settingAccountAdminChangePasswordForm) {
       })
         .then(res => res.json())
         .then(data => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
           if (data.code === 'error') {
             notyf.error(data.message);
           }
@@ -1025,6 +1183,13 @@ if (settingAccountAdminChangePasswordForm) {
             notyf.success(data.message);
           }
         })
+        .catch(err => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+        });
     });
 }
 // End validate setting account admin change password form
@@ -1068,10 +1233,13 @@ if (roleCreateForm) {
             notyf.error(data.message);
           }
           if (data.code === 'success') {
-            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
+            drawNotyf(data.code, data.message);
             window.location.reload();
           }
         })
+        .catch(err => {
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+        });
     });
 }
 // End validate setting role create form
@@ -1089,6 +1257,11 @@ if (roleEditForm) {
     ])
 
     .onSuccess((event) => {
+      const btnSubmit = event.target.querySelector('button[type="submit"]');
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Đang lưu...";
+      }
       const id = event.target.elements['id'].value;
       const roleName = event.target.roleName.value;
       const description = event.target.description.value;
@@ -1111,6 +1284,10 @@ if (roleEditForm) {
       })
         .then(res => res.json())
         .then(data => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
           if (data.code === 'error') {
             notyf.error(data.message);
           }
@@ -1118,6 +1295,13 @@ if (roleEditForm) {
             notyf.success(data.message);
           }
         })
+        .catch(err => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+        });
     });
 }
 // End validate setting role edit form
@@ -1156,6 +1340,11 @@ if (profileEditForm) {
       },
     ])
     .onSuccess((event) => {
+      const btnSubmit = event.target.querySelector('button[type="submit"]');
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Đang lưu...";
+      }
       const fullName = event.target.fullName.value;
       const email = event.target.email.value;
       const phone = event.target.phone.value;
@@ -1173,14 +1362,24 @@ if (profileEditForm) {
       })
         .then(res => res.json())
         .then(data => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
           if (data.code === 'error') {
             notyf.error(data.message);
           }
           if (data.code === 'success') {
-            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
-            window.location.reload();
+            notyf.success(data.message);
           }
         })
+        .catch(err => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cập nhật";
+          }
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+        });
     });
 }
 // End validate profile edit form
@@ -1254,8 +1453,8 @@ if (changePasswordForm) {
             notyf.error(data.message); // In ra thông báo lỗi khi ko bị load lại trang
           }
           if (data.code === 'success') {
-            drawNotyf(data.code, data.message);// In ra thông báo thành công khi bị load lại trang
-            window.location.reload();
+            notyf.success(data.message);
+            event.target.reset();
           }
         })
     });
@@ -1284,10 +1483,13 @@ if (listBtnDelete.length > 0) {
             notyf.error(data.message);
           }
           if (data.code === 'success') {
-            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
+            drawNotyf(data.code, data.message);
             window.location.reload();
           }
         })
+        .catch(err => {
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+        });
     })
   })
 }
@@ -1312,10 +1514,13 @@ if (listBtnRestore.length > 0) {
             notyf.error(data.message);
           }
           if (data.code === 'success') {
-            drawNotyf(data.code, data.message); // In ra thông báo thành công khi bị load lại trang
+            drawNotyf(data.code, data.message);
             window.location.reload();
           }
         })
+        .catch(err => {
+          notyf.error("Có lỗi xảy ra, vui lòng thử lại!");
+        });
     })
   })
 }
