@@ -220,8 +220,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const headerName = document.querySelector(".user-account .user-fullname");
         if (headerName) headerName.textContent = fullNameVal;
 
-        if (result.data && result.data.avatar) {
-          const headerAvatar = document.querySelector(".user-account .inner-icon-login");
+        // Cập nhật avatar: Nếu người dùng vừa chọn ảnh mới thì giữ nguyên ảnh xem trước
+        // (Tránh bị đè ngược lại URL ảnh cũ từ database do RabbitMQ đang tải ngầm)
+        const headerAvatar = document.querySelector(".user-account .inner-icon-login");
+        if (selectedAvatarFile && profileAvatarImg) {
+          if (headerAvatar) headerAvatar.src = profileAvatarImg.src;
+        } else if (result.data && result.data.avatar) {
           if (headerAvatar) headerAvatar.src = result.data.avatar;
           if (profileAvatarImg) profileAvatarImg.src = result.data.avatar;
         }
