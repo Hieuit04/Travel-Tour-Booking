@@ -686,7 +686,7 @@ const drawCart = () => {
   // Đã đăng nhập: server tự lấy giỏ hàng từ DB, không cần gửi dữ liệu
   const cartItems = loggedIn ? "[]" : JSON.stringify(cartStore.getLocal());
   fetch("/cart/detail", {
-    method: 'POST',
+    method: 'POST',   
     headers: {
       'Content-Type': 'application/json',
     },

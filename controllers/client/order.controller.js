@@ -25,12 +25,37 @@ module.exports.createPost = async (req, res) => {
       })
     }
 
-    const { fullName, phone, note, paymentMethod, items, coupon } = req.body;
+    const { fullName, phone, note, paymentMethod, coupon } = req.body;
     const validMethod = variableConfig.paymentMethodList.some(method => method.value === paymentMethod);
-    if (!fullName || !phone || !validMethod || !Array.isArray(items) || items.length === 0) {
+    if (!fullName || !phone || !validMethod) {
       return res.json({
         code: "error",
         message: "Dữ liệu không hợp lệ",
+      })
+    }
+
+    // Lấy các tour được chọn: nếu đã đăng nhập thì lấy từ giỏ hàng trong DB, nếu không thì lấy từ client gửi lên
+    let itemsToOrder = [];
+    if (res.locals.account) {
+      const cart = await Cart.findOne({ accountId: res.locals.account.id });
+      itemsToOrder = cart
+        ? cart.items.filter(item => item.checked).map(item => ({
+            tourId: String(item.tourId),
+            locationForm: item.locationForm ? String(item.locationForm) : "",
+            quantityAdult: item.quantityAdult || 0,
+            quantityChildren: item.quantityChildren || 0,
+            quantityBaby: item.quantityBaby || 0,
+            checked: true,
+          }))
+        : [];
+    } else if (Array.isArray(req.body.items)) {
+      itemsToOrder = req.body.items;
+    }
+
+    if (!Array.isArray(itemsToOrder) || itemsToOrder.length === 0) {
+      return res.json({
+        code: "error",
+        message: "Vui lòng chọn ít nhất 1 tour!",
       })
     }
 
@@ -45,31 +70,9 @@ module.exports.createPost = async (req, res) => {
     let subTotal = 0;
     const orderItems = [];
     const lines = [];
-    
-    // Đã đăng nhập: lấy các tour được chọn từ giỏ hàng trong DB, không tin dữ liệu client
-    if (res.locals.account) {
-      const cart = await Cart.findOne({ accountId: res.locals.account.id });
-      req.body.items = cart
-        ? cart.items.filter(item => item.checked).map(item => ({
-            tourId: String(item.tourId),
-            locationForm: item.locationForm ? String(item.locationForm) : "",
-            quantityAdult: item.quantityAdult || 0,
-            quantityChildren: item.quantityChildren || 0,
-            quantityBaby: item.quantityBaby || 0,
-            checked: true,
-          }))
-        : [];
-    }
-    if (!Array.isArray(req.body.items) || req.body.items.length === 0) {
-      return res.json({
-        code: "error",
-        message: "Vui lòng chọn ít nhất 1 tour!",
-      })
-    }
 
-    req.body.subTotal = 0;
     // Danh sách tour 
-    for (const item of items) {
+    for (const item of itemsToOrder) {
       if (!validQuantities(item)) {
         return res.json({
           code: "error",

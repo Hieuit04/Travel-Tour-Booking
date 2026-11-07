@@ -491,12 +491,12 @@ module.exports.roleCreate = (req, res) => {
   });
 };
 
+
 module.exports.roleCreatePost = async (req, res) => {
   try {
     req.body.createdBy = res.locals.account.id;
     const newRecord = new Role(req.body);
     await newRecord.save();
-
     res.json({
       code: "success",
       message: "Nhóm quyền đã được tạo thành công",
