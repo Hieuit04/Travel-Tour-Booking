@@ -38,6 +38,7 @@
   ],
   "controllers/admin/order.controller.js": [
     "configs/variable.config.js",
+    "helpers/order.helper.js",
     "helpers/permission.helper.js",
     "models/accounts-admin.model.js",
     "models/order.model.js"
@@ -87,6 +88,7 @@
     "helpers/generate.helper.js",
     "helpers/mail.helper.js",
     "models/accounts-clients.model.js",
+    "models/cart.model.js",
     "models/otp-verification.model.js"
   ],
   "controllers/client/blog.controller.js": [
@@ -94,6 +96,9 @@
     "models/tour.model.js"
   ],
   "controllers/client/cart.controller.js": [
+    "helpers/order.helper.js",
+    "helpers/validate.helper.js",
+    "models/cart.model.js",
     "models/city.model.js",
     "models/tour.model.js"
   ],
@@ -118,12 +123,15 @@
   ],
   "controllers/client/my-order.controller.js": [
     "configs/variable.config.js",
+    "helpers/order.helper.js",
     "models/city.model.js",
     "models/order.model.js"
   ],
   "controllers/client/order.controller.js": [
     "configs/variable.config.js",
     "helpers/generate.helper.js",
+    "helpers/order.helper.js",
+    "models/cart.model.js",
     "models/city.model.js",
     "models/order.model.js",
     "models/tour.model.js"
@@ -148,10 +156,16 @@
   "helpers/categoryTree.helper.js": [],
   "helpers/generate.helper.js": [],
   "helpers/mail.helper.js": [],
+  "helpers/order.helper.js": [
+    "models/order.model.js",
+    "models/promotion.model.js",
+    "models/tour.model.js"
+  ],
   "helpers/permission.helper.js": [],
   "helpers/priceSuggest.helper.js": [],
   "helpers/tour.helper.js": [],
   "helpers/upload-disk.helper.js": [],
+  "helpers/validate.helper.js": [],
   "index.js": [
     "configs/database.config.js",
     "configs/rabbitmq.config.js",
@@ -182,6 +196,7 @@
   "models/accounts-admin.model.js": [],
   "models/accounts-clients.model.js": [],
   "models/blog.model.js": [],
+  "models/cart.model.js": [],
   "models/category.model.js": [],
   "models/city.model.js": [],
   "models/competitor-price.model.js": [],
